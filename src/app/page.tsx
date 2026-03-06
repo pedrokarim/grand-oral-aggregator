@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { Suspense } from "react";
+import { EmbedLink } from "@/components/embed-link";
 import { themeStats, subjects, themeIcons } from "@/lib/data";
 import { getThemeColor } from "@/lib/theme-colors";
 import {
@@ -54,29 +55,31 @@ export default function DashboardPage() {
             const color = getThemeColor(theme);
             return (
               <li key={slug}>
-                <Link
-                  href={`/themes/${slug}`}
-                  className="flex items-center gap-3 p-3 rounded-md border border-transparent
-                    hover:border-[#D2D3CC] dark:hover:border-[#3a3b3f] hover:bg-[#E5E7E0]/30 dark:hover:bg-[#2a2b2f]/30
-                    hover:translate-y-[-1px] active:translate-y-[1px] active:scale-[.99]
-                    transition-all relative group"
-                >
-                  <div className={`rounded-md p-2 ${color.bgLight} shrink-0`}>
-                    <Icon className={`h-5 w-5 ${color.text}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-medium text-[#23251D] dark:text-[#EAECF6] truncate">
-                      {theme}
-                    </p>
-                    <p className="text-[13px] text-[#9EA096]">
-                      {count} sujet{count > 1 ? "s" : ""}
-                    </p>
-                  </div>
-                  <span className="inline-flex px-2 py-0.5 text-[12px] font-medium rounded-full bg-[#E5E7E0] dark:bg-[#2a2b2f] text-[#4D4F46] dark:text-[#9EA096]">
-                    {count}
-                  </span>
-                  <ChevronRight className="h-4 w-4 text-[#9EA096] opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Link>
+                <Suspense>
+                  <EmbedLink
+                    href={`/themes/${slug}`}
+                    className="flex items-center gap-3 p-3 rounded-md border border-transparent
+                      hover:border-[#D2D3CC] dark:hover:border-[#3a3b3f] hover:bg-[#E5E7E0]/30 dark:hover:bg-[#2a2b2f]/30
+                      hover:translate-y-[-1px] active:translate-y-[1px] active:scale-[.99]
+                      transition-all relative group"
+                  >
+                    <div className={`rounded-md p-2 ${color.bgLight} shrink-0`}>
+                      <Icon className={`h-5 w-5 ${color.text}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] font-medium text-[#23251D] dark:text-[#EAECF6] truncate">
+                        {theme}
+                      </p>
+                      <p className="text-[13px] text-[#9EA096]">
+                        {count} sujet{count > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <span className="inline-flex px-2 py-0.5 text-[12px] font-medium rounded-full bg-[#E5E7E0] dark:bg-[#2a2b2f] text-[#4D4F46] dark:text-[#9EA096]">
+                      {count}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-[#9EA096] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </EmbedLink>
+                </Suspense>
               </li>
             );
           })}

@@ -186,6 +186,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     minimizeWindow,
     updatePosition,
     updateSize,
+    updateWindowRoute,
   } = useWindowManager();
 
   const computePositions = useCallback(() => {
@@ -249,10 +250,24 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
         const title = getWindowTitle(e.data.path);
         openWindow(e.data.path, title);
       }
+      if (e.data?.type === "update-window-route" && e.data.path) {
+        // Find which iframe sent this message using e.source
+        const iframes = document.querySelectorAll<HTMLIFrameElement>("iframe[data-window-id]");
+        for (const frame of iframes) {
+          if (frame.contentWindow === e.source) {
+            const windowId = frame.getAttribute("data-window-id");
+            if (windowId) {
+              const newTitle = getWindowTitle(e.data.path);
+              updateWindowRoute(windowId, e.data.path, newTitle);
+            }
+            break;
+          }
+        }
+      }
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [computePositions]);
+  }, [computePositions, windows, updateWindowRoute]);
 
   const handlePositionChange = (label: string, pos: { x: number; y: number }) => {
     const next = { ...iconPositions, [label]: pos };
@@ -372,7 +387,8 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
                 toolbar={win.path === "/demo" ? undefined : <EditorToolbar />}
               >
                 <iframe
-                  src={`${win.path}${win.path.includes("?") ? "&" : "?"}_embed=1`}
+                  data-window-id={win.id}
+                  src={`${win.initialPath ?? win.path}${(win.initialPath ?? win.path).includes("?") ? "&" : "?"}_embed=1`}
                   className="w-full h-full border-0"
                   title={win.title}
                 />

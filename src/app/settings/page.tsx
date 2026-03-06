@@ -37,7 +37,7 @@ export default function SettingsPage() {
       const models = (data.models ?? []).map((m: { name: string }) => m.name);
       setOllamaModels(models);
       if (models.length > 0 && !models.includes(settings.ai.model)) {
-        updateSettings({ ai: { model: models[0] } });
+        updateSettings({ ai: { ...settings.ai, model: models[0] } });
       }
     } catch {
       setOllamaError("Impossible de contacter Ollama");

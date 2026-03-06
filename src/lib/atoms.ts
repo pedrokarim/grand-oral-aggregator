@@ -5,6 +5,8 @@ import { atomWithStorage } from "jotai/utils";
 export interface AppWindow {
   id: string;
   path: string;
+  /** The path used for the iframe src — never changes after creation */
+  initialPath: string;
   title: string;
   zIndex: number;
   minimized: boolean;

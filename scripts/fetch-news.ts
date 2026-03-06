@@ -1,12 +1,14 @@
 // Cron script to fetch news for all themes.
 // Usage: bun run scripts/fetch-news.ts
-// Requires NEWS_API_KEY env variable (from newsapi.org or similar).
-// Falls back to Google News RSS if no API key is set.
+// Uses Bing News RSS by default (direct article links).
+// Set NEWS_API_KEY for NewsAPI.org as alternative source.
 // Schedule with cron: 0 0/6 * * * cd /path/to/project && bun run scripts/fetch-news.ts
 
 import "dotenv/config";
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
+import { Readability } from "@mozilla/readability";
+import { parseHTML } from "linkedom";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -15,6 +17,9 @@ const prisma = new PrismaClient({ adapter });
 
 const CACHE_DIR = join(import.meta.dir, "..", "resources", "news-cache");
 mkdirSync(CACHE_DIR, { recursive: true });
+
+const BROWSER_UA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
 const themeKeywords: Record<string, string[]> = {
   "SI et environnement": ["green IT", "sobriété numérique", "datacenter énergie", "numérique responsable"],
@@ -57,19 +62,19 @@ function slugifyTitle(title: string): string {
 
 function decodeHtmlEntities(text: string): string {
   return text
-    .replace(/<!\[CDATA\[(.*?)\]\]>/g, "$1")
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&apos;/g, "'");
+    .replace(/&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n)));
 }
 
 function stripHtml(text: string): string {
   return decodeHtmlEntities(text)
     .replace(/<[^>]*>/g, "")
-    .replace(/https?:\/\/[^\s]+/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -88,109 +93,139 @@ function getFaviconUrl(url: string): string {
   return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
 }
 
-interface ArticleMetadata {
+/** Extract real URL from Bing News redirect link */
+function extractBingRealUrl(bingLink: string): string {
+  const decoded = decodeHtmlEntities(bingLink);
+  const urlParam = decoded.match(/[?&]url=([^&]+)/);
+  if (urlParam) return decodeURIComponent(urlParam[1]);
+  return decoded;
+}
+
+/** Fetch HTML from a URL with browser-like headers */
+async function fetchHtml(url: string): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": BROWSER_UA,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
+      },
+      redirect: "follow",
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("text/html") && !contentType.includes("xhtml")) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
+
+interface ScrapedContent {
   content: string;
   image: string;
 }
 
-async function fetchArticleContent(url: string): Promise<ArticleMetadata> {
+/** Extract article content and OG image using Readability */
+function extractArticle(html: string): ScrapedContent {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
+    const { document } = parseHTML(html);
 
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; GrandOralBot/1.0)",
-        Accept: "text/html",
-      },
-    });
-    clearTimeout(timeout);
-
-    if (!response.ok) return { content: "", image: "" };
-
-    const html = await response.text();
-
-    // Extract OG image
+    // OG image
     let image = "";
-    const ogImageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i)
-      ?? html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i);
-    if (ogImageMatch) {
-      image = ogImageMatch[1];
-    }
+    const ogMeta = document.querySelector('meta[property="og:image"]');
+    if (ogMeta) image = ogMeta.getAttribute("content") ?? "";
 
-    // Try to extract main article content
-    let content = "";
-    const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
-    if (articleMatch) {
-      content = articleMatch[1];
-    } else {
-      const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
-      if (mainMatch) content = mainMatch[1];
-    }
+    const reader = new Readability(document, { charThreshold: 100 });
+    const article = reader.parse();
 
-    if (!content) return { content: "", image };
+    if (!article?.textContent) return { content: "", image };
 
-    // Extract text from paragraphs
-    const paragraphs: string[] = [];
-    const pRegex = /<p[^>]*>([\s\S]*?)<\/p>/gi;
-    let pMatch;
-    while ((pMatch = pRegex.exec(content)) !== null) {
-      const text = stripHtml(pMatch[1]);
-      if (text.length > 30) paragraphs.push(text);
-    }
+    const content = article.textContent
+      .split(/\n{2,}/)
+      .map((p: string) => p.replace(/\s+/g, " ").trim())
+      .filter((p: string) => p.length > 30)
+      .slice(0, 20)
+      .join("\n\n");
 
-    return { content: paragraphs.slice(0, 15).join("\n\n"), image };
+    return { content, image };
   } catch {
     return { content: "", image: "" };
   }
 }
 
-async function fetchFromGoogleNewsRSS(query: string, theme: string): Promise<NewsArticle[]> {
-  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=fr&gl=FR&ceid=FR:fr`;
+/** Scrape article content from its URL */
+async function scrapeArticle(url: string): Promise<ScrapedContent> {
+  console.log(`    [scrape] ${url.slice(0, 80)}...`);
+  const html = await fetchHtml(url);
+  if (!html) return { content: "", image: "" };
+  return extractArticle(html);
+}
+
+/* ============================================================
+   Bing News RSS (default — gives direct article links)
+   ============================================================ */
+
+async function fetchFromBingNews(query: string, theme: string): Promise<NewsArticle[]> {
+  const url = `https://www.bing.com/news/search?q=${encodeURIComponent(query)}&format=rss&mkt=fr-FR`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { headers: { "User-Agent": BROWSER_UA } });
     const xml = await response.text();
 
     const articles: NewsArticle[] = [];
     const itemRegex = /<item>([\s\S]*?)<\/item>/g;
     let match;
 
-    while ((match = itemRegex.exec(xml)) !== null) {
+    while ((match = itemRegex.exec(xml)) !== null && articles.length < 5) {
       const item = match[1];
       const title = stripHtml(item.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? "");
-      const link = item.match(/<link>([\s\S]*?)<\/link>/)?.[1]?.trim() ?? "";
+      const rawLink = decodeHtmlEntities(item.match(/<link>([\s\S]*?)<\/link>/)?.[1]?.trim() ?? "");
       const pubDate = item.match(/<pubDate>([\s\S]*?)<\/pubDate>/)?.[1] ?? "";
-      const source = stripHtml(item.match(/<source[^>]*>([\s\S]*?)<\/source>/)?.[1] ?? "Google News");
       const rawDesc = item.match(/<description>([\s\S]*?)<\/description>/)?.[1] ?? "";
       const description = stripHtml(rawDesc).slice(0, 300);
 
-      if (title && link) {
-        const { content, image } = await fetchArticleContent(link);
-        const favicon = getFaviconUrl(link);
+      // Bing source is in <news:source> or extract from domain
+      const sourceTag = stripHtml(item.match(/<news:source>([\s\S]*?)<\/news:source>/i)?.[1] ?? "");
 
-        articles.push({
-          title,
-          description: description.length > 20 ? description : `${title} - ${source}`,
-          content,
-          url: link,
-          source,
-          publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
-          theme,
-          image: image || undefined,
-          favicon: favicon || undefined,
-          slug: slugifyTitle(title),
-        });
-      }
+      if (!title || !rawLink) continue;
+
+      // Extract real article URL from Bing redirect
+      const articleUrl = extractBingRealUrl(rawLink);
+      const source = sourceTag || extractDomain(articleUrl).replace(/^www\./, "");
+      const favicon = getFaviconUrl(articleUrl);
+
+      // Scrape the article content
+      const { content, image } = await scrapeArticle(articleUrl);
+
+      articles.push({
+        title,
+        description: description.length > 20 ? description : `${title} - ${source}`,
+        content,
+        url: articleUrl,
+        source,
+        publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        theme,
+        image: image || undefined,
+        favicon: favicon || undefined,
+        slug: slugifyTitle(title),
+      });
     }
 
-    return articles.slice(0, 5);
+    return articles;
   } catch (error) {
-    console.error(`Error fetching RSS for "${query}":`, error);
+    console.error(`Error fetching Bing News for "${query}":`, error);
     return [];
   }
 }
+
+/* ============================================================
+   NewsAPI (requires API key)
+   ============================================================ */
 
 async function fetchFromNewsAPI(query: string, theme: string, apiKey: string): Promise<NewsArticle[]> {
   const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=fr&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`;
@@ -204,7 +239,7 @@ async function fetchFromNewsAPI(query: string, theme: string, apiKey: string): P
     const articles: NewsArticle[] = [];
     for (const a of data.articles) {
       const articleUrl = a.url ?? "";
-      const { content, image } = await fetchArticleContent(articleUrl);
+      const { content, image } = await scrapeArticle(articleUrl);
       const favicon = getFaviconUrl(articleUrl);
 
       articles.push({
@@ -227,11 +262,15 @@ async function fetchFromNewsAPI(query: string, theme: string, apiKey: string): P
   }
 }
 
+/* ============================================================
+   Main
+   ============================================================ */
+
 async function main() {
   const apiKey = process.env.NEWS_API_KEY;
   const useNewsAPI = !!apiKey;
 
-  console.log(`Fetching news using ${useNewsAPI ? "NewsAPI" : "Google News RSS"}...`);
+  console.log(`Fetching news using ${useNewsAPI ? "NewsAPI" : "Bing News RSS"}...`);
 
   for (const [theme, keywords] of Object.entries(themeKeywords)) {
     console.log(`\nTheme: ${theme}`);
@@ -240,10 +279,11 @@ async function main() {
     for (const keyword of keywords) {
       const articles = useNewsAPI
         ? await fetchFromNewsAPI(keyword, theme, apiKey!)
-        : await fetchFromGoogleNewsRSS(keyword, theme);
+        : await fetchFromBingNews(keyword, theme);
 
       allArticles.push(...articles);
-      console.log(`  "${keyword}" -> ${articles.length} articles`);
+      const withContent = articles.filter((a) => a.content.length > 0).length;
+      console.log(`  "${keyword}" -> ${articles.length} articles (${withContent} with content)`);
 
       // Small delay to avoid rate limiting
       await new Promise((r) => setTimeout(r, 500));
@@ -275,7 +315,8 @@ async function main() {
       )
     );
 
-    console.log(`  -> ${allArticles.length} articles cached`);
+    const totalContent = allArticles.filter((a) => a.content.length > 0).length;
+    console.log(`  -> ${allArticles.length} articles cached (${totalContent} with content)`);
 
     // Write to PostgreSQL
     const themeRecord = await prisma.theme.findUnique({ where: { name: theme } });
@@ -307,7 +348,7 @@ async function main() {
               themeId: themeRecord.id,
             },
           });
-        } catch (e) {
+        } catch {
           // Slug collision — append theme suffix
           const suffixedSlug = `${article.slug}-${themeRecord.id}`;
           await prisma.newsArticle.upsert({

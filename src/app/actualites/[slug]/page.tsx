@@ -52,6 +52,25 @@ export default function ArticleDetailPage() {
     setSummaryError(null);
 
     try {
+      // If no content, try on-demand scraping first
+      let articleContent = article.content || "";
+      if (!articleContent && article.slug) {
+        setSummaryError(null);
+        const scrapeRes = await fetch(`/api/news/${article.slug}/scrape`, { method: "POST" });
+        const scrapeData = await scrapeRes.json();
+        if (scrapeData.content) {
+          articleContent = scrapeData.content;
+          // Update local article state so content shows in the page too
+          setArticle({ ...article, content: articleContent });
+        }
+      }
+
+      if (!articleContent) {
+        setSummaryError(
+          "Impossible d'extraire le contenu de l'article. Le résumé sera basé uniquement sur le titre."
+        );
+      }
+
       const res = await fetch("/api/ai/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,7 +78,7 @@ export default function ArticleDetailPage() {
           slug: article.slug,
           subject: article.title,
           theme: article.theme,
-          articleContent: article.content || undefined,
+          articleContent: articleContent || undefined,
           provider: settings.ai.provider,
           apiKey: settings.ai.apiKey,
           model: settings.ai.model,
@@ -72,6 +91,7 @@ export default function ArticleDetailPage() {
 
       setSummary(data.summary);
       setSummaryOpen(true);
+      setSummaryError(null);
     } catch (err) {
       setSummaryError(err instanceof Error ? err.message : "Erreur de génération");
     } finally {
@@ -212,6 +232,9 @@ export default function ArticleDetailPage() {
           {/* AI Summary loading */}
           {summaryLoading && (
             <div className="space-y-2">
+              <p className="text-[12px] text-[#9EA096] animate-pulse">
+                {!article.content ? "Extraction du contenu de l'article..." : "Génération du résumé IA..."}
+              </p>
               <div className="h-4 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
               <div className="h-4 w-5/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
               <div className="h-4 w-4/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />

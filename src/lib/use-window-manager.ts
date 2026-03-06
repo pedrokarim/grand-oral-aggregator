@@ -16,7 +16,7 @@ export function useWindowManager() {
   const openWindow = useCallback(
     (path: string, title: string) => {
       setWindows((prev) => {
-        const existing = prev.find((w) => w.path === path);
+        const existing = prev.find((w) => w.path === path || w.initialPath === path);
         if (existing) {
           // Bring to front
           const maxZ = Math.max(...prev.map((w) => w.zIndex), 0);
@@ -40,6 +40,7 @@ export function useWindowManager() {
         const newWindow: AppWindow = {
           id: `win-${nextId++}`,
           path,
+          initialPath: path,
           title,
           zIndex: maxZ + 1,
           minimized: false,
@@ -150,6 +151,17 @@ export function useWindowManager() {
     [setWindows],
   );
 
+  /** Update a window's path and title (when iframe navigates internally) */
+  const updateWindowRoute = useCallback(
+    (windowId: string, path: string, title: string) => {
+      setWindows((prev) =>
+        prev.map((w) => (w.id === windowId ? { ...w, path, title } : w)),
+      );
+      router.push(path);
+    },
+    [setWindows, router],
+  );
+
   /** Close all windows */
   const closeAllWindows = useCallback(() => {
     setWindows([]);
@@ -165,5 +177,6 @@ export function useWindowManager() {
     minimizeWindow,
     updatePosition,
     updateSize,
+    updateWindowRoute,
   };
 }

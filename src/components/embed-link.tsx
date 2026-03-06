@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { type ReactNode, useCallback } from "react";
+import { type ReactNode } from "react";
 
 /**
- * A Link that, when inside an iframe (_embed=1), tells the parent
- * desktop to open a new window instead of navigating in-place.
+ * A Link that, when inside an iframe (_embed=1), navigates in-place
+ * within the iframe (preserving _embed=1) so that the desktop layout
+ * is not duplicated inside the window.
  */
 export function EmbedLink({
   href,
@@ -22,18 +23,14 @@ export function EmbedLink({
   const searchParams = useSearchParams();
   const isEmbed = searchParams.get("_embed") === "1";
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (isEmbed && href.startsWith("/")) {
-        e.preventDefault();
-        window.parent.postMessage({ type: "open-window", path: href }, "*");
-      }
-    },
-    [isEmbed, href],
-  );
+  // In embed mode, rewrite internal hrefs to include _embed=1
+  const finalHref =
+    isEmbed && href.startsWith("/")
+      ? `${href}${href.includes("?") ? "&" : "?"}_embed=1`
+      : href;
 
   return (
-    <Link href={href} className={className} onClick={handleClick} {...props}>
+    <Link href={finalHref} className={className} {...props}>
       {children}
     </Link>
   );

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { type AppSettings, DEFAULT_SETTINGS } from "@/lib/settings";
+import { type AppSettings, type AIProviderConfig, DEFAULT_SETTINGS } from "@/lib/settings";
 
 const STORAGE_KEY = "grand-oral-settings";
 
-export function useSettings(): [AppSettings, (update: Partial<AppSettings>) => void] {
+type SettingsUpdate = Omit<Partial<AppSettings>, "ai"> & { ai?: Partial<AIProviderConfig> };
+
+export function useSettings(): [AppSettings, (update: SettingsUpdate) => void] {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
@@ -20,11 +22,12 @@ export function useSettings(): [AppSettings, (update: Partial<AppSettings>) => v
     }
   }, []);
 
-  const updateSettings = useCallback((update: Partial<AppSettings>) => {
+  const updateSettings = useCallback((update: SettingsUpdate) => {
     setSettings((prev) => {
-      const next = { ...prev, ...update };
-      if (update.ai) {
-        next.ai = { ...prev.ai, ...update.ai };
+      const { ai, ...rest } = update;
+      const next: AppSettings = { ...prev, ...rest };
+      if (ai) {
+        next.ai = { ...prev.ai, ...ai };
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       return next;
