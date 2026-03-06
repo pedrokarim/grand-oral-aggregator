@@ -2,7 +2,7 @@ import { BookOpen, Terminal, Settings, Sparkles, ExternalLink } from "lucide-rea
 
 export default function DocsPage() {
   return (
-    <div className="space-y-8 max-w-3xl mx-auto">
+    <div className="space-y-8 max-w-3xl mx-auto p-6">
       {/* Header */}
       <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] bg-[#E5E7E0]/30 dark:bg-[#2a2b2f]/30 p-6">
         <div className="flex items-center gap-4">

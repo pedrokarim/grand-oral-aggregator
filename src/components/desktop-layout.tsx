@@ -14,7 +14,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeStats } from "@/lib/data";
 import { useWindowManager } from "@/lib/use-window-manager";
 import { ActiveWindowsPanel } from "./active-windows-panel";
-import { DesktopVideoWidget } from "./desktop-video-widget";
 import { GraduationCap, Search, Bell, User } from "lucide-react";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
@@ -35,9 +34,28 @@ function getThemeIcon(theme: string): string {
   return themeIconMap[theme] ?? "/icons/doc.png";
 }
 
+/* ---- Video thumbnail icon (like PostHog's demo.mov) ---- */
+function VideoThumbIcon() {
+  return (
+    <svg viewBox="0 0 48 48" width="48" height="48" className="w-14 h-14 -my-1">
+      <rect x="2" y="10" width="44" height="28" rx="3" fill="#23251D" />
+      <rect x="4" y="12" width="40" height="24" rx="2" fill="#2F3128" />
+      <text x="24" y="22" textAnchor="middle" fill="#EB9D2A" fontSize="8" fontWeight="bold" fontFamily="monospace">DEMO</text>
+      <rect x="8" y="26" width="32" height="2" rx="1" fill="#4D4F46" />
+      <rect x="8" y="26" width="12" height="2" rx="1" fill="#EB9D2A" />
+      <path
+        d="M20.38 15.9C19.41 15.31 18.17 16.01 18.17 17.15V30.85C18.17 31.99 19.41 32.69 20.38 32.1L31.69 25.25C32.63 24.68 32.63 23.32 31.69 22.75L20.38 15.9Z"
+        fill="white"
+        opacity="0.9"
+      />
+    </svg>
+  );
+}
+
 /* ---- All desktop apps ---- */
 interface DesktopApp {
   icon: string;
+  customIcon?: boolean;
   label: string;
   href: string;
   side: "left" | "right";
@@ -48,6 +66,7 @@ function getAllApps(): DesktopApp[] {
     { icon: "/icons/doc.png", label: "home.mdx", href: "/", side: "left" },
     { icon: "/icons/folder.png", label: "Product OS", href: "/", side: "left" },
     { icon: "/icons/invite.png", label: "Actualités", href: "/actualites", side: "left" },
+    { icon: "/icons/video.png", label: "demo.mov", href: "/demo", side: "left", customIcon: true },
     ...themeStats.slice(0, 6).map(({ theme, slug }) => ({
       icon: getThemeIcon(theme),
       label: theme.length > 14 ? theme.slice(0, 13) + "…" : theme,
@@ -117,6 +136,7 @@ const routeTitles: Record<string, string> = {
   "/": "home.mdx",
   "/actualites": "actualites.mdx",
   "/settings": "settings.mdx",
+  "/demo": "Demo - Grand Oral",
 };
 
 function getWindowTitle(pathname: string): string {
@@ -319,7 +339,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
                 return (
                   <DesktopIcon
                     key={app.label}
-                    icon={<PngIcon src={app.icon} alt={app.label} />}
+                    icon={app.customIcon ? <VideoThumbIcon /> : <PngIcon src={app.icon} alt={app.label} />}
                     label={app.label}
                     href={app.href}
                     constraintsRef={desktopRef}
@@ -331,17 +351,6 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
               })}
             </motion.ul>
           </nav>
-
-          {/* Video widget — PostHog style */}
-          <div className="hidden md:block absolute inset-0 z-10 pointer-events-none">
-            <div className="pointer-events-auto">
-              <DesktopVideoWidget
-                constraintsRef={desktopRef}
-                containerWidth={desktopRef.current?.getBoundingClientRect().width ?? 1200}
-                containerHeight={desktopRef.current?.getBoundingClientRect().height ?? 800}
-              />
-            </div>
-          </div>
 
           {/* Windows — each rendered with iframe for independent content */}
           {windows
@@ -360,7 +369,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
                 onMinimize={() => minimizeWindow(win.id)}
                 onPositionChange={(pos) => updatePosition(win.id, pos)}
                 onSizeChange={(size) => updateSize(win.id, size)}
-                toolbar={<EditorToolbar />}
+                toolbar={win.path === "/demo" ? undefined : <EditorToolbar />}
               >
                 <iframe
                   src={`${win.path}${win.path.includes("?") ? "&" : "?"}_embed=1`}
@@ -377,7 +386,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
                 <span className="text-sm font-semibold text-[#23251D]">{getWindowTitle(pathname)}</span>
               </div>
               <ScrollArea className="flex-1">
-                <div className="p-6">{children}</div>
+                {children}
               </ScrollArea>
             </div>
           </div>

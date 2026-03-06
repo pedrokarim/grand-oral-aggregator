@@ -83,7 +83,7 @@ export default function ArticleDetailPage() {
 
   if (loading) {
     return (
-      <div className="space-y-4 max-w-3xl mx-auto">
+      <div className="space-y-4 max-w-3xl mx-auto p-6">
         <div className="h-8 w-48 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
         <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 space-y-4">
           <div className="h-6 w-3/4 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
@@ -100,7 +100,7 @@ export default function ArticleDetailPage() {
 
   if (error || !article) {
     return (
-      <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 text-center text-[#9EA096]">
+      <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 text-center text-[#9EA096] m-6">
         {error ?? "Article non trouvé"}
       </div>
     );
@@ -110,7 +110,7 @@ export default function ArticleDetailPage() {
   const contentParagraphs = article.content?.split("\n\n").filter(Boolean) ?? [];
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-3xl mx-auto p-6">
       {/* Back link */}
       <EmbedLink
         href="/actualites"

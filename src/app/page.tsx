@@ -14,7 +14,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       {/* Hero header */}
       <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] bg-[#E5E7E0]/30 dark:bg-[#2a2b2f]/30 p-6">
         <h1 className="text-2xl font-bold text-[#23251D] dark:text-[#EAECF6]">

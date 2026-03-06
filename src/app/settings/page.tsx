@@ -54,7 +54,7 @@ export default function SettingsPage() {
   }, [settings.ai.provider, fetchOllamaModels]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <div className="flex items-center gap-4">
         <div className="rounded-lg bg-primary/10 p-3">
           <Settings className="h-8 w-8 text-primary" />

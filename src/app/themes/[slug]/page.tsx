@@ -36,7 +36,7 @@ export default async function ThemePage({
   const color = getThemeColor(themeStat.theme);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       {/* Theme header */}
       <div className={`rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 ${color.bgLight}`}>
         <div className="flex items-center gap-4">
