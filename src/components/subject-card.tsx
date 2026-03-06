@@ -1,15 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Sparkles, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import type { ThemeColor } from "@/lib/theme-colors";
@@ -67,75 +58,70 @@ export function SubjectCard({ sujet, type, domaine, theme, color }: SubjectCardP
   const hasAIConfig = settings.ai.apiKey || settings.ai.provider === "ollama";
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen}>
-      <Card className={`border-l-4 ${color.border}`}>
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between gap-4">
-            <CardTitle className="text-base font-medium leading-snug">
-              {sujet}
-            </CardTitle>
-            <div className="flex items-center gap-2 shrink-0">
-              {hasAIConfig && (
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      generateSummary();
-                    }}
-                    disabled={loading}
-                    className="gap-1.5 text-xs"
-                  >
-                    <Sparkles className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-                    {summary ? (open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />) : "Résumé IA"}
-                  </Button>
-                </CollapsibleTrigger>
-              )}
-              <Badge variant="outline" className="text-xs">
-                {type}
-              </Badge>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex gap-2">
-            <Badge variant="secondary" className="text-xs">{domaine}</Badge>
-            <Badge className={`${color.bgLight} ${color.text} border-0 text-xs`}>
-              {theme}
-            </Badge>
-          </div>
-
-          {loading && (
-            <div className="space-y-2 pt-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-5/6" />
-              <Skeleton className="h-4 w-4/6" />
-            </div>
+    <div
+      className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] bg-[#FDFDF8] dark:bg-[#1E1F23]
+        hover:border-[#BFC1B7] dark:hover:border-[#555] hover:translate-y-[-1px] active:translate-y-[1px]
+        transition-all p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-[15px] font-medium text-[#23251D] dark:text-[#EAECF6] leading-snug">
+          {sujet}
+        </p>
+        <div className="flex items-center gap-2 shrink-0">
+          {hasAIConfig && (
+            <button
+              onClick={generateSummary}
+              disabled={loading}
+              className="inline-flex items-center gap-1 px-2 py-1 text-[12px] font-medium rounded-md
+                border border-transparent hover:border-[#D2D3CC] dark:hover:border-[#3a3b3f]
+                text-[#4D4F46] dark:text-[#9EA096] hover:bg-[#E5E7E0]/50 dark:hover:bg-[#2a2b2f]
+                transition-colors cursor-default"
+            >
+              <Sparkles className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+              {summary ? (open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />) : "Résumé IA"}
+            </button>
           )}
+          <span className="inline-flex px-2 py-0.5 text-[12px] font-medium rounded-full border border-[#D2D3CC] dark:border-[#3a3b3f] text-[#4D4F46] dark:text-[#9EA096]">
+            {type}
+          </span>
+        </div>
+      </div>
 
-          {error && (
-            <div className="flex items-center gap-2 text-sm text-destructive pt-2">
-              <AlertCircle className="h-4 w-4" />
-              {error}
-            </div>
-          )}
+      <div className="flex gap-2 mt-3">
+        <span className="inline-flex px-2 py-0.5 text-[12px] uppercase font-medium rounded-md bg-[#E5E7E0] dark:bg-[#2a2b2f] text-[#4D4F46] dark:text-[#9EA096]">
+          {domaine}
+        </span>
+        <span className={`inline-flex px-2 py-0.5 text-[12px] font-medium rounded-md ${color.bgLight} ${color.text}`}>
+          {theme}
+        </span>
+      </div>
 
-          <CollapsibleContent>
-            {summary && (
-              <div className="rounded-lg bg-muted/50 p-4 mt-2">
-                <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Résumé généré par IA</span>
-                </div>
-                <div className="prose prose-sm max-w-none dark:prose-invert whitespace-pre-wrap text-sm">
-                  {summary}
-                </div>
-              </div>
-            )}
-          </CollapsibleContent>
-        </CardContent>
-      </Card>
-    </Collapsible>
+      {loading && (
+        <div className="space-y-2 pt-3">
+          <div className="h-4 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
+          <div className="h-4 w-5/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
+          <div className="h-4 w-4/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-2 text-[13px] text-red-600 dark:text-red-400 pt-3">
+          <AlertCircle className="h-4 w-4" />
+          {error}
+        </div>
+      )}
+
+      {open && summary && (
+        <div className="rounded-md bg-[#E5E7E0]/50 dark:bg-[#2a2b2f]/50 p-4 mt-3 border border-[#D2D3CC] dark:border-[#3a3b3f]">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-4 w-4 text-[#EB9D2A]" />
+            <span className="text-[13px] font-medium text-[#23251D] dark:text-[#EAECF6]">Résumé IA</span>
+          </div>
+          <div className="text-[14px] text-[#4D4F46] dark:text-[#9EA096] leading-relaxed whitespace-pre-wrap">
+            {summary}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

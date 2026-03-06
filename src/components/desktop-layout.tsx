@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useAtom } from "jotai";
 import { DesktopWindow } from "./desktop-window";
 import { EditorToolbar } from "./editor-toolbar";
 import { DesktopIcon } from "./desktop-icon";
@@ -13,9 +12,10 @@ import { MobileDock } from "./mobile-dock";
 import { DesktopContextMenu } from "./desktop-context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeStats } from "@/lib/data";
-import { iconPositionsAtom, type IconPositions } from "@/lib/atoms";
 import { useWindowManager } from "@/lib/use-window-manager";
-import { GraduationCap, Search, Bell } from "lucide-react";
+import { ActiveWindowsPanel } from "./active-windows-panel";
+import { DesktopVideoWidget } from "./desktop-video-widget";
+import { GraduationCap, Search, Bell, User } from "lucide-react";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
 const themeIconMap: Record<string, string> = {
@@ -71,7 +71,9 @@ function getAllApps(): DesktopApp[] {
   return [...left, ...right];
 }
 
-/* ---- Position calculation ---- */
+/* ---- Position calculation (like PostHog) ---- */
+type IconPositions = Record<string, { x: number; y: number }>;
+const STORAGE_KEY = "desktop-icon-positions";
 const ICON_HEIGHT = 75;
 const PADDING_H = 4;
 const PADDING_V = 20;
@@ -129,9 +131,9 @@ function getWindowTitle(pathname: string): string {
 
 /* PostHog-style 3D orange button */
 function OSButton({ children, href }: { children: ReactNode; href?: string }) {
-  const classes = `text-[13px] font-bold text-[#FDFDF8] px-3 py-1 rounded-sm cursor-default
-    bg-[#EB9D2A] border-b-[3px] border-[#B17816] shadow-[0_2px_0_#CD8407]
-    hover:translate-y-[-1px] hover:shadow-[0_3px_0_#CD8407] active:translate-y-0 active:shadow-none
+  const classes = `text-[13px] font-bold text-[#FDFDF8] px-2.5 py-0.5 rounded-sm cursor-default
+    bg-[#EB9D2A] border-b-2 border-[#B17816] shadow-[0_1px_0_#CD8407]
+    hover:translate-y-[-1px] hover:shadow-[0_2px_0_#CD8407] active:translate-y-0 active:shadow-none
     transition-all`;
 
   if (href) {
@@ -150,7 +152,9 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   const [rendered, setRendered] = useState(false);
 
   const allApps = getAllApps();
-  const [iconPositions, setIconPositions] = useAtom(iconPositionsAtom);
+  const [iconPositions, setIconPositions] = useState<IconPositions>({});
+
+  const [activeWindowsPanelOpen, setActiveWindowsPanelOpen] = useState(false);
 
   const {
     windows,
@@ -158,10 +162,10 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     openWindow,
     bringToFront,
     closeWindow,
+    closeAllWindows,
     minimizeWindow,
     updatePosition,
     updateSize,
-    resetIcons,
   } = useWindowManager();
 
   const computePositions = useCallback(() => {
@@ -170,27 +174,76 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     return generatePositions(allApps, w, h);
   }, []);
 
+  // Load positions from localStorage on mount (like PostHog)
   useEffect(() => {
-    const allExist = allApps.every((a) => iconPositions[a.label]);
-    if (!allExist) {
-      setIconPositions(computePositions());
+    const savedPositions = localStorage.getItem(STORAGE_KEY);
+    if (savedPositions) {
+      try {
+        const parsed = JSON.parse(savedPositions);
+        const allExist = allApps.every((a) => parsed[a.label]);
+        if (allExist) {
+          setIconPositions(parsed);
+        } else {
+          setIconPositions(generateInitial());
+        }
+      } catch {
+        setIconPositions(generateInitial());
+      }
+    } else {
+      setIconPositions(generateInitial());
     }
 
-    const handleResize = () => setIconPositions(computePositions());
+    function generateInitial() {
+      const pos = computePositions();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(pos));
+      return pos;
+    }
+
+    const handleResize = () => {
+      setIconPositions(computePositions());
+    };
+
+    setTimeout(() => setRendered(true), 400);
     window.addEventListener("resize", handleResize);
-    setTimeout(() => setRendered(true), 300);
     return () => window.removeEventListener("resize", handleResize);
   }, [computePositions]);
 
-  // Auto-open a window for the current route on first load
+  // Auto-open a window for the current route on first load (only if no windows restored from storage)
+  const hasAutoOpened = useRef(false);
   useEffect(() => {
-    if (windows.length === 0) {
+    if (!hasAutoOpened.current && windows.length === 0) {
+      hasAutoOpened.current = true;
       openWindow(pathname, getWindowTitle(pathname));
     }
-  }, []);
+  }, [windows.length]);
+
+  // Listen for postMessage from iframes (e.g. reset-icons from settings)
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === "reset-icons") {
+        localStorage.removeItem(STORAGE_KEY);
+        const fresh = computePositions();
+        setIconPositions(fresh);
+      }
+      if (e.data?.type === "open-window" && e.data.path) {
+        const title = getWindowTitle(e.data.path);
+        openWindow(e.data.path, title);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [computePositions]);
 
   const handlePositionChange = (label: string, pos: { x: number; y: number }) => {
-    setIconPositions((prev) => ({ ...prev, [label]: pos }));
+    const next = { ...iconPositions, [label]: pos };
+    setIconPositions(next);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const resetIcons = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    const fresh = computePositions();
+    setIconPositions(fresh);
   };
 
   const handleIconOpen = (href: string, label: string) => {
@@ -203,12 +256,12 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       <DesktopWallpaper />
 
       {/* ===== Top header bar ===== */}
-      <header className="hidden md:flex items-center h-8 px-4 bg-[#23251D] z-50 shrink-0 select-none">
-        <Link href="/" className="flex items-center gap-1.5 mr-6">
+      <header className="hidden md:flex items-center h-8 pl-1 pr-2 bg-[#23251D] z-50 shrink-0 select-none">
+        <Link href="/" className="flex items-center gap-1.5 px-2">
           <GraduationCap className="w-4 h-4 text-[#FDFDF8]" />
           <span className="text-[13px] font-bold text-[#FDFDF8]">Grand Oral</span>
         </Link>
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center">
           {[
             { label: "Thèmes", href: "/" },
             { label: "Actualités", href: "/actualites" },
@@ -225,14 +278,28 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="flex-1" />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-0.5 py-1">
+          <OSButton>Préparer l&apos;oral</OSButton>
           <button className="p-1 text-[#9EA096] hover:text-[#FDFDF8] transition-colors cursor-default" tabIndex={-1}>
             <Search className="w-3.5 h-3.5" />
           </button>
           <button className="p-1 text-[#9EA096] hover:text-[#FDFDF8] transition-colors cursor-default" tabIndex={-1}>
             <Bell className="w-3.5 h-3.5" />
           </button>
-          <OSButton>Préparer l&apos;oral</OSButton>
+          <button
+            onClick={() => setActiveWindowsPanelOpen(!activeWindowsPanelOpen)}
+            className={`min-w-6 h-5 px-1.5 ml-0.5 inline-flex justify-center items-center rounded
+              border-[1.5px] border-t-4 transition-colors cursor-default
+              ${windows.length > 1
+                ? "bg-[#2F3128] border-[#4D4F46] text-[#FDFDF8]"
+                : "bg-[#23251D] border-[#4D4F46] text-[#9EA096]"}
+              hover:bg-[#3a3b33] hover:text-[#FDFDF8]`}
+          >
+            <span className="text-[13px] font-semibold relative -top-px">{windows.length}</span>
+          </button>
+          <button className="p-1 text-[#9EA096] hover:text-[#FDFDF8] transition-colors cursor-default" tabIndex={-1}>
+            <User className="w-3.5 h-3.5" />
+          </button>
         </div>
       </header>
 
@@ -264,6 +331,17 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
               })}
             </motion.ul>
           </nav>
+
+          {/* Video widget — PostHog style */}
+          <div className="hidden md:block absolute inset-0 z-10 pointer-events-none">
+            <div className="pointer-events-auto">
+              <DesktopVideoWidget
+                constraintsRef={desktopRef}
+                containerWidth={desktopRef.current?.getBoundingClientRect().width ?? 1200}
+                containerHeight={desktopRef.current?.getBoundingClientRect().height ?? 800}
+              />
+            </div>
+          </div>
 
           {/* Windows — each rendered with iframe for independent content */}
           {windows
@@ -308,6 +386,17 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 
       {/* Mobile dock */}
       <MobileDock />
+
+      {/* Active windows panel */}
+      <ActiveWindowsPanel
+        open={activeWindowsPanelOpen}
+        onClose={() => setActiveWindowsPanelOpen(false)}
+        windows={windows}
+        focusedWindowId={focusedWindow?.id ?? null}
+        onWindowClick={(id) => bringToFront(id)}
+        onWindowClose={(id) => closeWindow(id)}
+        onCloseAll={closeAllWindows}
+      />
     </div>
   );
 }

@@ -2,7 +2,8 @@
 
 import { type ReactNode, useState, useRef, useCallback } from "react";
 import { motion, useDragControls } from "framer-motion";
-import { FileText, ChevronDown, Minus, Square, X, Maximize2, Minimize2 } from "lucide-react";
+import { FileText, ChevronDown, Minus, Square, X, Maximize2, Minimize2, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { ContextMenu, Tooltip } from "radix-ui";
 
 interface DesktopWindowProps {
   id: string;
@@ -23,6 +24,7 @@ interface DesktopWindowProps {
 
 const MIN_WIDTH = 400;
 const MIN_HEIGHT = 300;
+const HEADER_HEIGHT = 32;
 
 export function DesktopWindow({
   title,
@@ -59,23 +61,44 @@ export function DesktopWindow({
     edge: string;
   } | null>(null);
 
+  const expandWindow = useCallback(() => {
+    if (isMaximized) return;
+    setPreMaxState({ position, size });
+    const vw = window.innerWidth;
+    const vh = window.innerHeight - HEADER_HEIGHT;
+    onPositionChange({ x: 0, y: 0 });
+    onSizeChange({ width: vw, height: vh });
+    setIsMaximized(true);
+  }, [isMaximized, position, size, onPositionChange, onSizeChange]);
+
+  const collapseWindow = useCallback(() => {
+    if (!isMaximized || !preMaxState) return;
+    onPositionChange(preMaxState.position);
+    onSizeChange(preMaxState.size);
+    setIsMaximized(false);
+    setPreMaxState(null);
+  }, [isMaximized, preMaxState, onPositionChange, onSizeChange]);
+
   const handleDoubleClickTitleBar = useCallback(() => {
-    if (isMaximized && preMaxState) {
-      // Restore
-      onPositionChange(preMaxState.position);
-      onSizeChange(preMaxState.size);
-      setIsMaximized(false);
-      setPreMaxState(null);
+    if (isMaximized) {
+      collapseWindow();
     } else {
-      // Maximize
-      setPreMaxState({ position, size });
-      onPositionChange({ x: 0, y: 0 });
-      const vw = window.innerWidth;
-      const vh = window.innerHeight - 32; // header height
-      onSizeChange({ width: vw, height: vh });
-      setIsMaximized(true);
+      expandWindow();
     }
-  }, [isMaximized, preMaxState, position, size, onPositionChange, onSizeChange]);
+  }, [isMaximized, collapseWindow, expandWindow]);
+
+  const handleSnapToSide = useCallback(
+    (side: "left" | "right") => {
+      setPreMaxState({ position, size });
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - HEADER_HEIGHT;
+      const halfW = Math.floor(vw / 2);
+      onSizeChange({ width: halfW, height: vh });
+      onPositionChange({ x: side === "left" ? 0 : halfW, y: 0 });
+      setIsMaximized(true);
+    },
+    [position, size, onPositionChange, onSizeChange],
+  );
 
   const handleDragEnd = useCallback(
     (_: unknown, info: { offset: { x: number; y: number } }) => {
@@ -145,11 +168,11 @@ export function DesktopWindow({
 
   return (
     <>
-      <div ref={constraintsRef} className="fixed inset-0 pointer-events-none" style={{ top: 32 }} />
+      <div ref={constraintsRef} className="fixed inset-0 pointer-events-none" style={{ top: HEADER_HEIGHT }} />
 
       <motion.div
         ref={windowRef}
-        className={`absolute flex flex-col rounded-lg border border-[#BFC1B7] bg-[#FDFDF8] dark:bg-[#1E1F23] dark:border-[#3a3b3f] overflow-hidden
+        className={`absolute flex flex-col rounded-lg border border-[#BFC1B7] dark:border-[#3a3b3f] overflow-hidden
           ${isDragging ? "shadow-[0_25px_60px_rgba(0,0,0,0.3)]" : "shadow-2xl"}
           ${!isFocused ? "opacity-95" : ""}
           ${className ?? ""}`}
@@ -176,6 +199,10 @@ export function DesktopWindow({
           isMaximized={isMaximized}
           onClose={onClose}
           onMinimize={onMinimize}
+          onExpandWindow={expandWindow}
+          onCollapseWindow={collapseWindow}
+          onSnapToSide={handleSnapToSide}
+          windowWidth={size.width}
         />
         {toolbar && <div className="shrink-0">{toolbar}</div>}
         <div className="flex-1 overflow-y-auto bg-[#FDFDF8] dark:bg-[#1E1F23]">{children}</div>
@@ -195,6 +222,15 @@ export function DesktopWindow({
   );
 }
 
+/* ---- Keyboard shortcut badge ---- */
+function KBD({ children }: { children: ReactNode }) {
+  return (
+    <kbd className="inline-flex items-center justify-center min-w-[20px] h-[18px] px-1 rounded border border-[#BFC1B7] dark:border-[#3a3b3f] bg-[#E5E7E0] dark:bg-[#2a2b2f] text-[10px] font-mono text-[#4D4F46] dark:text-[#9EA096]">
+      {children}
+    </kbd>
+  );
+}
+
 /* ---- Sub-components ---- */
 
 function WindowTitleBar({
@@ -204,6 +240,10 @@ function WindowTitleBar({
   isMaximized,
   onClose,
   onMinimize,
+  onExpandWindow,
+  onCollapseWindow,
+  onSnapToSide,
+  windowWidth,
 }: {
   title: string;
   onPointerDown: (e: React.PointerEvent) => void;
@@ -211,10 +251,18 @@ function WindowTitleBar({
   isMaximized: boolean;
   onClose: () => void;
   onMinimize: () => void;
+  onExpandWindow: () => void;
+  onCollapseWindow: () => void;
+  onSnapToSide: (side: "left" | "right") => void;
+  windowWidth: number;
 }) {
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+
+  const isFullWidth = typeof window !== "undefined" && windowWidth >= window.innerWidth;
+
   return (
     <div
-      className="flex items-center h-9 px-1.5 pr-0.5 bg-[#E5E7E0] dark:bg-[#2a2b2f] border-b border-[#BFC1B7] dark:border-[#3a3b3f] shrink-0 select-none relative cursor-grab active:cursor-grabbing"
+      className="flex items-center h-9 px-1.5 pr-0.5 bg-[#E5E7E0]/50 backdrop-blur-xl dark:bg-[#2a2b2f]/50 border-b border-[#BFC1B7] dark:border-[#3a3b3f] shrink-0 select-none relative cursor-grab active:cursor-grabbing"
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
     >
@@ -233,6 +281,7 @@ function WindowTitleBar({
       <div className="flex-1" />
       {/* Right: window controls */}
       <div className="flex items-center z-10">
+        {/* Minimize */}
         <button
           className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default"
           tabIndex={-1}
@@ -243,21 +292,96 @@ function WindowTitleBar({
         >
           <Minus className="w-4 h-4 relative top-[1px]" />
         </button>
-        <button
-          className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default group"
-          tabIndex={-1}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            onDoubleClick();
-          }}
-        >
-          <Square className="w-[18px] h-[18px] group-hover:hidden" />
-          {isMaximized ? (
-            <Minimize2 className="w-5 h-5 hidden group-hover:block" />
-          ) : (
-            <Maximize2 className="w-5 h-5 hidden group-hover:block" />
-          )}
-        </button>
+
+        {/* Maximize / Restore — with right-click context menu */}
+        <ContextMenu.Root onOpenChange={() => setTooltipVisible(false)}>
+          <Tooltip.Provider delayDuration={400}>
+            <Tooltip.Root open={tooltipVisible} onOpenChange={setTooltipVisible}>
+              <Tooltip.Trigger asChild>
+                <ContextMenu.Trigger asChild>
+                  <button
+                    className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] data-[state=open]:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default group"
+                    tabIndex={-1}
+                    onPointerDown={(e) => {
+                      if (e.button === 0) {
+                        e.stopPropagation();
+                        setTooltipVisible(false);
+                        if (isFullWidth) {
+                          onCollapseWindow();
+                        } else {
+                          onExpandWindow();
+                        }
+                      }
+                    }}
+                  >
+                    <Square className="w-[18px] h-[18px] group-hover:hidden" />
+                    {isMaximized ? (
+                      <Minimize2 className="w-5 h-5 hidden group-hover:block" />
+                    ) : (
+                      <Maximize2 className="w-5 h-5 hidden group-hover:block" />
+                    )}
+                  </button>
+                </ContextMenu.Trigger>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  side="bottom"
+                  sideOffset={6}
+                  className="px-2 py-1 rounded bg-[#23251D] text-[#FDFDF8] text-[11px] whitespace-nowrap shadow-lg z-[9999]"
+                >
+                  Right click for more options
+                  <Tooltip.Arrow className="fill-[#23251D]" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+          <ContextMenu.Portal>
+            <ContextMenu.Content
+              className="min-w-[220px] rounded-md bg-white dark:bg-[#1E1F23] p-1 shadow-xl border border-[#BFC1B7] dark:border-[#3a3b3f] z-[9999]"
+            >
+              <ContextMenu.Label className="px-2.5 text-[13px] leading-[25px] text-[#9EA096]">
+                Snap to...
+              </ContextMenu.Label>
+              <ContextMenu.Item
+                className="group relative flex h-[25px] select-none items-center rounded px-2.5 text-sm leading-none text-[#23251D] dark:text-[#EAECF6] outline-none data-[highlighted]:bg-[#E5E7E0] dark:data-[highlighted]:bg-[#2a2b2f] cursor-default"
+                onClick={() => onSnapToSide("left")}
+              >
+                Left half
+                <div className="ml-auto pl-5 flex items-center gap-0.5 text-[#9EA096]">
+                  <KBD>Shift</KBD>
+                  <KBD><ArrowLeft className="w-3 h-3" /></KBD>
+                </div>
+              </ContextMenu.Item>
+              <ContextMenu.Item
+                className="group relative flex h-[25px] select-none items-center rounded px-2.5 text-sm leading-none text-[#23251D] dark:text-[#EAECF6] outline-none data-[highlighted]:bg-[#E5E7E0] dark:data-[highlighted]:bg-[#2a2b2f] cursor-default"
+                onClick={() => onSnapToSide("right")}
+              >
+                Right half
+                <div className="ml-auto pl-5 flex items-center gap-0.5 text-[#9EA096]">
+                  <KBD>Shift</KBD>
+                  <KBD><ArrowRight className="w-3 h-3" /></KBD>
+                </div>
+              </ContextMenu.Item>
+              <ContextMenu.Separator className="m-[5px] h-px bg-[#BFC1B7] dark:bg-[#3a3b3f]" />
+              <ContextMenu.Label className="px-2.5 text-[13px] leading-[25px] text-[#9EA096]">
+                Resize
+              </ContextMenu.Label>
+              <ContextMenu.Item
+                disabled={isFullWidth}
+                className="group relative flex h-[25px] select-none items-center rounded px-2.5 text-sm leading-none text-[#23251D] dark:text-[#EAECF6] outline-none data-[highlighted]:bg-[#E5E7E0] dark:data-[highlighted]:bg-[#2a2b2f] data-[disabled]:text-[#9EA096] data-[disabled]:pointer-events-none cursor-default"
+                onClick={onExpandWindow}
+              >
+                Maximize
+                <div className="ml-auto pl-5 flex items-center gap-0.5 text-[#9EA096]">
+                  <KBD>Shift</KBD>
+                  <KBD><ArrowUp className="w-3 h-3" /></KBD>
+                </div>
+              </ContextMenu.Item>
+            </ContextMenu.Content>
+          </ContextMenu.Portal>
+        </ContextMenu.Root>
+
+        {/* Close */}
         <button
           className="inline-flex items-center justify-center px-1.5 py-1 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default"
           tabIndex={-1}

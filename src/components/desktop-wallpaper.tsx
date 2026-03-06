@@ -21,6 +21,15 @@ export function DesktopWallpaper() {
           backgroundRepeat: "repeat",
         }}
       />
+      {/* Iconic illustration */}
+      <div className="absolute bottom-4 right-4 md:bottom-12 md:right-12 select-none pointer-events-none">
+        <img
+          src="/wallpaper/iconic-background.png"
+          alt=""
+          className="w-[250px] md:w-[450px] h-auto opacity-90"
+          draggable={false}
+        />
+      </div>
     </div>
   );
 }

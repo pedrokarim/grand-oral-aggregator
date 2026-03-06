@@ -1,7 +1,7 @@
 import type { AIProviderConfig } from "./settings";
 
-const SYSTEM_PROMPT = `Tu es un assistant spécialisé dans la préparation au Grand Oral du BTS SIO (option SISR/SLAM).
-Génère un résumé structuré du sujet proposé pour aider un étudiant à préparer son oral de 15 minutes.
+const SUBJECT_SYSTEM_PROMPT = `Tu es un assistant spécialisé dans la préparation au Grand Oral de dernière année de Master en informatique.
+Génère un résumé structuré du sujet proposé pour aider un étudiant à préparer sa soutenance orale.
 
 Structure ta réponse ainsi :
 1. **Contexte** : Présente le sujet et son importance dans le domaine IT
@@ -10,32 +10,47 @@ Structure ta réponse ainsi :
 4. **Contre-arguments** : Points de vue opposés à considérer
 5. **Conclusion** : Synthèse et ouverture possible
 
-Sois concis, professionnel et utilise des exemples récents et pertinents.`;
+Sois concis, professionnel et utilise des exemples récents et pertinents. Adopte un niveau d'analyse adapté au Master.`;
+
+const ARTICLE_SYSTEM_PROMPT = `Tu es un assistant spécialisé dans la préparation au Grand Oral de dernière année de Master en informatique.
+Résume cet article d'actualité de manière structurée pour aider un étudiant à l'utiliser dans sa préparation.
+
+Structure ta réponse ainsi :
+1. **Résumé** : Synthèse de l'article en quelques phrases
+2. **Points clés** : Les informations essentielles à retenir
+3. **Analyse** : Ton analyse critique de l'article
+4. **Pertinence Grand Oral** : Comment cet article peut être utilisé dans le cadre du Grand Oral Master
+
+Sois concis, professionnel et mets en avant la pertinence pour un étudiant en Master informatique.`;
 
 export async function generateSummary(
   config: AIProviderConfig,
   subject: string,
-  theme: string
+  theme: string,
+  articleContent?: string
 ): Promise<string> {
-  const userPrompt = `Thème : ${theme}\nSujet : ${subject}`;
+  const sysPrompt = articleContent ? ARTICLE_SYSTEM_PROMPT : SUBJECT_SYSTEM_PROMPT;
+  const userPrompt = articleContent
+    ? `Thème : ${theme}\nArticle : ${subject}\n\nContenu :\n${articleContent.slice(0, 3000)}`
+    : `Thème : ${theme}\nSujet : ${subject}`;
 
   switch (config.provider) {
     case "openai":
-      return callOpenAI(config, userPrompt);
+      return callOpenAI(config, sysPrompt, userPrompt);
     case "anthropic":
-      return callAnthropic(config, userPrompt);
+      return callAnthropic(config, sysPrompt, userPrompt);
     case "google":
-      return callGemini(config, userPrompt);
+      return callGemini(config, sysPrompt, userPrompt);
     case "mistral":
-      return callMistral(config, userPrompt);
+      return callMistral(config, sysPrompt, userPrompt);
     case "ollama":
-      return callOllama(config, userPrompt);
+      return callOllama(config, sysPrompt, userPrompt);
     default:
       throw new Error(`Provider inconnu: ${config.provider}`);
   }
 }
 
-async function callOpenAI(config: AIProviderConfig, prompt: string): Promise<string> {
+async function callOpenAI(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -45,7 +60,7 @@ async function callOpenAI(config: AIProviderConfig, prompt: string): Promise<str
     body: JSON.stringify({
       model: config.model,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
       max_tokens: 2000,
@@ -56,7 +71,7 @@ async function callOpenAI(config: AIProviderConfig, prompt: string): Promise<str
   return data.choices[0].message.content;
 }
 
-async function callAnthropic(config: AIProviderConfig, prompt: string): Promise<string> {
+async function callAnthropic(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -68,7 +83,7 @@ async function callAnthropic(config: AIProviderConfig, prompt: string): Promise<
     body: JSON.stringify({
       model: config.model,
       max_tokens: 2000,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -77,13 +92,13 @@ async function callAnthropic(config: AIProviderConfig, prompt: string): Promise<
   return data.content[0].text;
 }
 
-async function callGemini(config: AIProviderConfig, prompt: string): Promise<string> {
+async function callGemini(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${config.apiKey}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: `${SYSTEM_PROMPT}\n\n${prompt}` }] }],
+      contents: [{ parts: [{ text: `${systemPrompt}\n\n${prompt}` }] }],
       generationConfig: { maxOutputTokens: 2000 },
     }),
   });
@@ -92,7 +107,7 @@ async function callGemini(config: AIProviderConfig, prompt: string): Promise<str
   return data.candidates[0].content.parts[0].text;
 }
 
-async function callMistral(config: AIProviderConfig, prompt: string): Promise<string> {
+async function callMistral(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
   const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -102,7 +117,7 @@ async function callMistral(config: AIProviderConfig, prompt: string): Promise<st
     body: JSON.stringify({
       model: config.model,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
       max_tokens: 2000,
@@ -113,7 +128,7 @@ async function callMistral(config: AIProviderConfig, prompt: string): Promise<st
   return data.choices[0].message.content;
 }
 
-async function callOllama(config: AIProviderConfig, prompt: string): Promise<string> {
+async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
   const baseUrl = config.baseUrl || "http://localhost:11434";
   const res = await fetch(`${baseUrl}/api/chat`, {
     method: "POST",
@@ -121,7 +136,7 @@ async function callOllama(config: AIProviderConfig, prompt: string): Promise<str
     body: JSON.stringify({
       model: config.model,
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
       ],
       stream: false,

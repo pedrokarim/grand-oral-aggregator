@@ -1,85 +1,125 @@
 {
   "articles": [
     {
-      "title": "La plateforme des Cours d'Adultes de la Ville de Paris a été victime d'une cyberattaque accompagnée d'une fuite de données, dont l’ampleur reste encore à définir - BFM",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMi0wJBVV95cUxNSUNwSE1QRjNDUUdWcmdaUlM0TTBSb2R3RXE0X0VtazgweHhtM1NiVDZtcGhYQ201WGs5M3ZQTFhDY20xSGdhZGZhMkxIdlJtZE1TQVVCckVuZW04ZEppZWVqRXVnWjVKemQ5MGVHazRBSmwtSk42MXVNdmMzVzhEU1B1amF0NVE3aEZFOW5URVQ1LVlGcVpfSHlOYXFBU2EwZVlwV0dwWS10VkNiTURoV3BjVDF3YVM",
-      "url": "https://news.google.com/rss/articles/CBMi0wJBVV95cUxNSUNwSE1QRjNDUUdWcmdaUlM0TTBSb2R3RXE0X0VtazgweHhtM1NiVDZtcGhYQ201WGs5M3ZQTFhDY20xSGdhZGZhMkxIdlJtZE1TQVVCckVuZW04ZEppZWVqRXVnWjVKemQ5MGVHazRBSmwtSk42MXVNdmMzVzhEU1B1amF0NVE3aEZFOW5URVQ1LVlGcVpfSHlOYXFBU2EwZVlwV0dwWS10VkNiTURoV3BjVDF3YVM2SEhydVVsSGZFc3R3R1Z2SFNDR2NHMVZ5OVZ4dVpPT2pZVE9uUVBuY0hIbURYbTVudzRXZmEtRnRjLUtqV0hWbzg2OUZacy1vc2gwVFA2VmxTZDBCY0tqTG9ocUZsd1FCdGoxOE04ZFV3TmxDcVhnVU1ELWtFVUdDdTJMS3pqcDR2ZFFFNEJPME12aGtUMk9IMXR0V3NIdEdSZFk?oc=5",
+      "title": "Fragilisée par les coupes budgétaires et les départs imposés par l’administration Trump, la cybersécurité américaine court le risque de ne pas être prête pour une cyberguerre avec l’Iran - BFM",
+      "description": "Fragilisée par les coupes budgétaires et les départs imposés par l’administration Trump, la cybersécurité américaine court le risque de ne pas être prête pour une cyberguerre avec l’Iran&nbsp;&nbsp;BFM",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMi5gJBVV95cUxPM2tWZERMaHljemVXcXhhNkVoWVVjZHZ5d2JHRGp6RjdQSmJhOFNlLTdjcHhuWTRiRlQtU21PSzlFeFNUaXB6RDJnSVQ2eUFkc2t3ckc3bnBpRnpDTkpBbEN6c05HLUhYeGhXR0R1OGhhMWM4WkR4SnY3TVJ4VkRWWVFmSTV5aDRfcmkzQW9OMkVpRm9KYTRTV1ExUVozcnUtTTUtdGxXSEJtTE50TUtOMDRfdTlCMmVLRUVfWjJqZTd6ZktsWGNNN2RhdGhkZm4zTmxMSlVaMUdtNFpVUVNQM0liS18ya05zaTdNcm9QaDE3NmQtTDlyX0RqNllwOWxrQ2RVc2lHWWRLUnZWeTlncGE2eGxPeEZtQ3FqRTVhdU9QaFNvaHF0dlBKbEEtOUMxXzd1N1pRdEFOWjNVUElQTHIxajNQR2ZwckExV3BhZ3pwelBhb21VTlBqQS00cmNMVjlYS1d3?oc=5",
       "source": "BFM",
-      "publishedAt": "2026-03-05T17:38:53.000Z",
-      "theme": "Cybersecurité"
+      "publishedAt": "2026-03-06T15:15:18.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "fragilisee-par-les-coupes-budgetaires-et-les-departs-imposes-par-l-administratio"
     },
     {
-      "title": "Cybersécurité : Clap de fin pour LeakBase, plaque tournante des données volées - Journal du Coin",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMickFVX3lxTE81enRRamZ2WmxhQ2NraUZXVG5VN0F2ZFdnZGV2S3l5REszU0Ixd3ZQYTBSd2JnT25HWHEwRzQ0b2J6NVN3R2IycFhvQl9Bc0M2UTZsM29YZG5wWDFEcmswWUQ2RFZwZnViUnZRMDR0dkJEZw?oc=5\" target=\"_blank\"&gt;Cybersécurité : Clap de fin pour LeakBase, plaque tournante des don",
-      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE81enRRamZ2WmxhQ2NraUZXVG5VN0F2ZFdnZGV2S3l5REszU0Ixd3ZQYTBSd2JnT25HWHEwRzQ0b2J6NVN3R2IycFhvQl9Bc0M2UTZsM29YZG5wWDFEcmswWUQ2RFZwZnViUnZRMDR0dkJEZw?oc=5",
-      "source": "Journal du Coin",
-      "publishedAt": "2026-03-05T16:00:00.000Z",
-      "theme": "Cybersecurité"
+      "title": "Les données de 10 millions de personnes auraient fuité lors de la cyberattaque sur les transports londoniens en 2024 - Ouest-France",
+      "description": "Les données de 10 millions de personnes auraient fuité lors de la cyberattaque sur les transports londoniens en 2024&nbsp;&nbsp;Ouest-France",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMipwJBVV95cUxPNTNEWU00NkJDZ0FTMU9RN2owdzNvZ19HN3dzUXV6ZjhtelM3MUo5Mm8zbXFScUllU3hpWGl3cnRkQ0lxTHpUSW1NcXhhWFpabWk4Wk1XNWNCcWlOMUhQSkkwRUQxaFRYX1ZWQzF6RERQQUNxR3FHMUZZOGdzbjRocnBRZ1RFNDRjamZQUE9XTnRVN2NKNkF3TEdGSGVpdUVGUXR2QklqMmlGUEZlRjhKV1JVemJrUGpqWnhXNUhYQnB2ZU1pYUhuMlhGRnZPSVY3cV8wLXVzdkdxbzVwYWwwSm95WWJGVVdCVzNVTEx3TmpCaUc0TVZrQXlsa3Z2VjFuUG82Qk1BTERCQlFmNnllVEZFekExM3FPU3RiaGcweWdvT0RrRnRB?oc=5",
+      "source": "Ouest-France",
+      "publishedAt": "2026-03-06T14:40:47.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "les-donnees-de-10-millions-de-personnes-auraient-fuite-lors-de-la-cyberattaque-s"
+    },
+    {
+      "title": "Dix millions de personnes affectées par une cyberattaque sur les transports londoniens - RTBF",
+      "description": "Dix millions de personnes affectées par une cyberattaque sur les transports londoniens&nbsp;&nbsp;RTBF",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxNakhzMXBKMFdyYmU0anZlWFRjcWJfZW9ObjdsSGR0OFhjMktkeGNIYnE3b1VBNmRWYllqeWQ5TUNhS3hROUVBaEFubzJCNGVYVGdkRXNpZDQySlc2UFI5Qm9IZ2dCbzZRZVhrTlRfem5QeUNyenlCNTRZMEdLUUVPZ09INlA3MHFQcmlfRms3R3NXZkRVTVZMVThIOHJEc2F2TjNmd1NSZXdOZ0c3SHVkTEMwS0RGVkRZeUl1ZGJaeE8?oc=5",
+      "source": "RTBF",
+      "publishedAt": "2026-03-06T12:51:46.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "dix-millions-de-personnes-affectees-par-une-cyberattaque-sur-les-transports-lond"
+    },
+    {
+      "title": "Une cyberattaque sur les transports londoniens a fait fuiter les données de dix millions de personnes, assure la BBC - Le Figaro",
+      "description": "Une cyberattaque sur les transports londoniens a fait fuiter les données de dix millions de personnes, assure la BBC&nbsp;&nbsp;Le Figaro",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxOZGROM2s0Y0dtR3Y4TDdrRjBtRGRLQld2djBNbGFtTDBTdlZFa3ZLZ2tNUUhfbElNbFloQTJBZWVXYVZVQlYxRUI0aVlfdER5S3ZnY3k4ZHR3ZThVaUQtaU9EOURVVTBUVXRXV01xTU9xRkJLRE80c2dmeUo4clAxY2RDcTJZNG9qdmV0YThqY1ZnaHZoUkJGenE5X0NfR2ZJUHZWdkFDNlAyc01mNlk4c1hkX1NPUElzbXk2TGhfN0RLU1RUbWZtMm5rMXlMUm81VGhYSTBWM3N3c2RKS0gzYzBVTFdKMHJSZlk4VEN4bDFGRHcxQmJEZXhB?oc=5",
+      "source": "Le Figaro",
+      "publishedAt": "2026-03-06T12:27:45.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "une-cyberattaque-sur-les-transports-londoniens-a-fait-fuiter-les-donnees-de-dix-"
+    },
+    {
+      "title": "Cybersécurité du secteur public : l'urgence est déjà là - journaldunet.com",
+      "description": "Cybersécurité du secteur public : l'urgence est déjà là&nbsp;&nbsp;journaldunet.com",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPX1dnSTIzaWt3ZGtsaVVCSDR0MlJrdjNFZk14V0J4SUIwR1kyREJjTzBNY2c1aGxtUFhWQ1VFVURIdS1YQXZteDB4NHVEcUVudGt2NG4xelZvUjFGTzFmZm1RNVBwYzdpQXJ0U1N1TG9vZF9sTEhrMzV6dWM5VGtBMVNhQjYzZVhLNl9pM1Bscm8yVzFrZXpyUDN3dUFmakJPVWRJZFIzdzU?oc=5",
+      "source": "journaldunet.com",
+      "publishedAt": "2026-03-06T10:42:38.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "cybersecurite-du-secteur-public-l-urgence-est-deja-la-journaldunet-com"
+    },
+    {
+      "title": "Ransomwares : pourquoi la menace revient plus forte que jamais - journaldunet.com",
+      "description": "Ransomwares : pourquoi la menace revient plus forte que jamais&nbsp;&nbsp;journaldunet.com",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQR3BVYm0yNTFua05fb0RFSDR6a2hNT2xERnFDZVdtN1hoUGFUTzFzaGVwYjJyNzVQakpkNlJ2Um83Z2xBNUpQNUNOV3kyQUgweERHb01odXc2QWU5TF9ud0ZZLW0xUWc2clUyWXczYzRLQzFmR1kxYURRb3VKdGNnVXJTMHBsOUJxUHRKYml4ZHEtakI1Q1RiWklqR0tfVmI0SkVKU2U0UWZ3TEpQdG5QcHZ3?oc=5",
+      "source": "journaldunet.com",
+      "publishedAt": "2026-03-06T10:39:00.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "ransomwares-pourquoi-la-menace-revient-plus-forte-que-jamais-journaldunet-com"
     },
     {
       "title": "Zero-day : l’entreprise devient la cible prioritaire des cyberattaques - Solutions-Numeriques",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiqAFBVV95cUxPcGJ6VngwUVlFU1c2MldIcGZGV0w5SXowNmYtN3VOY0JzQ0pXWkhyd3pOdGhLMTZzWDF4S1NrNEpkeEpHUnZIWWRabm52MDRzQWRUWXZ3RVZQcW93c1N3ZlY4T3lMakVFaVhJdE9kOElUQ25NTzZBNTgxdUtXUnRDZ3lGdS1IVXhhS1B1anpBbWl6Q0MxYUdxYnBoSF93WV9FN2lZSFdmdmw?oc=5\" target=\"_blan",
+      "description": "Zero-day : l’entreprise devient la cible prioritaire des cyberattaques&nbsp;&nbsp;Solutions-Numeriques",
+      "content": "",
       "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPcGJ6VngwUVlFU1c2MldIcGZGV0w5SXowNmYtN3VOY0JzQ0pXWkhyd3pOdGhLMTZzWDF4S1NrNEpkeEpHUnZIWWRabm52MDRzQWRUWXZ3RVZQcW93c1N3ZlY4T3lMakVFaVhJdE9kOElUQ25NTzZBNTgxdUtXUnRDZ3lGdS1IVXhhS1B1anpBbWl6Q0MxYUdxYnBoSF93WV9FN2lZSFdmdmw?oc=5",
       "source": "Solutions-Numeriques",
       "publishedAt": "2026-03-05T15:00:10.000Z",
-      "theme": "Cybersecurité"
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "zero-day-l-entreprise-devient-la-cible-prioritaire-des-cyberattaques-solutions-n"
     },
     {
       "title": "Cybersécurité : La moitié des attaques “zero day” ciblent désormais des entreprises privées, d’après Google - L'Usine Digitale",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiiAJBVV95cUxPYXoxMmFXR3k4WVNNbVhUNWhqUjI3SzVUdWNjTXhINDlLSDk2SWQ2U01ZaTQ4bFpyRks1RzRIQ2hoa1lsYW52SDlEc0hRaS1scXp6RWhnVnJDZjdUR2dwQVFkTFhlREN4TzJNaEczZ0hzUlBUQTVRN19KUFJmZEFOUnJrS0p3XzVrM3JrYzNiMHRMaEhGM2lCM255ckpBbDY0NUtnWS0yVU9KX19GdnlFNTNwNE9SY2Z",
+      "description": "Cybersécurité : La moitié des attaques “zero day” ciblent désormais des entreprises privées, d’après Google&nbsp;&nbsp;L'Usine Digitale",
+      "content": "",
       "url": "https://news.google.com/rss/articles/CBMiiAJBVV95cUxPYXoxMmFXR3k4WVNNbVhUNWhqUjI3SzVUdWNjTXhINDlLSDk2SWQ2U01ZaTQ4bFpyRks1RzRIQ2hoa1lsYW52SDlEc0hRaS1scXp6RWhnVnJDZjdUR2dwQVFkTFhlREN4TzJNaEczZ0hzUlBUQTVRN19KUFJmZEFOUnJrS0p3XzVrM3JrYzNiMHRMaEhGM2lCM255ckpBbDY0NUtnWS0yVU9KX19GdnlFNTNwNE9SY2ZCSG1RUVZXYndxTks1NERzMG1EQTFyRE9oTldyODhwVjZlSU5oMEFoLVhwYUxQMzcyYWVVYlEwN2lqLVZCdGswc29yNXZBVTdtRnVONUl5MWc?oc=5",
       "source": "L'Usine Digitale",
       "publishedAt": "2026-03-05T15:00:04.000Z",
-      "theme": "Cybersecurité"
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "cybersecurite-la-moitie-des-attaques-zero-day-ciblent-desormais-des-entreprises-"
     },
     {
       "title": "3 questions à…Gilles Pirman, Chargé de mission Stratégie des territoires à l'Agence nationale de la sécurité des systèmes d'information (ANSSI) - Association des Petites Villes de France",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMihAJBVV95cUxQQWpNeUNPb1R6ckpXM0pnRnhleXlFODdYbFNTWmtwRmw4MDdXaTVnR2NZVXJoVmhSby1VdHVsWU5oakJrOGlnYmJJUzVrOExTTS1POFVPRzJTWEJULXU0N2Z4dm1sUWpWZW1CQjlSRm1VN2VrZURwY3pvUWJHYTNjRnM5bzJKbHdCQ1R2VjcycVdTYU1ybkt2LTdOa0drUlBkeDgtSGJLU3JoQnBuTDI0NWNJN1BFTnJ",
+      "description": "3 questions à…Gilles Pirman, Chargé de mission Stratégie des territoires à l'Agence nationale de la sécurité des systèmes d'information (ANSSI)&nbsp;&nbsp;Association des Petites Villes de France",
+      "content": "",
       "url": "https://news.google.com/rss/articles/CBMihAJBVV95cUxQQWpNeUNPb1R6ckpXM0pnRnhleXlFODdYbFNTWmtwRmw4MDdXaTVnR2NZVXJoVmhSby1VdHVsWU5oakJrOGlnYmJJUzVrOExTTS1POFVPRzJTWEJULXU0N2Z4dm1sUWpWZW1CQjlSRm1VN2VrZURwY3pvUWJHYTNjRnM5bzJKbHdCQ1R2VjcycVdTYU1ybkt2LTdOa0drUlBkeDgtSGJLU3JoQnBuTDI0NWNJN1BFTnJoTFBIZjNQdXU5ZE9OWjNmbXRkWnpMaERVVzVCX2tkVkRVaXZFeVg0U295c1RCS2RzSHpkSThFS24tMHZySTFKay11TnFKc3hqZkNGNg?oc=5",
       "source": "Association des Petites Villes de France",
       "publishedAt": "2026-03-05T14:28:44.000Z",
-      "theme": "Cybersecurité"
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "3-questions-a-gilles-pirman-charge-de-mission-strategie-des-territoires-a-l-agen"
     },
     {
-      "title": "ZDNET Morning 05/03/2026 : Nouveautés ransomware, MacBook Neo, Explosion des contenus illicites,... - ZDNET",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMizwFBVV95cUxObzg5NFJwLVRJMnY5TDAyclBMTFhJelZOWnUzZDZUNkV4NVZnc0ltUWRpbjVlbUF3MTNQVkRZblJyak5DUi0ydVI3LWlxYXpibVJtS0hRQTItZlVFUVIzQXBsR2ZFNHBMREFJRlkxRFBDRXA1QWJ1ZWwzMVdKS0JGUHFjU2lYZDh5TmNJa21Dd0FLejVFM1FsODZYWE94TEZMWmlsZmVnYnRDaWJTWXYxTWdwRnZsTnp",
-      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxObzg5NFJwLVRJMnY5TDAyclBMTFhJelZOWnUzZDZUNkV4NVZnc0ltUWRpbjVlbUF3MTNQVkRZblJyak5DUi0ydVI3LWlxYXpibVJtS0hRQTItZlVFUVIzQXBsR2ZFNHBMREFJRlkxRFBDRXA1QWJ1ZWwzMVdKS0JGUHFjU2lYZDh5TmNJa21Dd0FLejVFM1FsODZYWE94TEZMWmlsZmVnYnRDaWJTWXYxTWdwRnZsTnprR1VWTU1iQ2dDUWdJMF9xRHRPdTB6VGM?oc=5",
-      "source": "ZDNET",
-      "publishedAt": "2026-03-05T09:14:07.000Z",
-      "theme": "Cybersecurité"
-    },
-    {
-      "title": "Une plateforme de la ville victime d’une cyberattaque, des données d’usagers fuitent - 20 Minutes",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMivgFBVV95cUxNWm4zb3FNcVRMZVVlQnhmeHhoOTgzZ2xtMmhPSGx0OXoyaUhFT0swV0pvN1BHTHNMcThlUFg4bm1tOENSUmd2aGZCazE2VE9ZMElUd3pobDBJdUJ2QWZ1T0RUaDlocXdJSmJTT2FuR29pbEVHMENqQm5aV0VXamVfX0hjUE1QVjVfamN0c0RESmczSVJWaHdaS3hXYTdXaEhpMG1nUmwyeHp3clBUcnVZaERScXpudGh",
-      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNWm4zb3FNcVRMZVVlQnhmeHhoOTgzZ2xtMmhPSGx0OXoyaUhFT0swV0pvN1BHTHNMcThlUFg4bm1tOENSUmd2aGZCazE2VE9ZMElUd3pobDBJdUJ2QWZ1T0RUaDlocXdJSmJTT2FuR29pbEVHMENqQm5aV0VXamVfX0hjUE1QVjVfamN0c0RESmczSVJWaHdaS3hXYTdXaEhpMG1nUmwyeHp3clBUcnVZaERScXpudGhOVmxoRW1R?oc=5",
-      "source": "20 Minutes",
-      "publishedAt": "2026-03-05T08:28:00.000Z",
-      "theme": "Cybersecurité"
-    },
-    {
-      "title": "Guerre au Moyen-Orient: pas de hausse de la menace cyber en France, selon l'Anssi - TradingView",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiYkFVX3lxTE9OM3dmbkR1MERCOTFaTlg2cmZtY0Y4UnBfQUxWMFFpZFpQNXpyRWhSUFJqWDlvV2tqaGozMmRaU19mQjhCVnRFcm5wUVlTTHZvaVRDRlJ5QTk5a0w2SzRxb3NR?oc=5\" target=\"_blank\"&gt;Guerre au Moyen-Orient: pas de hausse de la menace cyber en France, selon l'Anssi&lt;/a&g",
-      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE9OM3dmbkR1MERCOTFaTlg2cmZtY0Y4UnBfQUxWMFFpZFpQNXpyRWhSUFJqWDlvV2tqaGozMmRaU19mQjhCVnRFcm5wUVlTTHZvaVRDRlJ5QTk5a0w2SzRxb3NR?oc=5",
-      "source": "TradingView",
-      "publishedAt": "2026-03-04T15:03:47.000Z",
-      "theme": "Cybersecurité"
-    },
-    {
-      "title": "Une fuite de base de données éclaire l’usage des cryptomonnaies en Iran - Solutions-Numeriques",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMirAFBVV95cUxPMG9La0RqeEJFSWNsanh6NWlwMFU4cjJPcm9fazJZTHdVSzIzRkRMTVV0RHZIeHQ3Y3VxUmxPb1pwNWQwRXc5ajIyUklnUmE4RjVkT3JQdVZGLVhDOVYwTkE4bUdVeV90UUsxaUV0Sml6bFIzUW03X201RVZwYm02ZU1yaXRJREw0eTRPeHVaSFlFWWR0MkxFZ2FDamFWY2tCSEMwWERuRl8xRjVj?oc=5\" target=\"",
-      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPMG9La0RqeEJFSWNsanh6NWlwMFU4cjJPcm9fazJZTHdVSzIzRkRMTVV0RHZIeHQ3Y3VxUmxPb1pwNWQwRXc5ajIyUklnUmE4RjVkT3JQdVZGLVhDOVYwTkE4bUdVeV90UUsxaUV0Sml6bFIzUW03X201RVZwYm02ZU1yaXRJREw0eTRPeHVaSFlFWWR0MkxFZ2FDamFWY2tCSEMwWERuRl8xRjVj?oc=5",
-      "source": "Solutions-Numeriques",
-      "publishedAt": "2026-03-04T12:12:19.000Z",
-      "theme": "Cybersecurité"
-    },
-    {
-      "title": "Piratage du fichier national des comptes bancaires : le fisc en dit plus sur la cyberattaque - 01net.com",
-      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMixwFBVV95cUxPaktNR1B3Z1lDQkVweVk5NWFRT3locklQbEVGRVQxVGI2SVB1eklTSlJiTzZRUGY2N0l2UWVFRmFkX1VRVXo2RktVMUFHczVhLVNVWjM4WVNQbzdaSV9UYjVqbmhreThRNXNScThrMkpKZkhoQ1pLOFhYUXEzRkhnd3M5eXg0TTJ0TFZMUEZzRHVhV3RDRFl0WU5CVlZxOVRMck55NGh3WHlsdDVaOENoc0JiVjFabTV",
-      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPaktNR1B3Z1lDQkVweVk5NWFRT3locklQbEVGRVQxVGI2SVB1eklTSlJiTzZRUGY2N0l2UWVFRmFkX1VRVXo2RktVMUFHczVhLVNVWjM4WVNQbzdaSV9UYjVqbmhreThRNXNScThrMkpKZkhoQ1pLOFhYUXEzRkhnd3M5eXg0TTJ0TFZMUEZzRHVhV3RDRFl0WU5CVlZxOVRMck55NGh3WHlsdDVaOENoc0JiVjFabTVGdmFiN0tkZXR6Q1ZTRktR?oc=5",
-      "source": "01net.com",
-      "publishedAt": "2026-03-04T10:44:54.000Z",
-      "theme": "Cybersecurité"
+      "title": "Un mystérieux outil de piratage visant l'iPhone aurait infecté des dizaines de milliers d'appareils - Siècle Digital",
+      "description": "Un mystérieux outil de piratage visant l'iPhone aurait infecté des dizaines de milliers d'appareils&nbsp;&nbsp;Siècle Digital",
+      "content": "",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNQVNoeWNHVGE2R1lrUG1OZVd1UWVxVkczdHVYaUM4cjBNYzNEd0JUMTJVQmVCR0hGUnFUSF9XOGlYQkdBbUZIcTZYanhJbWl5Ykd3Umo3NlFIb1hCRHBseFhtdFNPbS1PTDhxTFBYSWpTZkZheE40Znlqc2V1dXVjUFJzcy1ETUJOblMwM3NNTnpBTU1xZzhBN3J5bUdmNzEtRmx4T0JzWmNiRnBDUXM1aQ?oc=5",
+      "source": "Siècle Digital",
+      "publishedAt": "2026-03-05T13:34:00.000Z",
+      "theme": "Cybersecurité",
+      "image": "https://lh3.googleusercontent.com/J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc=s0-w300",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.google.com&sz=32",
+      "slug": "un-mysterieux-outil-de-piratage-visant-l-iphone-aurait-infecte-des-dizaines-de-m"
     }
   ],
-  "fetchedAt": "2026-03-06T09:31:51.144Z"
+  "fetchedAt": "2026-03-06T15:30:03.917Z"
 }

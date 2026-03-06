@@ -4,8 +4,14 @@
 // Falls back to Google News RSS if no API key is set.
 // Schedule with cron: 0 0/6 * * * cd /path/to/project && bun run scripts/fetch-news.ts
 
+import "dotenv/config";
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 const CACHE_DIR = join(import.meta.dir, "..", "resources", "news-cache");
 mkdirSync(CACHE_DIR, { recursive: true });
@@ -31,6 +37,9 @@ interface NewsArticle {
   source: string;
   publishedAt: string;
   theme: string;
+  image?: string;
+  favicon?: string;
+  slug: string;
 }
 
 function slugify(str: string): string {
@@ -40,6 +49,10 @@ function slugify(str: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+function slugifyTitle(title: string): string {
+  return slugify(title).slice(0, 80);
 }
 
 function decodeHtmlEntities(text: string): string {
@@ -61,7 +74,26 @@ function stripHtml(text: string): string {
     .trim();
 }
 
-async function fetchArticleContent(url: string): Promise<string> {
+function extractDomain(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return "";
+  }
+}
+
+function getFaviconUrl(url: string): string {
+  const domain = extractDomain(url);
+  if (!domain) return "";
+  return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+}
+
+interface ArticleMetadata {
+  content: string;
+  image: string;
+}
+
+async function fetchArticleContent(url: string): Promise<ArticleMetadata> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
@@ -75,14 +107,20 @@ async function fetchArticleContent(url: string): Promise<string> {
     });
     clearTimeout(timeout);
 
-    if (!response.ok) return "";
+    if (!response.ok) return { content: "", image: "" };
 
     const html = await response.text();
 
-    // Try to extract main article content via common patterns
-    // Look for <article>, <main>, or common article class patterns
-    let content = "";
+    // Extract OG image
+    let image = "";
+    const ogImageMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']+)["']/i)
+      ?? html.match(/<meta[^>]*content=["']([^"']+)["'][^>]*property=["']og:image["']/i);
+    if (ogImageMatch) {
+      image = ogImageMatch[1];
+    }
 
+    // Try to extract main article content
+    let content = "";
     const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
     if (articleMatch) {
       content = articleMatch[1];
@@ -91,7 +129,7 @@ async function fetchArticleContent(url: string): Promise<string> {
       if (mainMatch) content = mainMatch[1];
     }
 
-    if (!content) return "";
+    if (!content) return { content: "", image };
 
     // Extract text from paragraphs
     const paragraphs: string[] = [];
@@ -102,9 +140,9 @@ async function fetchArticleContent(url: string): Promise<string> {
       if (text.length > 30) paragraphs.push(text);
     }
 
-    return paragraphs.slice(0, 15).join("\n\n");
+    return { content: paragraphs.slice(0, 15).join("\n\n"), image };
   } catch {
-    return "";
+    return { content: "", image: "" };
   }
 }
 
@@ -129,8 +167,8 @@ async function fetchFromGoogleNewsRSS(query: string, theme: string): Promise<New
       const description = stripHtml(rawDesc).slice(0, 300);
 
       if (title && link) {
-        // Try to fetch the actual article content
-        const content = await fetchArticleContent(link);
+        const { content, image } = await fetchArticleContent(link);
+        const favicon = getFaviconUrl(link);
 
         articles.push({
           title,
@@ -140,6 +178,9 @@ async function fetchFromGoogleNewsRSS(query: string, theme: string): Promise<New
           source,
           publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
           theme,
+          image: image || undefined,
+          favicon: favicon || undefined,
+          slug: slugifyTitle(title),
         });
       }
     }
@@ -162,15 +203,21 @@ async function fetchFromNewsAPI(query: string, theme: string, apiKey: string): P
 
     const articles: NewsArticle[] = [];
     for (const a of data.articles) {
-      const content = await fetchArticleContent(a.url ?? "");
+      const articleUrl = a.url ?? "";
+      const { content, image } = await fetchArticleContent(articleUrl);
+      const favicon = getFaviconUrl(articleUrl);
+
       articles.push({
         title: a.title ?? "",
         description: a.description ?? "",
         content,
-        url: a.url ?? "",
+        url: articleUrl,
         source: a.source?.name ?? "Unknown",
         publishedAt: a.publishedAt ?? new Date().toISOString(),
         theme,
+        image: image || a.urlToImage || undefined,
+        favicon: favicon || undefined,
+        slug: slugifyTitle(a.title ?? ""),
       });
     }
     return articles;
@@ -202,11 +249,11 @@ async function main() {
       await new Promise((r) => setTimeout(r, 500));
     }
 
-    // Deduplicate by title
+    // Deduplicate by slug
     const seen = new Set<string>();
     allArticles = allArticles.filter((a) => {
-      if (seen.has(a.title)) return false;
-      seen.add(a.title);
+      if (seen.has(a.slug)) return false;
+      seen.add(a.slug);
       return true;
     });
 
@@ -229,9 +276,72 @@ async function main() {
     );
 
     console.log(`  -> ${allArticles.length} articles cached`);
+
+    // Write to PostgreSQL
+    const themeRecord = await prisma.theme.findUnique({ where: { name: theme } });
+    if (themeRecord) {
+      for (const article of allArticles) {
+        try {
+          await prisma.newsArticle.upsert({
+            where: { url_themeId: { url: article.url, themeId: themeRecord.id } },
+            update: {
+              title: article.title,
+              description: article.description,
+              content: article.content || null,
+              source: article.source,
+              image: article.image ?? null,
+              favicon: article.favicon ?? null,
+              slug: article.slug,
+              publishedAt: new Date(article.publishedAt),
+            },
+            create: {
+              title: article.title,
+              description: article.description,
+              content: article.content || null,
+              url: article.url,
+              source: article.source,
+              image: article.image ?? null,
+              favicon: article.favicon ?? null,
+              slug: article.slug,
+              publishedAt: new Date(article.publishedAt),
+              themeId: themeRecord.id,
+            },
+          });
+        } catch (e) {
+          // Slug collision — append theme suffix
+          const suffixedSlug = `${article.slug}-${themeRecord.id}`;
+          await prisma.newsArticle.upsert({
+            where: { url_themeId: { url: article.url, themeId: themeRecord.id } },
+            update: {
+              title: article.title,
+              description: article.description,
+              content: article.content || null,
+              source: article.source,
+              image: article.image ?? null,
+              favicon: article.favicon ?? null,
+              slug: suffixedSlug,
+              publishedAt: new Date(article.publishedAt),
+            },
+            create: {
+              title: article.title,
+              description: article.description,
+              content: article.content || null,
+              url: article.url,
+              source: article.source,
+              image: article.image ?? null,
+              favicon: article.favicon ?? null,
+              slug: suffixedSlug,
+              publishedAt: new Date(article.publishedAt),
+              themeId: themeRecord.id,
+            },
+          });
+        }
+      }
+      console.log(`  -> ${allArticles.length} articles saved to DB`);
+    }
   }
 
-  console.log("\nDone! News cached in resources/news-cache/");
+  console.log("\nDone! News cached in resources/news-cache/ and PostgreSQL.");
 }
 
-main();
+main().finally(() => prisma.$disconnect());

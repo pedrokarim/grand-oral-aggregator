@@ -39,4 +39,4 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 /src/generated/prisma
 
 # reference repos
-.reference/
+.reference

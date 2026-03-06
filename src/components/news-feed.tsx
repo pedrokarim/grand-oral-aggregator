@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { EmbedLink } from "./embed-link";
 import { ExternalLink } from "lucide-react";
 import { sanitizeDescription } from "@/lib/utils";
 import { getThemeColor } from "@/lib/theme-colors";
 import type { NewsArticle } from "@/lib/news";
 
+interface ArticleWithVisited extends NewsArticle {
+  visited?: boolean;
+}
+
 export function NewsFeed({ theme }: { theme?: string }) {
-  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [articles, setArticles] = useState<ArticleWithVisited[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,17 +35,13 @@ export function NewsFeed({ theme }: { theme?: string }) {
 
   if (loading) {
     return (
-      <div className="grid gap-3">
+      <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-5 w-3/4" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3 mt-2" />
-            </CardContent>
-          </Card>
+          <div key={i} className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-4">
+            <div className="h-5 w-3/4 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
+            <div className="h-4 w-full rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse mt-3" />
+            <div className="h-4 w-2/3 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse mt-2" />
+          </div>
         ))}
       </div>
     );
@@ -51,63 +49,99 @@ export function NewsFeed({ theme }: { theme?: string }) {
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="py-6 text-center text-muted-foreground">
-          {error}
-        </CardContent>
-      </Card>
+      <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 text-center text-[#9EA096]">
+        {error}
+      </div>
     );
   }
 
   if (articles.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-6 text-center text-muted-foreground">
-          Aucune actualité disponible pour le moment. Lancez le cron pour récupérer les news.
-        </CardContent>
-      </Card>
+      <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 text-center text-[#9EA096]">
+        Aucune actualité disponible pour le moment.
+      </div>
     );
   }
 
   return (
-    <div className="grid gap-3">
+    <ul className="list-none m-0 p-0 grid gap-3 md:grid-cols-2">
       {articles.map((article, i) => {
         const color = getThemeColor(article.theme);
+        const isRead = !!article.visited;
+        const detailHref = article.slug ? `/actualites/${article.slug}` : article.url;
+
         return (
-          <a
-            key={i}
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block"
-          >
-            <Card className={`border-l-4 ${color.border} hover:shadow-md transition-all`}>
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-base font-medium leading-snug line-clamp-2">
-                    {article.title}
-                  </CardTitle>
-                  <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground mt-0.5" />
+          <li key={i} className="relative">
+            <div
+              className={`rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] overflow-hidden
+                bg-[#FDFDF8] dark:bg-[#1E1F23]
+                hover:border-[#BFC1B7] dark:hover:border-[#555]
+                hover:translate-y-[-1px] hover:scale-[1.01]
+                active:translate-y-[1px] active:scale-[.99]
+                transition-all h-full ${isRead ? "opacity-75" : ""}`}
+            >
+              {/* Stretched link covering the whole card */}
+              <EmbedLink
+                href={detailHref}
+                className="absolute inset-0 z-0"
+                aria-label={article.title}
+              />
+
+              {/* OG image thumbnail */}
+              {article.image && (
+                <div className="w-full h-32 overflow-hidden">
+                  <img
+                    src={article.image}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }}
+                  />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-2 break-words overflow-hidden">
+              )}
+
+              <div className="p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="text-[15px] font-medium text-[#23251D] dark:text-[#EAECF6] leading-snug line-clamp-2">
+                    {article.title}
+                  </h3>
+                  <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                    {isRead && (
+                      <span className="text-[10px] font-medium text-[#9EA096] bg-[#E5E7E0] dark:bg-[#2a2b2f] px-1.5 py-0.5 rounded">
+                        Lu
+                      </span>
+                    )}
+                    <a
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="relative z-10 text-[#9EA096] hover:text-[#4D4F46] dark:hover:text-[#EAECF6] transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
+                <p className="text-[13px] text-[#9EA096] line-clamp-2 mt-2">
                   {sanitizeDescription(article.description)}
                 </p>
                 <div className="flex items-center gap-2 mt-3 flex-wrap">
-                  <Badge variant="outline" className="text-xs">{article.source}</Badge>
-                  <Badge className={`${color.bgLight} ${color.text} border-0 text-xs`}>
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[12px] font-medium rounded-full border border-[#D2D3CC] dark:border-[#3a3b3f] text-[#4D4F46] dark:text-[#9EA096]">
+                    {article.favicon && (
+                      <img src={article.favicon} alt="" className="w-3.5 h-3.5" />
+                    )}
+                    {article.source}
+                  </span>
+                  <span className={`inline-flex px-2 py-0.5 text-[12px] font-medium rounded-md ${color.bgLight} ${color.text}`}>
                     {article.theme}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground ml-auto">
+                  </span>
+                  <span className="text-[12px] text-[#9EA096] ml-auto">
                     {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
                   </span>
                 </div>
-              </CardContent>
-            </Card>
-          </a>
+              </div>
+            </div>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 }

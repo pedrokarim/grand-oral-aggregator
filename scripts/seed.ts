@@ -1,10 +1,13 @@
 import "dotenv/config";
-import { PrismaClient } from "../src/generated/prisma";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import sujets from "../resources/sujets.json";
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
+import { slugifyTitle } from "../src/lib/news";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 function slugify(str: string): string {
   return str
@@ -79,19 +82,28 @@ async function main() {
         const themeId = themeMap.get(article.theme);
         if (!themeId) continue;
 
+        const articleSlug = article.slug || slugifyTitle(article.title);
         await prisma.newsArticle.upsert({
           where: { url_themeId: { url: article.url, themeId } },
           update: {
             title: article.title,
             description: article.description,
+            content: article.content ?? null,
             source: article.source,
+            image: article.image ?? null,
+            favicon: article.favicon ?? null,
+            slug: articleSlug,
             publishedAt: new Date(article.publishedAt),
           },
           create: {
             title: article.title,
             description: article.description,
+            content: article.content ?? null,
             url: article.url,
             source: article.source,
+            image: article.image ?? null,
+            favicon: article.favicon ?? null,
+            slug: articleSlug,
             publishedAt: new Date(article.publishedAt),
             themeId,
           },

@@ -32,9 +32,9 @@ export const providerLabels: Record<AIProvider, string> = {
 };
 
 export const providerModels: Record<AIProvider, string[]> = {
-  openai: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"],
+  openai: ["gpt-4o", "gpt-4o-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano"],
   anthropic: ["claude-sonnet-4-20250514", "claude-haiku-4-5-20241022", "claude-opus-4-20250514"],
-  google: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
-  mistral: ["mistral-large-latest", "mistral-small-latest", "open-mistral-nemo"],
-  ollama: ["llama3", "mistral", "phi3", "gemma2"],
+  google: ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"],
+  mistral: ["mistral-large-latest", "mistral-small-latest", "mistral-medium-latest"],
+  ollama: ["qwen3:8b", "qwen3:4b", "qwen3:30b", "qwen3-coder:30b", "gpt-oss:20b", "gemma3", "llama3.2", "mistral", "phi4", "deepseek-r1"],
 };

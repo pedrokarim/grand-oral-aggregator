@@ -150,12 +150,10 @@ export function useWindowManager() {
     [setWindows],
   );
 
-  /** Reset icon positions */
-  const resetIcons = useCallback(() => {
-    // Will be called from context menu
-    localStorage.removeItem("desktop-icon-positions");
-    window.location.reload();
-  }, []);
+  /** Close all windows */
+  const closeAllWindows = useCallback(() => {
+    setWindows([]);
+  }, [setWindows]);
 
   return {
     windows,
@@ -163,9 +161,9 @@ export function useWindowManager() {
     openWindow,
     bringToFront,
     closeWindow,
+    closeAllWindows,
     minimizeWindow,
     updatePosition,
     updateSize,
-    resetIcons,
   };
 }

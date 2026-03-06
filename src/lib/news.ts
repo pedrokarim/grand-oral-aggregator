@@ -59,9 +59,22 @@ export interface NewsArticle {
   source: string;
   publishedAt: string;
   theme: string;
+  image?: string;
+  favicon?: string;
+  slug: string;
 }
 
 export interface CachedNews {
   articles: NewsArticle[];
   fetchedAt: string;
+}
+
+export function slugifyTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 80);
 }

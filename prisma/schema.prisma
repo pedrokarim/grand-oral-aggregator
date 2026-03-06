@@ -31,16 +31,44 @@ model Subject {
 
 model NewsArticle {
   id          Int      @id @default(autoincrement())
+  slug        String   @unique
   title       String
   description String
   content     String?
   url         String
   source      String
+  image       String?
+  favicon     String?
   publishedAt DateTime
   themeId     Int
   theme       Theme    @relation(fields: [themeId], references: [id])
-
   fetchedAt   DateTime @default(now())
 
+  histories   NewsHistory[]
+  summaries   AiSummary[]
+
   @@unique([url, themeId])
+}
+
+model NewsHistory {
+  id        Int         @id @default(autoincrement())
+  articleId Int
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  sessionId String
+  visitedAt DateTime    @default(now())
+
+  @@unique([articleId, sessionId])
+  @@index([sessionId])
+}
+
+model AiSummary {
+  id        Int         @id @default(autoincrement())
+  articleId Int
+  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  provider  String
+  model     String
+  content   String
+  createdAt DateTime    @default(now())
+
+  @@unique([articleId, provider, model])
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { type ReactNode, type RefObject, useState } from "react";
+import { type ReactNode, type RefObject, useState, useEffect } from "react";
 import { motion, useDragControls } from "framer-motion";
 
 interface DesktopIconProps {
@@ -29,6 +29,11 @@ export function DesktopIcon({
   const [isDragging, setIsDragging] = useState(false);
   const [hasDragged, setHasDragged] = useState(false);
   const [position, setPosition] = useState(initialPosition);
+
+  // Sync with parent when initialPosition changes (e.g. reset, resize)
+  useEffect(() => {
+    setPosition(initialPosition);
+  }, [initialPosition]);
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number; y: number } }) => {
     setIsDragging(false);

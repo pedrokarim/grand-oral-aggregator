@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,10 +19,39 @@ import {
   providerLabels,
   providerModels,
 } from "@/lib/settings";
-import { Settings, Brain, Palette, Bell } from "lucide-react";
+import { Settings, Brain, Palette, Bell, RotateCcw, RefreshCw, Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
   const [settings, updateSettings] = useSettings();
+  const [ollamaModels, setOllamaModels] = useState<string[]>([]);
+  const [ollamaLoading, setOllamaLoading] = useState(false);
+  const [ollamaError, setOllamaError] = useState<string | null>(null);
+
+  const fetchOllamaModels = useCallback(async () => {
+    const baseUrl = settings.ai.baseUrl || "http://localhost:11434";
+    setOllamaLoading(true);
+    setOllamaError(null);
+    try {
+      const res = await fetch(`${baseUrl}/api/tags`);
+      const data = await res.json();
+      const models = (data.models ?? []).map((m: { name: string }) => m.name);
+      setOllamaModels(models);
+      if (models.length > 0 && !models.includes(settings.ai.model)) {
+        updateSettings({ ai: { model: models[0] } });
+      }
+    } catch {
+      setOllamaError("Impossible de contacter Ollama");
+      setOllamaModels([]);
+    } finally {
+      setOllamaLoading(false);
+    }
+  }, [settings.ai.baseUrl, settings.ai.model]);
+
+  useEffect(() => {
+    if (settings.ai.provider === "ollama") {
+      fetchOllamaModels();
+    }
+  }, [settings.ai.provider, fetchOllamaModels]);
 
   return (
     <div className="space-y-8">
@@ -51,6 +81,10 @@ export default function SettingsPage() {
             <Bell className="h-4 w-4" />
             Actualités
           </TabsTrigger>
+          <TabsTrigger value="reset" className="gap-2">
+            <RotateCcw className="h-4 w-4" />
+            Réinitialisation
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="ai" className="space-y-4">
@@ -66,15 +100,16 @@ export default function SettingsPage() {
                 <Label>Fournisseur</Label>
                 <Select
                   value={settings.ai.provider}
-                  onValueChange={(v) =>
+                  onValueChange={(v) => {
+                    const provider = v as AIProvider;
                     updateSettings({
                       ai: {
                         ...settings.ai,
-                        provider: v as AIProvider,
-                        model: providerModels[v as AIProvider][0],
+                        provider,
+                        model: provider === "ollama" ? "" : providerModels[provider][0],
                       },
-                    })
-                  }
+                    });
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -107,24 +142,73 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Modèle</Label>
-                <Select
-                  value={settings.ai.model}
-                  onValueChange={(v) =>
-                    updateSettings({ ai: { ...settings.ai, model: v } })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {providerModels[settings.ai.provider].map((model) => (
-                      <SelectItem key={model} value={model}>
-                        {model}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center justify-between">
+                  <Label>Modèle</Label>
+                  {settings.ai.provider === "ollama" && (
+                    <button
+                      onClick={fetchOllamaModels}
+                      disabled={ollamaLoading}
+                      className="inline-flex items-center gap-1 text-[12px] text-muted-foreground hover:text-foreground transition-colors cursor-default"
+                    >
+                      {ollamaLoading ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-3 w-3" />
+                      )}
+                      Rafraîchir
+                    </button>
+                  )}
+                </div>
+                {settings.ai.provider === "ollama" ? (
+                  <>
+                    {ollamaError && (
+                      <p className="text-[12px] text-destructive">{ollamaError}</p>
+                    )}
+                    {ollamaModels.length > 0 ? (
+                      <Select
+                        value={settings.ai.model}
+                        onValueChange={(v) =>
+                          updateSettings({ ai: { ...settings.ai, model: v } })
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner un modèle..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ollamaModels.map((model) => (
+                            <SelectItem key={model} value={model}>
+                              {model}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="text-[13px] text-muted-foreground">
+                        {ollamaLoading
+                          ? "Chargement des modèles..."
+                          : "Aucun modèle installé. Lancez `ollama pull qwen3:8b` pour en installer un."}
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <Select
+                    value={settings.ai.model}
+                    onValueChange={(v) =>
+                      updateSettings({ ai: { ...settings.ai, model: v } })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {providerModels[settings.ai.provider].map((model) => (
+                        <SelectItem key={model} value={model}>
+                          {model}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               {settings.ai.provider === "ollama" && (
@@ -250,6 +334,40 @@ export default function SettingsPage() {
                   Actuellement : toutes les {settings.newsRefreshInterval} minutes
                   ({(settings.newsRefreshInterval / 60).toFixed(1)}h)
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reset" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Icônes du bureau</CardTitle>
+              <CardDescription>
+                Réinitialisez la position des icônes du bureau à leur emplacement par défaut
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Positions des icônes</p>
+                  <p className="text-sm text-muted-foreground">
+                    Remet toutes les icônes à leur position initiale en grille
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    // Tell the parent desktop to reset icons via postMessage
+                    // jotai atomWithStorage handles localStorage automatically
+                    window.parent.postMessage({ type: "reset-icons" }, "*");
+                  }}
+                  className="text-[13px] font-bold text-[#FDFDF8] px-4 py-1.5 rounded-sm cursor-default
+                    bg-[#EB9D2A] border-b-[3px] border-[#B17816] shadow-[0_2px_0_#CD8407]
+                    hover:translate-y-[-1px] hover:shadow-[0_3px_0_#CD8407] active:translate-y-0 active:shadow-none
+                    transition-all"
+                >
+                  Réinitialiser
+                </button>
               </div>
             </CardContent>
           </Card>

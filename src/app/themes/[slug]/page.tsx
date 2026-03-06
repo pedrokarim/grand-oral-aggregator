@@ -37,41 +37,44 @@ export default async function ThemePage({
 
   return (
     <div className="space-y-8">
-      <div className={`rounded-xl p-6 ${color.bgLight}`}>
+      {/* Theme header */}
+      <div className={`rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 ${color.bgLight}`}>
         <div className="flex items-center gap-4">
           <div className={`rounded-lg p-3 ${color.bg}`}>
             <Icon className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold text-[#23251D] dark:text-[#EAECF6]">
               {themeStat.theme}
             </h1>
-            <p className="text-muted-foreground">
-              {themeStat.count} sujet{themeStat.count > 1 ? "s" : ""} de
-              préparation
+            <p className="text-[15px] text-[#9EA096]">
+              {themeStat.count} sujet{themeStat.count > 1 ? "s" : ""} de préparation
             </p>
           </div>
         </div>
       </div>
 
+      {/* Subjects list */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">Sujets</h2>
-        <div className="grid gap-3">
+        <h2 className="text-lg font-semibold text-[#23251D] dark:text-[#EAECF6] mb-4">Sujets</h2>
+        <ul className="list-none m-0 p-0 space-y-3">
           {subjects.map((subject, i) => (
-            <SubjectCard
-              key={i}
-              sujet={subject.sujet}
-              type={subject.type}
-              domaine={subject.domaine}
-              theme={subject.theme}
-              color={color}
-            />
+            <li key={i}>
+              <SubjectCard
+                sujet={subject.sujet}
+                type={subject.type}
+                domaine={subject.domaine}
+                theme={subject.theme}
+                color={color}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
+      {/* Related news */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">Actualités liées</h2>
+        <h2 className="text-lg font-semibold text-[#23251D] dark:text-[#EAECF6] mb-4">Actualités liées</h2>
         <NewsFeed theme={themeStat.theme} />
       </div>
     </div>

@@ -1,53 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import { join } from "path";
-import type { CachedNews, NewsArticle } from "@/lib/news";
-
-const CACHE_DIR = join(process.cwd(), "resources", "news-cache");
+import { prisma } from "@/lib/prisma";
+import { getSessionId } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   const theme = request.nextUrl.searchParams.get("theme");
 
   try {
-    if (theme) {
-      const filePath = join(CACHE_DIR, `${slugify(theme)}.json`);
-      const data: CachedNews = JSON.parse(await readFile(filePath, "utf-8"));
-      return NextResponse.json(data);
-    }
+    const where = theme ? { theme: { name: theme } } : {};
 
-    // Return all cached news
-    const { readdir } = await import("fs/promises");
-    let allArticles: NewsArticle[] = [];
+    const articles = await prisma.newsArticle.findMany({
+      where,
+      include: { theme: true },
+      orderBy: { publishedAt: "desc" },
+      take: 30,
+    });
 
+    // Check visited status
+    let visitedSlugs = new Set<string>();
     try {
-      const files = await readdir(CACHE_DIR);
-      for (const file of files) {
-        if (!file.endsWith(".json")) continue;
-        const data: CachedNews = JSON.parse(
-          await readFile(join(CACHE_DIR, file), "utf-8")
-        );
-        allArticles.push(...data.articles);
-      }
+      const sessionId = await getSessionId();
+      const visited = await prisma.newsHistory.findMany({
+        where: { sessionId },
+        select: { article: { select: { slug: true } } },
+      });
+      visitedSlugs = new Set(visited.map((v) => v.article.slug));
     } catch {
-      // Cache dir doesn't exist yet
+      // No session cookie yet
     }
 
-    allArticles.sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
+    const mapped = articles.map((a) => ({
+      slug: a.slug,
+      title: a.title,
+      description: a.description,
+      content: a.content,
+      url: a.url,
+      source: a.source,
+      image: a.image,
+      favicon: a.favicon,
+      publishedAt: a.publishedAt.toISOString(),
+      theme: a.theme.name,
+      visited: visitedSlugs.has(a.slug),
+    }));
 
-    return NextResponse.json({ articles: allArticles.slice(0, 30) });
+    return NextResponse.json({ articles: mapped });
   } catch {
     return NextResponse.json({ articles: [] });
   }
-}
-
-function slugify(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
 }
