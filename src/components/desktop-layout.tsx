@@ -4,13 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useAtom } from "jotai";
 import { DesktopWindow } from "./desktop-window";
 import { EditorToolbar } from "./editor-toolbar";
 import { DesktopIcon } from "./desktop-icon";
 import { DesktopWallpaper } from "./desktop-wallpaper";
 import { MobileDock } from "./mobile-dock";
+import { DesktopContextMenu } from "./desktop-context-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeStats } from "@/lib/data";
+import { iconPositionsAtom, type IconPositions } from "@/lib/atoms";
+import { useWindowManager } from "@/lib/use-window-manager";
 import { GraduationCap, Search, Bell } from "lucide-react";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
@@ -67,14 +71,12 @@ function getAllApps(): DesktopApp[] {
   return [...left, ...right];
 }
 
-/* ---- Position calculation (like PostHog generateInitialPositions) ---- */
-type IconPositions = Record<string, { x: number; y: number }>;
-const ICON_WIDTH = 112;
+/* ---- Position calculation ---- */
 const ICON_HEIGHT = 75;
 const PADDING_H = 4;
 const PADDING_V = 20;
 const COL_SPACING = 128;
-const STORAGE_KEY = "desktop-icon-positions";
+const ICON_WIDTH = 112;
 
 function generatePositions(
   apps: DesktopApp[],
@@ -144,16 +146,23 @@ function PngIcon({ src, alt }: { src: string; alt: string }) {
 
 export function DesktopLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const windowTitle = getWindowTitle(pathname);
   const desktopRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(false);
 
   const allApps = getAllApps();
+  const [iconPositions, setIconPositions] = useAtom(iconPositionsAtom);
 
-  const [iconPositions, setIconPositions] = useState<IconPositions>(() => {
-    // SSR-safe: return empty, will be computed in useEffect
-    return {};
-  });
+  const {
+    windows,
+    focusedWindow,
+    openWindow,
+    bringToFront,
+    closeWindow,
+    minimizeWindow,
+    updatePosition,
+    updateSize,
+    resetIcons,
+  } = useWindowManager();
 
   const computePositions = useCallback(() => {
     const w = desktopRef.current?.getBoundingClientRect().width ?? (typeof window !== "undefined" ? window.innerWidth : 1200);
@@ -162,21 +171,8 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Validate all icons exist
-        const allExist = allApps.every((a) => parsed[a.label]);
-        if (allExist) {
-          setIconPositions(parsed);
-        } else {
-          setIconPositions(computePositions());
-        }
-      } catch {
-        setIconPositions(computePositions());
-      }
-    } else {
+    const allExist = allApps.every((a) => iconPositions[a.label]);
+    if (!allExist) {
       setIconPositions(computePositions());
     }
 
@@ -186,10 +182,20 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("resize", handleResize);
   }, [computePositions]);
 
+  // Auto-open a window for the current route on first load
+  useEffect(() => {
+    if (windows.length === 0) {
+      openWindow(pathname, getWindowTitle(pathname));
+    }
+  }, []);
+
   const handlePositionChange = (label: string, pos: { x: number; y: number }) => {
-    const next = { ...iconPositions, [label]: pos };
-    setIconPositions(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    setIconPositions((prev) => ({ ...prev, [label]: pos }));
+  };
+
+  const handleIconOpen = (href: string, label: string) => {
+    const title = getWindowTitle(href);
+    openWindow(href, title);
   };
 
   return (
@@ -197,7 +203,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       <DesktopWallpaper />
 
       {/* ===== Top header bar ===== */}
-      <header className="hidden md:flex items-center h-8 px-4 bg-[#23251D] z-20 shrink-0 select-none">
+      <header className="hidden md:flex items-center h-8 px-4 bg-[#23251D] z-50 shrink-0 select-none">
         <Link href="/" className="flex items-center gap-1.5 mr-6">
           <GraduationCap className="w-4 h-4 text-[#FDFDF8]" />
           <span className="text-[13px] font-bold text-[#FDFDF8]">Grand Oral</span>
@@ -209,13 +215,13 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
             { label: "Docs", href: "/" },
             { label: "Paramètres", href: "/settings" },
           ].map(({ label, href }) => (
-            <Link
+            <button
               key={label}
-              href={href}
-              className="text-[13px] text-[#9EA096] hover:text-[#FDFDF8] px-2 py-0.5 rounded transition-colors"
+              onClick={() => handleIconOpen(href, label)}
+              className="text-[13px] text-[#9EA096] hover:text-[#FDFDF8] px-2 py-0.5 rounded transition-colors cursor-default"
             >
               {label}
-            </Link>
+            </button>
           ))}
         </nav>
         <div className="flex-1" />
@@ -231,49 +237,74 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* ===== Desktop area ===== */}
-      <div ref={desktopRef} className="flex-1 relative overflow-hidden">
+      <DesktopContextMenu onResetIcons={resetIcons}>
+        <div ref={desktopRef} className="flex-1 relative overflow-hidden">
 
-        {/* Icons — absolutely positioned on the desktop, like PostHog */}
-        <nav className="hidden md:block absolute inset-0 z-10">
-          <motion.ul
-            initial={{ opacity: 0 }}
-            animate={{ opacity: rendered ? 1 : 0 }}
-            className="list-none m-0 p-0"
-          >
-            {allApps.map((app) => {
-              const pos = iconPositions[app.label] || { x: 0, y: 0 };
-              return (
-                <DesktopIcon
-                  key={app.label}
-                  icon={<PngIcon src={app.icon} alt={app.label} />}
-                  label={app.label}
-                  href={app.href}
-                  constraintsRef={desktopRef}
-                  initialPosition={pos}
-                  onPositionChange={(p) => handlePositionChange(app.label, p)}
-                />
-              );
-            })}
-          </motion.ul>
-        </nav>
-
-        {/* Main window — above icons */}
-        <div className="absolute inset-0 flex items-stretch py-2 px-2 md:py-3 md:left-28 md:right-0 lg:right-28 md:px-3 z-20 pointer-events-none">
-          <div className="pointer-events-auto flex-1 min-h-0">
-            <DesktopWindow
-              title={windowTitle}
-              toolbar={<EditorToolbar />}
-              className="h-full"
+          {/* Icons — absolutely positioned on the desktop */}
+          <nav className="hidden md:block absolute inset-0 z-10">
+            <motion.ul
+              initial={{ opacity: 0 }}
+              animate={{ opacity: rendered ? 1 : 0 }}
+              className="list-none m-0 p-0"
             >
-              <ScrollArea className="h-full">
-                <div className="p-6">
-                  {children}
-                </div>
+              {allApps.map((app) => {
+                const pos = iconPositions[app.label] || { x: 0, y: 0 };
+                return (
+                  <DesktopIcon
+                    key={app.label}
+                    icon={<PngIcon src={app.icon} alt={app.label} />}
+                    label={app.label}
+                    href={app.href}
+                    constraintsRef={desktopRef}
+                    initialPosition={pos}
+                    onPositionChange={(p) => handlePositionChange(app.label, p)}
+                    onOpen={handleIconOpen}
+                  />
+                );
+              })}
+            </motion.ul>
+          </nav>
+
+          {/* Windows — each rendered with iframe for independent content */}
+          {windows
+            .filter((w) => !w.minimized)
+            .map((win) => (
+              <DesktopWindow
+                key={win.id}
+                id={win.id}
+                title={win.title}
+                zIndex={win.zIndex + 20}
+                position={win.position}
+                size={win.size}
+                isFocused={focusedWindow?.id === win.id}
+                onFocus={() => bringToFront(win.id)}
+                onClose={() => closeWindow(win.id)}
+                onMinimize={() => minimizeWindow(win.id)}
+                onPositionChange={(pos) => updatePosition(win.id, pos)}
+                onSizeChange={(size) => updateSize(win.id, size)}
+                toolbar={<EditorToolbar />}
+              >
+                <iframe
+                  src={`${win.path}${win.path.includes("?") ? "&" : "?"}_embed=1`}
+                  className="w-full h-full border-0"
+                  title={win.title}
+                />
+              </DesktopWindow>
+            ))}
+
+          {/* Mobile fallback — single window */}
+          <div className="md:hidden absolute inset-0 flex items-stretch py-2 px-2 z-20">
+            <div className="flex-1 min-h-0 flex flex-col rounded-lg border border-[#BFC1B7] bg-[#FDFDF8] shadow-2xl overflow-hidden">
+              <div className="flex items-center h-9 px-3 bg-[#E5E7E0] border-b border-[#BFC1B7] shrink-0">
+                <span className="text-sm font-semibold text-[#23251D]">{getWindowTitle(pathname)}</span>
+              </div>
+              <ScrollArea className="flex-1">
+                <div className="p-6">{children}</div>
               </ScrollArea>
-            </DesktopWindow>
+            </div>
           </div>
         </div>
-      </div>
+      </DesktopContextMenu>
 
       {/* Mobile dock */}
       <MobileDock />

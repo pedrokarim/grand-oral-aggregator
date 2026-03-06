@@ -5,31 +5,50 @@ import { motion, useDragControls } from "framer-motion";
 import { FileText, ChevronDown, Minus, Square, X, Maximize2, Minimize2 } from "lucide-react";
 
 interface DesktopWindowProps {
+  id: string;
   title: string;
   children: ReactNode;
   toolbar?: ReactNode;
   className?: string;
-}
-
-interface Size {
-  width: number;
-  height: number;
+  zIndex: number;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  isFocused: boolean;
+  onFocus: () => void;
+  onClose: () => void;
+  onMinimize: () => void;
+  onPositionChange: (pos: { x: number; y: number }) => void;
+  onSizeChange: (size: { width: number; height: number }) => void;
 }
 
 const MIN_WIDTH = 400;
 const MIN_HEIGHT = 300;
 
-export function DesktopWindow({ title, children, toolbar, className }: DesktopWindowProps) {
+export function DesktopWindow({
+  title,
+  children,
+  toolbar,
+  className,
+  zIndex,
+  position,
+  size,
+  isFocused,
+  onFocus,
+  onClose,
+  onMinimize,
+  onPositionChange,
+  onSizeChange,
+}: DesktopWindowProps) {
   const dragControls = useDragControls();
   const constraintsRef = useRef<HTMLDivElement>(null);
   const windowRef = useRef<HTMLDivElement>(null);
-
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState<Size | null>(null); // null = auto (flex)
-  const [isMaximized, setIsMaximized] = useState(true); // starts maximized in layout
   const [isDragging, setIsDragging] = useState(false);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [preMaxState, setPreMaxState] = useState<{
+    position: { x: number; y: number };
+    size: { width: number; height: number };
+  } | null>(null);
 
-  // Resize state
   const resizeRef = useRef<{
     startX: number;
     startY: number;
@@ -41,48 +60,46 @@ export function DesktopWindow({ title, children, toolbar, className }: DesktopWi
   } | null>(null);
 
   const handleDoubleClickTitleBar = useCallback(() => {
-    if (isMaximized) {
-      // Un-maximize: shrink to 80% of viewport, center
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const w = Math.max(MIN_WIDTH, vw * 0.7);
-      const h = Math.max(MIN_HEIGHT, vh * 0.7);
-      setSize({ width: w, height: h });
-      setPosition({ x: (vw - w) / 2 - 112, y: (vh - h) / 2 - 40 });
+    if (isMaximized && preMaxState) {
+      // Restore
+      onPositionChange(preMaxState.position);
+      onSizeChange(preMaxState.size);
       setIsMaximized(false);
+      setPreMaxState(null);
     } else {
-      // Maximize: reset to flex fill
-      setSize(null);
-      setPosition({ x: 0, y: 0 });
+      // Maximize
+      setPreMaxState({ position, size });
+      onPositionChange({ x: 0, y: 0 });
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - 32; // header height
+      onSizeChange({ width: vw, height: vh });
       setIsMaximized(true);
     }
-  }, [isMaximized]);
+  }, [isMaximized, preMaxState, position, size, onPositionChange, onSizeChange]);
 
   const handleDragEnd = useCallback(
     (_: unknown, info: { offset: { x: number; y: number } }) => {
       setIsDragging(false);
       if (isMaximized) return;
-      setPosition((prev) => ({
-        x: prev.x + info.offset.x,
-        y: prev.y + info.offset.y,
-      }));
+      onPositionChange({
+        x: position.x + info.offset.x,
+        y: position.y + info.offset.y,
+      });
     },
-    [isMaximized]
+    [isMaximized, position, onPositionChange],
   );
 
-  // Resize via edge handles
   const startResize = useCallback(
     (e: React.PointerEvent, edge: string) => {
       e.preventDefault();
       e.stopPropagation();
-      if (isMaximized || !windowRef.current) return;
+      if (isMaximized) return;
 
-      const rect = windowRef.current.getBoundingClientRect();
       resizeRef.current = {
         startX: e.clientX,
         startY: e.clientY,
-        startW: rect.width,
-        startH: rect.height,
+        startW: size.width,
+        startH: size.height,
         startPosX: position.x,
         startPosY: position.y,
         edge,
@@ -110,8 +127,8 @@ export function DesktopWindow({ title, children, toolbar, className }: DesktopWi
           newY = r.startPosY + (r.startH - newH);
         }
 
-        setSize({ width: newW, height: newH });
-        setPosition({ x: newX, y: newY });
+        onSizeChange({ width: newW, height: newH });
+        onPositionChange({ x: newX, y: newY });
       };
 
       const onUp = () => {
@@ -123,50 +140,23 @@ export function DesktopWindow({ title, children, toolbar, className }: DesktopWi
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     },
-    [isMaximized, position]
+    [isMaximized, position, size, onPositionChange, onSizeChange],
   );
 
-  // When maximized, render as a simple flex child (no absolute positioning)
-  if (isMaximized) {
-    return (
-      <div
-        ref={windowRef}
-        className={`flex flex-col rounded-lg border border-[#BFC1B7] bg-[#FDFDF8] shadow-2xl overflow-hidden ${className ?? ""}`}
-      >
-        <WindowTitleBar
-          title={title}
-          onPointerDown={(e) => {
-            // Un-maximize on drag start
-            if (isMaximized) {
-              handleDoubleClickTitleBar();
-              return;
-            }
-            dragControls.start(e);
-          }}
-          onDoubleClick={handleDoubleClickTitleBar}
-          isMaximized={isMaximized}
-        />
-        {toolbar && <div className="shrink-0">{toolbar}</div>}
-        <div className="flex-1 overflow-y-auto bg-[#FDFDF8]">{children}</div>
-      </div>
-    );
-  }
-
-  // When not maximized, render as draggable absolute-positioned window
   return (
     <>
-      {/* Constraints container (full desktop area) */}
-      <div ref={constraintsRef} className="absolute inset-0 pointer-events-none" />
+      <div ref={constraintsRef} className="fixed inset-0 pointer-events-none" style={{ top: 32 }} />
 
       <motion.div
         ref={windowRef}
-        className={`absolute flex flex-col rounded-lg border border-[#BFC1B7] bg-[#FDFDF8] overflow-hidden
+        className={`absolute flex flex-col rounded-lg border border-[#BFC1B7] bg-[#FDFDF8] dark:bg-[#1E1F23] dark:border-[#3a3b3f] overflow-hidden
           ${isDragging ? "shadow-[0_25px_60px_rgba(0,0,0,0.3)]" : "shadow-2xl"}
+          ${!isFocused ? "opacity-95" : ""}
           ${className ?? ""}`}
         style={{
-          width: size?.width,
-          height: size?.height,
-          zIndex: 20,
+          width: size.width,
+          height: size.height,
+          zIndex,
         }}
         animate={{ x: position.x, y: position.y }}
         transition={{ duration: 0.2, ease: "easeOut" }}
@@ -177,22 +167,29 @@ export function DesktopWindow({ title, children, toolbar, className }: DesktopWi
         dragConstraints={constraintsRef}
         onDragStart={() => setIsDragging(true)}
         onDragEnd={handleDragEnd}
+        onPointerDown={onFocus}
       >
         <WindowTitleBar
           title={title}
           onPointerDown={(e) => dragControls.start(e)}
           onDoubleClick={handleDoubleClickTitleBar}
           isMaximized={isMaximized}
+          onClose={onClose}
+          onMinimize={onMinimize}
         />
         {toolbar && <div className="shrink-0">{toolbar}</div>}
-        <div className="flex-1 overflow-y-auto bg-[#FDFDF8]">{children}</div>
+        <div className="flex-1 overflow-y-auto bg-[#FDFDF8] dark:bg-[#1E1F23]">{children}</div>
 
         {/* Resize handles */}
-        <div className="absolute top-0 right-0 w-1.5 h-full cursor-ew-resize" onPointerDown={(e) => startResize(e, "e")} />
-        <div className="absolute top-0 left-0 w-1.5 h-full cursor-ew-resize" onPointerDown={(e) => startResize(e, "w")} />
-        <div className="absolute bottom-0 left-0 h-1.5 w-full cursor-ns-resize" onPointerDown={(e) => startResize(e, "s")} />
-        <div className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize" onPointerDown={(e) => startResize(e, "se")} />
-        <div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize" onPointerDown={(e) => startResize(e, "sw")} />
+        {!isMaximized && (
+          <>
+            <div className="absolute top-0 right-0 w-1.5 h-full cursor-ew-resize" onPointerDown={(e) => startResize(e, "e")} />
+            <div className="absolute top-0 left-0 w-1.5 h-full cursor-ew-resize" onPointerDown={(e) => startResize(e, "w")} />
+            <div className="absolute bottom-0 left-0 h-1.5 w-full cursor-ns-resize" onPointerDown={(e) => startResize(e, "s")} />
+            <div className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize" onPointerDown={(e) => startResize(e, "se")} />
+            <div className="absolute bottom-0 left-0 w-4 h-4 cursor-sw-resize" onPointerDown={(e) => startResize(e, "sw")} />
+          </>
+        )}
       </motion.div>
     </>
   );
@@ -205,42 +202,49 @@ function WindowTitleBar({
   onPointerDown,
   onDoubleClick,
   isMaximized,
+  onClose,
+  onMinimize,
 }: {
   title: string;
   onPointerDown: (e: React.PointerEvent) => void;
   onDoubleClick: () => void;
   isMaximized: boolean;
+  onClose: () => void;
+  onMinimize: () => void;
 }) {
   return (
     <div
-      className="flex items-center h-9 px-1.5 pr-0.5 bg-[#E5E7E0] border-b border-[#BFC1B7] shrink-0 select-none relative cursor-grab active:cursor-grabbing"
+      className="flex items-center h-9 px-1.5 pr-0.5 bg-[#E5E7E0] dark:bg-[#2a2b2f] border-b border-[#BFC1B7] dark:border-[#3a3b3f] shrink-0 select-none relative cursor-grab active:cursor-grabbing"
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
     >
       {/* Left: document icon + chevron */}
       <div className="flex items-center z-10">
-        <button className="flex items-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] transition-colors cursor-default" tabIndex={-1} onPointerDown={(e) => e.stopPropagation()}>
+        <button className="flex items-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default" tabIndex={-1} onPointerDown={(e) => e.stopPropagation()}>
           <FileText className="w-5 h-5" />
           <ChevronDown className="w-4 h-4 -mx-0.5 text-[#9EA096]" />
         </button>
       </div>
       {/* Center: title + chevron */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="text-sm font-semibold text-[#23251D]">{title}</span>
+        <span className="text-sm font-semibold text-[#23251D] dark:text-[#EAECF6]">{title}</span>
         <ChevronDown className="w-4 h-4 -ml-0.5 text-[#9EA096]" />
       </div>
       <div className="flex-1" />
-      {/* Right: window controls (OSButton style) */}
+      {/* Right: window controls */}
       <div className="flex items-center z-10">
         <button
-          className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] transition-colors cursor-default"
+          className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default"
           tabIndex={-1}
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            onMinimize();
+          }}
         >
           <Minus className="w-4 h-4 relative top-[1px]" />
         </button>
         <button
-          className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] transition-colors cursor-default group"
+          className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default group"
           tabIndex={-1}
           onPointerDown={(e) => {
             e.stopPropagation();
@@ -255,9 +259,12 @@ function WindowTitleBar({
           )}
         </button>
         <button
-          className="inline-flex items-center justify-center px-1.5 py-1 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] transition-colors cursor-default"
+          className="inline-flex items-center justify-center px-1.5 py-1 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default"
           tabIndex={-1}
-          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
         >
           <X className="w-4 h-4" />
         </button>
@@ -265,4 +272,3 @@ function WindowTitleBar({
     </div>
   );
 }
-

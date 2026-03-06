@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, type RefObject, useState, useRef } from "react";
+import { type ReactNode, type RefObject, useState } from "react";
 import { motion, useDragControls } from "framer-motion";
 
 interface DesktopIconProps {
@@ -12,6 +11,7 @@ interface DesktopIconProps {
   constraintsRef?: RefObject<HTMLElement | null>;
   initialPosition: { x: number; y: number };
   onPositionChange?: (position: { x: number; y: number }) => void;
+  onOpen: (href: string, label: string) => void;
 }
 
 export function DesktopIcon({
@@ -21,6 +21,7 @@ export function DesktopIcon({
   constraintsRef,
   initialPosition,
   onPositionChange,
+  onOpen,
 }: DesktopIconProps) {
   const pathname = usePathname();
   const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
@@ -52,6 +53,11 @@ export function DesktopIcon({
     setTimeout(() => { setHasDragged(false); }, 100);
   };
 
+  const handleClick = () => {
+    if (hasDragged) return;
+    onOpen(href, label);
+  };
+
   return (
     <motion.li
       className={`absolute w-28 flex justify-center items-center list-none
@@ -80,9 +86,8 @@ export function DesktopIcon({
       }}
     >
       <div className="relative cursor-move">
-        <Link
-          href={href}
-          onClick={(e) => { if (hasDragged) e.preventDefault(); }}
+        <button
+          onClick={handleClick}
           className="flex flex-col items-center gap-0.5 group"
           draggable={false}
         >
@@ -100,7 +105,7 @@ export function DesktopIcon({
               </span>
             </span>
           </figcaption>
-        </Link>
+        </button>
       </div>
     </motion.li>
   );

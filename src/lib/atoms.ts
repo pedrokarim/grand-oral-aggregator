@@ -1,0 +1,33 @@
+import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+
+/* ---- Icon positions (persisted) ---- */
+export type IconPositions = Record<string, { x: number; y: number }>;
+
+export const iconPositionsAtom = atomWithStorage<IconPositions>(
+  "desktop-icon-positions",
+  {},
+  undefined,
+  { getOnInit: true },
+);
+
+/* ---- Window manager ---- */
+export interface AppWindow {
+  id: string;
+  path: string;
+  title: string;
+  zIndex: number;
+  minimized: boolean;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+}
+
+export const windowsAtom = atom<AppWindow[]>([]);
+
+/** Derive the focused window (highest zIndex, not minimized) */
+export const focusedWindowAtom = atom<AppWindow | null>((get) => {
+  const windows = get(windowsAtom);
+  const visible = windows.filter((w) => !w.minimized);
+  if (visible.length === 0) return null;
+  return visible.reduce((a, b) => (a.zIndex > b.zIndex ? a : b));
+});

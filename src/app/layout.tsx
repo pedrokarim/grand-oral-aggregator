@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { DesktopLayout } from "@/components/desktop-layout";
+import { LayoutShell } from "@/components/layout-shell";
 
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex",
@@ -36,7 +36,7 @@ export default function RootLayout({
       </head>
       <body className={`${ibmPlexSans.variable} antialiased`}>
         <TooltipProvider>
-          <DesktopLayout>{children}</DesktopLayout>
+          <LayoutShell>{children}</LayoutShell>
         </TooltipProvider>
       </body>
     </html>
