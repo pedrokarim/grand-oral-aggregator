@@ -1,0 +1,85 @@
+{
+  "articles": [
+    {
+      "title": "La plateforme des Cours d'Adultes de la Ville de Paris a été victime d'une cyberattaque accompagnée d'une fuite de données, dont l’ampleur reste encore à définir - BFM",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMi0wJBVV95cUxNSUNwSE1QRjNDUUdWcmdaUlM0TTBSb2R3RXE0X0VtazgweHhtM1NiVDZtcGhYQ201WGs5M3ZQTFhDY20xSGdhZGZhMkxIdlJtZE1TQVVCckVuZW04ZEppZWVqRXVnWjVKemQ5MGVHazRBSmwtSk42MXVNdmMzVzhEU1B1amF0NVE3aEZFOW5URVQ1LVlGcVpfSHlOYXFBU2EwZVlwV0dwWS10VkNiTURoV3BjVDF3YVM",
+      "url": "https://news.google.com/rss/articles/CBMi0wJBVV95cUxNSUNwSE1QRjNDUUdWcmdaUlM0TTBSb2R3RXE0X0VtazgweHhtM1NiVDZtcGhYQ201WGs5M3ZQTFhDY20xSGdhZGZhMkxIdlJtZE1TQVVCckVuZW04ZEppZWVqRXVnWjVKemQ5MGVHazRBSmwtSk42MXVNdmMzVzhEU1B1amF0NVE3aEZFOW5URVQ1LVlGcVpfSHlOYXFBU2EwZVlwV0dwWS10VkNiTURoV3BjVDF3YVM2SEhydVVsSGZFc3R3R1Z2SFNDR2NHMVZ5OVZ4dVpPT2pZVE9uUVBuY0hIbURYbTVudzRXZmEtRnRjLUtqV0hWbzg2OUZacy1vc2gwVFA2VmxTZDBCY0tqTG9ocUZsd1FCdGoxOE04ZFV3TmxDcVhnVU1ELWtFVUdDdTJMS3pqcDR2ZFFFNEJPME12aGtUMk9IMXR0V3NIdEdSZFk?oc=5",
+      "source": "BFM",
+      "publishedAt": "2026-03-05T17:38:53.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Cybersécurité : Clap de fin pour LeakBase, plaque tournante des données volées - Journal du Coin",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMickFVX3lxTE81enRRamZ2WmxhQ2NraUZXVG5VN0F2ZFdnZGV2S3l5REszU0Ixd3ZQYTBSd2JnT25HWHEwRzQ0b2J6NVN3R2IycFhvQl9Bc0M2UTZsM29YZG5wWDFEcmswWUQ2RFZwZnViUnZRMDR0dkJEZw?oc=5\" target=\"_blank\"&gt;Cybersécurité : Clap de fin pour LeakBase, plaque tournante des don",
+      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE81enRRamZ2WmxhQ2NraUZXVG5VN0F2ZFdnZGV2S3l5REszU0Ixd3ZQYTBSd2JnT25HWHEwRzQ0b2J6NVN3R2IycFhvQl9Bc0M2UTZsM29YZG5wWDFEcmswWUQ2RFZwZnViUnZRMDR0dkJEZw?oc=5",
+      "source": "Journal du Coin",
+      "publishedAt": "2026-03-05T16:00:00.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Zero-day : l’entreprise devient la cible prioritaire des cyberattaques - Solutions-Numeriques",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiqAFBVV95cUxPcGJ6VngwUVlFU1c2MldIcGZGV0w5SXowNmYtN3VOY0JzQ0pXWkhyd3pOdGhLMTZzWDF4S1NrNEpkeEpHUnZIWWRabm52MDRzQWRUWXZ3RVZQcW93c1N3ZlY4T3lMakVFaVhJdE9kOElUQ25NTzZBNTgxdUtXUnRDZ3lGdS1IVXhhS1B1anpBbWl6Q0MxYUdxYnBoSF93WV9FN2lZSFdmdmw?oc=5\" target=\"_blan",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPcGJ6VngwUVlFU1c2MldIcGZGV0w5SXowNmYtN3VOY0JzQ0pXWkhyd3pOdGhLMTZzWDF4S1NrNEpkeEpHUnZIWWRabm52MDRzQWRUWXZ3RVZQcW93c1N3ZlY4T3lMakVFaVhJdE9kOElUQ25NTzZBNTgxdUtXUnRDZ3lGdS1IVXhhS1B1anpBbWl6Q0MxYUdxYnBoSF93WV9FN2lZSFdmdmw?oc=5",
+      "source": "Solutions-Numeriques",
+      "publishedAt": "2026-03-05T15:00:10.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Cybersécurité : La moitié des attaques “zero day” ciblent désormais des entreprises privées, d’après Google - L'Usine Digitale",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiiAJBVV95cUxPYXoxMmFXR3k4WVNNbVhUNWhqUjI3SzVUdWNjTXhINDlLSDk2SWQ2U01ZaTQ4bFpyRks1RzRIQ2hoa1lsYW52SDlEc0hRaS1scXp6RWhnVnJDZjdUR2dwQVFkTFhlREN4TzJNaEczZ0hzUlBUQTVRN19KUFJmZEFOUnJrS0p3XzVrM3JrYzNiMHRMaEhGM2lCM255ckpBbDY0NUtnWS0yVU9KX19GdnlFNTNwNE9SY2Z",
+      "url": "https://news.google.com/rss/articles/CBMiiAJBVV95cUxPYXoxMmFXR3k4WVNNbVhUNWhqUjI3SzVUdWNjTXhINDlLSDk2SWQ2U01ZaTQ4bFpyRks1RzRIQ2hoa1lsYW52SDlEc0hRaS1scXp6RWhnVnJDZjdUR2dwQVFkTFhlREN4TzJNaEczZ0hzUlBUQTVRN19KUFJmZEFOUnJrS0p3XzVrM3JrYzNiMHRMaEhGM2lCM255ckpBbDY0NUtnWS0yVU9KX19GdnlFNTNwNE9SY2ZCSG1RUVZXYndxTks1NERzMG1EQTFyRE9oTldyODhwVjZlSU5oMEFoLVhwYUxQMzcyYWVVYlEwN2lqLVZCdGswc29yNXZBVTdtRnVONUl5MWc?oc=5",
+      "source": "L'Usine Digitale",
+      "publishedAt": "2026-03-05T15:00:04.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "3 questions à…Gilles Pirman, Chargé de mission Stratégie des territoires à l'Agence nationale de la sécurité des systèmes d'information (ANSSI) - Association des Petites Villes de France",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMihAJBVV95cUxQQWpNeUNPb1R6ckpXM0pnRnhleXlFODdYbFNTWmtwRmw4MDdXaTVnR2NZVXJoVmhSby1VdHVsWU5oakJrOGlnYmJJUzVrOExTTS1POFVPRzJTWEJULXU0N2Z4dm1sUWpWZW1CQjlSRm1VN2VrZURwY3pvUWJHYTNjRnM5bzJKbHdCQ1R2VjcycVdTYU1ybkt2LTdOa0drUlBkeDgtSGJLU3JoQnBuTDI0NWNJN1BFTnJ",
+      "url": "https://news.google.com/rss/articles/CBMihAJBVV95cUxQQWpNeUNPb1R6ckpXM0pnRnhleXlFODdYbFNTWmtwRmw4MDdXaTVnR2NZVXJoVmhSby1VdHVsWU5oakJrOGlnYmJJUzVrOExTTS1POFVPRzJTWEJULXU0N2Z4dm1sUWpWZW1CQjlSRm1VN2VrZURwY3pvUWJHYTNjRnM5bzJKbHdCQ1R2VjcycVdTYU1ybkt2LTdOa0drUlBkeDgtSGJLU3JoQnBuTDI0NWNJN1BFTnJoTFBIZjNQdXU5ZE9OWjNmbXRkWnpMaERVVzVCX2tkVkRVaXZFeVg0U295c1RCS2RzSHpkSThFS24tMHZySTFKay11TnFKc3hqZkNGNg?oc=5",
+      "source": "Association des Petites Villes de France",
+      "publishedAt": "2026-03-05T14:28:44.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "ZDNET Morning 05/03/2026 : Nouveautés ransomware, MacBook Neo, Explosion des contenus illicites,... - ZDNET",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMizwFBVV95cUxObzg5NFJwLVRJMnY5TDAyclBMTFhJelZOWnUzZDZUNkV4NVZnc0ltUWRpbjVlbUF3MTNQVkRZblJyak5DUi0ydVI3LWlxYXpibVJtS0hRQTItZlVFUVIzQXBsR2ZFNHBMREFJRlkxRFBDRXA1QWJ1ZWwzMVdKS0JGUHFjU2lYZDh5TmNJa21Dd0FLejVFM1FsODZYWE94TEZMWmlsZmVnYnRDaWJTWXYxTWdwRnZsTnp",
+      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxObzg5NFJwLVRJMnY5TDAyclBMTFhJelZOWnUzZDZUNkV4NVZnc0ltUWRpbjVlbUF3MTNQVkRZblJyak5DUi0ydVI3LWlxYXpibVJtS0hRQTItZlVFUVIzQXBsR2ZFNHBMREFJRlkxRFBDRXA1QWJ1ZWwzMVdKS0JGUHFjU2lYZDh5TmNJa21Dd0FLejVFM1FsODZYWE94TEZMWmlsZmVnYnRDaWJTWXYxTWdwRnZsTnprR1VWTU1iQ2dDUWdJMF9xRHRPdTB6VGM?oc=5",
+      "source": "ZDNET",
+      "publishedAt": "2026-03-05T09:14:07.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Une plateforme de la ville victime d’une cyberattaque, des données d’usagers fuitent - 20 Minutes",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMivgFBVV95cUxNWm4zb3FNcVRMZVVlQnhmeHhoOTgzZ2xtMmhPSGx0OXoyaUhFT0swV0pvN1BHTHNMcThlUFg4bm1tOENSUmd2aGZCazE2VE9ZMElUd3pobDBJdUJ2QWZ1T0RUaDlocXdJSmJTT2FuR29pbEVHMENqQm5aV0VXamVfX0hjUE1QVjVfamN0c0RESmczSVJWaHdaS3hXYTdXaEhpMG1nUmwyeHp3clBUcnVZaERScXpudGh",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNWm4zb3FNcVRMZVVlQnhmeHhoOTgzZ2xtMmhPSGx0OXoyaUhFT0swV0pvN1BHTHNMcThlUFg4bm1tOENSUmd2aGZCazE2VE9ZMElUd3pobDBJdUJ2QWZ1T0RUaDlocXdJSmJTT2FuR29pbEVHMENqQm5aV0VXamVfX0hjUE1QVjVfamN0c0RESmczSVJWaHdaS3hXYTdXaEhpMG1nUmwyeHp3clBUcnVZaERScXpudGhOVmxoRW1R?oc=5",
+      "source": "20 Minutes",
+      "publishedAt": "2026-03-05T08:28:00.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Guerre au Moyen-Orient: pas de hausse de la menace cyber en France, selon l'Anssi - TradingView",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiYkFVX3lxTE9OM3dmbkR1MERCOTFaTlg2cmZtY0Y4UnBfQUxWMFFpZFpQNXpyRWhSUFJqWDlvV2tqaGozMmRaU19mQjhCVnRFcm5wUVlTTHZvaVRDRlJ5QTk5a0w2SzRxb3NR?oc=5\" target=\"_blank\"&gt;Guerre au Moyen-Orient: pas de hausse de la menace cyber en France, selon l'Anssi&lt;/a&g",
+      "url": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE9OM3dmbkR1MERCOTFaTlg2cmZtY0Y4UnBfQUxWMFFpZFpQNXpyRWhSUFJqWDlvV2tqaGozMmRaU19mQjhCVnRFcm5wUVlTTHZvaVRDRlJ5QTk5a0w2SzRxb3NR?oc=5",
+      "source": "TradingView",
+      "publishedAt": "2026-03-04T15:03:47.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Une fuite de base de données éclaire l’usage des cryptomonnaies en Iran - Solutions-Numeriques",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMirAFBVV95cUxPMG9La0RqeEJFSWNsanh6NWlwMFU4cjJPcm9fazJZTHdVSzIzRkRMTVV0RHZIeHQ3Y3VxUmxPb1pwNWQwRXc5ajIyUklnUmE4RjVkT3JQdVZGLVhDOVYwTkE4bUdVeV90UUsxaUV0Sml6bFIzUW03X201RVZwYm02ZU1yaXRJREw0eTRPeHVaSFlFWWR0MkxFZ2FDamFWY2tCSEMwWERuRl8xRjVj?oc=5\" target=\"",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPMG9La0RqeEJFSWNsanh6NWlwMFU4cjJPcm9fazJZTHdVSzIzRkRMTVV0RHZIeHQ3Y3VxUmxPb1pwNWQwRXc5ajIyUklnUmE4RjVkT3JQdVZGLVhDOVYwTkE4bUdVeV90UUsxaUV0Sml6bFIzUW03X201RVZwYm02ZU1yaXRJREw0eTRPeHVaSFlFWWR0MkxFZ2FDamFWY2tCSEMwWERuRl8xRjVj?oc=5",
+      "source": "Solutions-Numeriques",
+      "publishedAt": "2026-03-04T12:12:19.000Z",
+      "theme": "Cybersecurité"
+    },
+    {
+      "title": "Piratage du fichier national des comptes bancaires : le fisc en dit plus sur la cyberattaque - 01net.com",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMixwFBVV95cUxPaktNR1B3Z1lDQkVweVk5NWFRT3locklQbEVGRVQxVGI2SVB1eklTSlJiTzZRUGY2N0l2UWVFRmFkX1VRVXo2RktVMUFHczVhLVNVWjM4WVNQbzdaSV9UYjVqbmhreThRNXNScThrMkpKZkhoQ1pLOFhYUXEzRkhnd3M5eXg0TTJ0TFZMUEZzRHVhV3RDRFl0WU5CVlZxOVRMck55NGh3WHlsdDVaOENoc0JiVjFabTV",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxPaktNR1B3Z1lDQkVweVk5NWFRT3locklQbEVGRVQxVGI2SVB1eklTSlJiTzZRUGY2N0l2UWVFRmFkX1VRVXo2RktVMUFHczVhLVNVWjM4WVNQbzdaSV9UYjVqbmhreThRNXNScThrMkpKZkhoQ1pLOFhYUXEzRkhnd3M5eXg0TTJ0TFZMUEZzRHVhV3RDRFl0WU5CVlZxOVRMck55NGh3WHlsdDVaOENoc0JiVjFabTVGdmFiN0tkZXR6Q1ZTRktR?oc=5",
+      "source": "01net.com",
+      "publishedAt": "2026-03-04T10:44:54.000Z",
+      "theme": "Cybersecurité"
+    }
+  ],
+  "fetchedAt": "2026-03-06T09:31:51.144Z"
+}

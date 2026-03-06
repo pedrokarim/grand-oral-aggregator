@@ -1,0 +1,83 @@
+{
+  "SI et environnement": [
+    "Green Storage : Enjeux et Facteurs clés de succès",
+    "Consommation énergétique des équipements informatiques en milieu professionnel : comment le gérer ? que proposez-vous ?",
+    "Quelles méthodes pour une optimisation énergétique des datacenters ?",
+    "Comment la sobriété numérique peut-elle aider les SI à réduire leurs impacts environnementaux ?",
+    "Est-il possible de rendre son système d'information éco-responsable ?"
+  ],
+  "Cybersecurité": [
+    "Cybersécurité et IA, l'avenir d'un SI résilient",
+    "PME, les grands oubliés de la Cybersécurité",
+    "La Cybersécurité, l'humain reste la clé du problème",
+    "Sous-traiter le SOC, la solution des structures de taille moyenne…",
+    "IA, un passage obligé pour le traitement des menaces",
+    "Monter son SOC est-il une bonne réponse aux risques Cyber ?",
+    "Géopolitique et cybersécurité des grandes entreprises françaises : analyse des risques et stratégies d'adaptation",
+    "Cybersécurité : comment impliquer les utilisateurs ?"
+  ],
+  "Cloud et virtualisation": [
+    "Cloud, la solution pour réduire sa facture IT",
+    "Cloud Souverain, une garantie pour mes données hébergées",
+    "Cloud et Sécurité, qui est responsable ?",
+    "Migration dans le Cloud: Des blocages existent encore…",
+    "La conteneurisation et la virtualisation : enjeux, avantages, limites ?",
+    "La migration Cloud n'est pas viable, vive le Cloud Native.",
+    "Le Cloud : la réponse aux problèmes de sécurité des données"
+  ],
+  "Big Data": [
+    "Big Data, une masse d'opportunité mais une masse de risques…",
+    "Big Data, des outils inadaptés aux petites entreprises",
+    "Big Data et IA : un réel enjeu business",
+    "Data Analytics ou comment donner de la valeur aux données...",
+    "Big Data, surveillance et confiance",
+    "Big Data et législation",
+    "La gestion des données dans un SI (quantification de la volumétrie, sauvegardes etc.)"
+  ],
+  "Développement": [
+    "ISO/CEI 25010, cette norme est nécessaire et suffisante pour garantir la qualité logicielle ?",
+    "Le déploiement continu  : valeur ajoutée/retour sur investissement ?",
+    "Apprentissage automatique et automatisation de tests de logiciels",
+    "Stratégie de maintenabilité logicielle et les couts associés ?",
+    "En quoi DevOps peut améliorer la qualité de votre S.I. et la productivité de vos équipes IT ?",
+    "Quels sont les enjeux et le positionnement de la RA/RV pour l’entreprise 4.0"
+  ],
+  "Mobilité": [
+    "Comment gérer la mobilité au sein d’un SI ?",
+    "Les outils numériques au service de la mobilité",
+    "Consumérisation de l'IT et BYOD : opportunités, risques et enjeux pour le SI"
+  ],
+  "Management et stratégie": [
+    "DSI: Gestion de la pénurie de techno-talents",
+    "SI et consommation énergétique, un enjeu toujours présent…",
+    "SI et cyberattaques: Faut-il revoir les PCA/PRA ?",
+    "DSI et RH: Comment solutionner le manque de compétences ?",
+    "RSSI : Quels impacts sur le métier avec l'avènement du Cloud ?",
+    "IT : Sur quels standards s'appuyer en terme de gouvernance ?",
+    "La gestion de l'énergie est-elle toujours d'actualité pour la DSI ?"
+  ],
+  "Blockchain": [
+    "Pourquoi la Blockchain est considérée comme la nouvelle révolution numérique ?",
+    "La blockchain, un outil informatique permettant la gestion de la traçabilité. En quoi cet outil peut répondre aux objectifs et enjeux des services de la consommation et de la production ?",
+    "Les problématiques éthiques et juridiques de la blockchain sont-elles un frein à son développement et déploiement au sein des entreprises françaises ?",
+    "Le droit face aux technologies tel que la blockchain ?",
+    "Blockchain et empreinte énergétique"
+  ],
+  "Intelligence artificielle": [
+    "IA : La solution à l'explosion des cyberattaques",
+    "IA : Enjeux juridiques, éthiques et de gouvernance ?",
+    "L'IA ou l'injustice algorithmique",
+    "L'intelligence artificielle peut-elle assurer la sécurité d'une infrastructure système et réseau de façon autonome ?",
+    "IA, La révolution marketing",
+    "Quelle éthique pour l’intelligence artificielle ?"
+  ],
+  "Optimisation du SI": [
+    "L'optimisation du SI passe forcément par le Cloud",
+    "Optimiser un système d’information grâce à ITIL",
+    "L'automatisation, un passage obligé dans l'optimisation du SI",
+    "Quels sont les indicateurs les plus pertinents pour gérer au mieux un projet informatique dans une entreprise 4.0 ?",
+    "Comment mettre en place une veille efficace afin d’orienter sa stratégie d’entreprise ?",
+    "Comment l'économie de l'énergie peut être une opportunité pour l'optimisation des SI ?",
+    "Quelles démarches adopter pour assurer l’amélioration continue des services ?"
+  ]
+}

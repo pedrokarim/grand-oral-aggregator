@@ -1,0 +1,368 @@
+[
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "SI et environnement",
+    "sujet": "Green Storage : Enjeux et Facteurs clés de succès"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "SI et environnement",
+    "sujet": "Consommation énergétique des équipements informatiques en milieu professionnel : comment le gérer ? que proposez-vous ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "SI et environnement",
+    "sujet": "Quelles méthodes pour une optimisation énergétique des datacenters ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "SI et environnement",
+    "sujet": "Comment la sobriété numérique peut-elle aider les SI à réduire leurs impacts environnementaux ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "SI et environnement",
+    "sujet": "Est-il possible de rendre son système d'information éco-responsable ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "Cybersécurité et IA, l'avenir d'un SI résilient"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "PME, les grands oubliés de la Cybersécurité"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "La Cybersécurité, l'humain reste la clé du problème"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "Sous-traiter le SOC, la solution des structures de taille moyenne…"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "IA, un passage obligé pour le traitement des menaces"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "Monter son SOC est-il une bonne réponse aux risques Cyber ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "Géopolitique et cybersécurité des grandes entreprises françaises : analyse des risques et stratégies d'adaptation"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cybersecurité",
+    "sujet": "Cybersécurité : comment impliquer les utilisateurs ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "Cloud, la solution pour réduire sa facture IT"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "Cloud Souverain, une garantie pour mes données hébergées"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "Cloud et Sécurité, qui est responsable ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "Migration dans le Cloud: Des blocages existent encore…"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "La conteneurisation et la virtualisation : enjeux, avantages, limites ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "La migration Cloud n'est pas viable, vive le Cloud Native."
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Cloud et virtualisation",
+    "sujet": "Le Cloud : la réponse aux problèmes de sécurité des données"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "Big Data, une masse d'opportunité mais une masse de risques…"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "Big Data, des outils inadaptés aux petites entreprises"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "Big Data et IA : un réel enjeu business"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "Data Analytics ou comment donner de la valeur aux données..."
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "Big Data, surveillance et confiance"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "Big Data et législation"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Big Data",
+    "sujet": "La gestion des données dans un SI (quantification de la volumétrie, sauvegardes etc.)"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Développement",
+    "sujet": "ISO/CEI 25010, cette norme est nécessaire et suffisante pour garantir la qualité logicielle ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Développement",
+    "sujet": "Le déploiement continu  : valeur ajoutée/retour sur investissement ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Développement",
+    "sujet": "Apprentissage automatique et automatisation de tests de logiciels"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Développement",
+    "sujet": "Stratégie de maintenabilité logicielle et les couts associés ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Développement",
+    "sujet": "En quoi DevOps peut améliorer la qualité de votre S.I. et la productivité de vos équipes IT ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Développement",
+    "sujet": "Quels sont les enjeux et le positionnement de la RA/RV pour l’entreprise 4.0"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Mobilité",
+    "sujet": "Comment gérer la mobilité au sein d’un SI ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Mobilité",
+    "sujet": "Les outils numériques au service de la mobilité"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Mobilité",
+    "sujet": "Consumérisation de l'IT et BYOD : opportunités, risques et enjeux pour le SI"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "DSI: Gestion de la pénurie de techno-talents"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "SI et consommation énergétique, un enjeu toujours présent…"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "SI et cyberattaques: Faut-il revoir les PCA/PRA ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "DSI et RH: Comment solutionner le manque de compétences ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "RSSI : Quels impacts sur le métier avec l'avènement du Cloud ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "IT : Sur quels standards s'appuyer en terme de gouvernance ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Management et stratégie",
+    "sujet": "La gestion de l'énergie est-elle toujours d'actualité pour la DSI ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Blockchain",
+    "sujet": "Pourquoi la Blockchain est considérée comme la nouvelle révolution numérique ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Blockchain",
+    "sujet": "La blockchain, un outil informatique permettant la gestion de la traçabilité. En quoi cet outil peut répondre aux objectifs et enjeux des services de la consommation et de la production ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Blockchain",
+    "sujet": "Les problématiques éthiques et juridiques de la blockchain sont-elles un frein à son développement et déploiement au sein des entreprises françaises ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Blockchain",
+    "sujet": "Le droit face aux technologies tel que la blockchain ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Blockchain",
+    "sujet": "Blockchain et empreinte énergétique"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Intelligence artificielle",
+    "sujet": "IA : La solution à l'explosion des cyberattaques"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Intelligence artificielle",
+    "sujet": "IA : Enjeux juridiques, éthiques et de gouvernance ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Intelligence artificielle",
+    "sujet": "L'IA ou l'injustice algorithmique"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Intelligence artificielle",
+    "sujet": "L'intelligence artificielle peut-elle assurer la sécurité d'une infrastructure système et réseau de façon autonome ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Intelligence artificielle",
+    "sujet": "IA, La révolution marketing"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Intelligence artificielle",
+    "sujet": "Quelle éthique pour l’intelligence artificielle ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "L'optimisation du SI passe forcément par le Cloud"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "Optimiser un système d’information grâce à ITIL"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "L'automatisation, un passage obligé dans l'optimisation du SI"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "Quels sont les indicateurs les plus pertinents pour gérer au mieux un projet informatique dans une entreprise 4.0 ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "Comment mettre en place une veille efficace afin d’orienter sa stratégie d’entreprise ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "Comment l'économie de l'énergie peut être une opportunité pour l'optimisation des SI ?"
+  },
+  {
+    "type": "Sujet de préparation",
+    "domaine": "INFO",
+    "theme": "Optimisation du SI",
+    "sujet": "Quelles démarches adopter pour assurer l’amélioration continue des services ?"
+  }
+]

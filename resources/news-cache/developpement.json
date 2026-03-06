@@ -1,0 +1,85 @@
+{
+  "articles": [
+    {
+      "title": "🐕 DevSecOps 2026 : 87 % des orgas exposées selon Datadog, on a lu le rapport - GoodTechInfo",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMimAFBVV95cUxPQVYySVR0VWE2ZkNfeXpGYzNkYkNqekZucU1xQ21jV0ZVbE1GdFJTU0lHeXRnWHJrRDBEZmtlT3ZmbUZFRFo4WXZJYk92N3BLc3Zscm9QNFJhT2hyUnoxaXRQN2xnVGtFZ3lqbmk0S1hQNlNZTGxJWkJqY0x1OHhvVFkwNlduZGtuTUhoczlMSTJHbGJaOU1uUw?oc=5\" target=\"_blank\"&gt;🐕 DevSecOps 20",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPQVYySVR0VWE2ZkNfeXpGYzNkYkNqekZucU1xQ21jV0ZVbE1GdFJTU0lHeXRnWHJrRDBEZmtlT3ZmbUZFRFo4WXZJYk92N3BLc3Zscm9QNFJhT2hyUnoxaXRQN2xnVGtFZ3lqbmk0S1hQNlNZTGxJWkJqY0x1OHhvVFkwNlduZGtuTUhoczlMSTJHbGJaOU1uUw?oc=5",
+      "source": "GoodTechInfo",
+      "publishedAt": "2026-03-04T06:28:10.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "Observabilité native : la nouvelle frontière du Cloud et du DevOps - Silicon.fr",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiqAFBVV95cUxPWWdWY0t4RE9IY1VpY2FMTGhONm1iZlFtQ2FleXM3QVotc21HOWRIMHV3RGZwV0h1bVZWLUZiYXJFcjRmZ0d1SFR2SUo0a25NZ2FGNmZITmQ1MXlCSzRGeXhPMEpVaWR4UDNQRTc4ckdxUlVSZVlOYnNUMjE4NG51aWh4TDdjYThqWjZQelFQMTJzbHFiWE1GSDNFckE4V3NXZDl4UnQtOWrSAa4BQVVfeXFMTXFxYVV",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxPWWdWY0t4RE9IY1VpY2FMTGhONm1iZlFtQ2FleXM3QVotc21HOWRIMHV3RGZwV0h1bVZWLUZiYXJFcjRmZ0d1SFR2SUo0a25NZ2FGNmZITmQ1MXlCSzRGeXhPMEpVaWR4UDNQRTc4ckdxUlVSZVlOYnNUMjE4NG51aWh4TDdjYThqWjZQelFQMTJzbHFiWE1GSDNFckE4V3NXZDl4UnQtOWrSAa4BQVVfeXFMTXFxYVVJN2twTzd6Y2JYQWJpd3NHc0tDYzdEUnBXRUpLYW5ucWFKazluQ29xTGhsd0l0WnRwd1VlZEhyZFdfMzJlMTc0VDFXSkdKSFRGMU9OeERQbWRCQU0wMl82S2RuTWxJSUNmYVM4Q2FVZi1Gd0RCRTlvY0tOWTIwY0ZVSUdWcDlURUFZREo1YXU3Mm81SGtsMkM4UFJBWU4teTBFZmhhOWNvdDR3?oc=5",
+      "source": "Silicon.fr",
+      "publishedAt": "2026-03-03T14:00:18.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "Migration de l’infrastructure traditionnelle vers AWS | DevOps – Algofi | Hamdi Miled - it social",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMi9gFBVV95cUxNNGdWWWJBQzh5YnNNclp3V2dBTHRNbEF5eWFMZzBUQy1iU1FiNHZwNGtlLTRSQ0E2YzNoaWIxSDdpV19XOTI4ZEFORWJLaExfc0MydFpvbUN3OFFWcmxCSDRzSEljbTNBd25lb0VhWHQ3U2lZUEUxWXp1YWdRN2xvVG03NHZoRERDaGZMa0k5VWoxNG10c0VwZXZJaUw4ZnY4V2JCUnJNTC1Kck1KNTZCb0FVQzZyQkV",
+      "url": "https://news.google.com/rss/articles/CBMi9gFBVV95cUxNNGdWWWJBQzh5YnNNclp3V2dBTHRNbEF5eWFMZzBUQy1iU1FiNHZwNGtlLTRSQ0E2YzNoaWIxSDdpV19XOTI4ZEFORWJLaExfc0MydFpvbUN3OFFWcmxCSDRzSEljbTNBd25lb0VhWHQ3U2lZUEUxWXp1YWdRN2xvVG03NHZoRERDaGZMa0k5VWoxNG10c0VwZXZJaUw4ZnY4V2JCUnJNTC1Kck1KNTZCb0FVQzZyQkVwY2ZiT3Naa0MxTVlmajBkc0NuRlNmeXJGZktrTmRwdFplejhWTXltNFlldU9hQ3pYX2xnUzVqNTF2Vk8tVmc?oc=5",
+      "source": "it social",
+      "publishedAt": "2026-03-02T16:05:17.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "L'important déploiement militaire américain au Moyen-Orient - France 24",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMivwFBVV95cUxNYnlxQkI5SkY4bEFmQ1FwLUVNTm41aVJoRGxXSk4tSXFPdWtteXlrN3VoLUV2T3NpU21uTWlJbVRGLWN1Yk9WckdxbnZLM0hKUVVhSzBMZ3B1c3ZsQl9oT3R3WExTMDdaMThtT3FlNDlvU2FLV2pQYlczQUJ4SFhqc1FGMjFkWVVDdzB4X0V6MGpDUHNPQl9FZ2NESGZQS25TRkRBVm1CcDFuLUZjXzg2Zks2MkM5VE5",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNYnlxQkI5SkY4bEFmQ1FwLUVNTm41aVJoRGxXSk4tSXFPdWtteXlrN3VoLUV2T3NpU21uTWlJbVRGLWN1Yk9WckdxbnZLM0hKUVVhSzBMZ3B1c3ZsQl9oT3R3WExTMDdaMThtT3FlNDlvU2FLV2pQYlczQUJ4SFhqc1FGMjFkWVVDdzB4X0V6MGpDUHNPQl9FZ2NESGZQS25TRkRBVm1CcDFuLUZjXzg2Zks2MkM5VE5XbFA0ZHppVQ?oc=5",
+      "source": "France 24",
+      "publishedAt": "2026-02-28T10:15:15.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "Opinions de 战刀007(@Square-Creator-e39f7e3a6c9b) - Binance",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiZEFVX3lxTE5yaU1VQWhwUmRlX2hyaGV1VUZzUHp5THZxZXFXbnY5dnY2cmlNVWhLenBGNmQtdnBKV0I0eEpHeHkxZ1A1c18wTVV5N2RNdVAwdDI0N1JhMlQzdU9XVG8zWUVEdlI?oc=5\" target=\"_blank\"&gt;Opinions de 战刀007(@Square-Creator-e39f7e3a6c9b)&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font ",
+      "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5yaU1VQWhwUmRlX2hyaGV1VUZzUHp5THZxZXFXbnY5dnY2cmlNVWhLenBGNmQtdnBKV0I0eEpHeHkxZ1A1c18wTVV5N2RNdVAwdDI0N1JhMlQzdU9XVG8zWUVEdlI?oc=5",
+      "source": "Binance",
+      "publishedAt": "2026-02-26T23:31:43.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "Taille, part, tendances et perspectives du marché DevOps, 2032 - Fortune Business Insights",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMicEFVX3lxTE13UWoxQTMyRUk5ek1NMUxlQjlHRmx4c1BLSXIzQ1dGYU04Sm5fZlZYN3NrX3RZbXlId2pEejFVUGpGUGJiQmlNUU5ST3g4ZVNWR2xGOW1DckozMEpOMVBhRGpDZmFNNFVWRTVhQlZYOEU?oc=5\" target=\"_blank\"&gt;Taille, part, tendances et perspectives du marché DevOps, 2032&lt;/a&g",
+      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE13UWoxQTMyRUk5ek1NMUxlQjlHRmx4c1BLSXIzQ1dGYU04Sm5fZlZYN3NrX3RZbXlId2pEejFVUGpGUGJiQmlNUU5ST3g4ZVNWR2xGOW1DckozMEpOMVBhRGpDZmFNNFVWRTVhQlZYOEU?oc=5",
+      "source": "Fortune Business Insights",
+      "publishedAt": "2026-02-09T08:00:00.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "Cisco Confie Ses Builds à Codex : 20 % Plus Vite, Mais Sous Gouvernance Stricte - Pause Hardware",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiaEFVX3lxTFBKZXY0VDRDcmZPUkp0bGtjdzZjbTdsckxKWHFKbTFjQWVqRXZvekxkYlBVQnEzb2owYVA5VTA0b0VONS1ld2w2MS1hc1JKdTFaSnFEUWFPN1BFcWNkV2thUEFWaDJHTXB4?oc=5\" target=\"_blank\"&gt;Cisco Confie Ses Builds à Codex : 20 % Plus Vite, Mais Sous Gouvernance Stricte&l",
+      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBKZXY0VDRDcmZPUkp0bGtjdzZjbTdsckxKWHFKbTFjQWVqRXZvekxkYlBVQnEzb2owYVA5VTA0b0VONS1ld2w2MS1hc1JKdTFaSnFEUWFPN1BFcWNkV2thUEFWaDJHTXB4?oc=5",
+      "source": "Pause Hardware",
+      "publishedAt": "2026-01-21T08:00:00.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "LambdaTest devient TestMu AI, la fin du test déterministe au profit du contrôle qualité continu de l'IA - it social",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMiuAJBVV95cUxNOHZ0TVYzQUZYT253el9PRTdIaElqRU9kcGk0ZFFua3NTZE9QRE95S0xib0s0NmhSczJiNTdmRWphUHpYa3pvaU9JUE1ieU95cElOOXoycDN0VVZFTjNZQ2R0bmtuRTdkSkE4S1dhRW1hWFZnemc3MmpxZkowVmR4dTlOVHEzLVZzYkJwSjdIQ21wRGt0OVVxeHI4WHpyQ3NXZnZNUnpRci1pMGZnWFFxMEJORi1zUGJ",
+      "url": "https://news.google.com/rss/articles/CBMiuAJBVV95cUxNOHZ0TVYzQUZYT253el9PRTdIaElqRU9kcGk0ZFFua3NTZE9QRE95S0xib0s0NmhSczJiNTdmRWphUHpYa3pvaU9JUE1ieU95cElOOXoycDN0VVZFTjNZQ2R0bmtuRTdkSkE4S1dhRW1hWFZnemc3MmpxZkowVmR4dTlOVHEzLVZzYkJwSjdIQ21wRGt0OVVxeHI4WHpyQ3NXZnZNUnpRci1pMGZnWFFxMEJORi1zUGJpaVlfbGZIcGpfVzViWUZMVDJSd0Y1U0l4Z1pLTGNmWk5fS2VPZTU5a2ZHVGJfME9DSHpaai04dTF1NXNpNy1KWC1GYkpSeUU2UFN1TGZrNWZyRWRUalE3UGNaamtsUHQ4T1NLNzkwS09Ccm4xdDdJMndwUEVhdGNyREhpc2tELWc?oc=5",
+      "source": "it social",
+      "publishedAt": "2026-01-13T08:00:00.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "DevOps : l’art de livrer plus rapidement sans sacrifier la qualité en 2026 - rotek.fr",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMid0FVX3lxTE1lSXRERERFNFZtV3JFTDB5SVFHWjZ6MXh6eEY5RkNlbkdHOXJtS0dEME1SUVdlbFloSXE5dUlBbjAwRWNBT0pZaFRrcU55eTVJNjhiUVZYc3BRT0ZuckJ1WERac1hyb0xQRkVfRzFnVG1CQ2Zrbk1z?oc=5\" target=\"_blank\"&gt;DevOps : l’art de livrer plus rapidement sans sacrifier la qu",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE1lSXRERERFNFZtV3JFTDB5SVFHWjZ6MXh6eEY5RkNlbkdHOXJtS0dEME1SUVdlbFloSXE5dUlBbjAwRWNBT0pZaFRrcU55eTVJNjhiUVZYc3BRT0ZuckJ1WERac1hyb0xQRkVfRzFnVG1CQ2Zrbk1z?oc=5",
+      "source": "rotek.fr",
+      "publishedAt": "2026-01-01T08:00:00.000Z",
+      "theme": "Développement"
+    },
+    {
+      "title": "Netflix migre sa base de données PostgreSQL sur Aurora d'AWS - Le Monde Informatique",
+      "description": "&lt;a href=\"https://news.google.com/rss/articles/CBMivwFBVV95cUxQeDlmcmJaUEY3YklhZWxVcUJwNUtRMmc1ZWFBWjZjWHNCaWE4cllHd3ZNSnRQWHdORHNGeXRBQWJiYV8ybTVCS0tweExLbENveDVleFNGbmF1VE5BNDgwNV9zTHJFSl9jOG1FX1JJQXdxOUZwWnUtSTZBQU1FLTRrM3B6cFhoamY2T0prazA0eWltblJvRmFrVVpWNlpIWElGcWloeXF6ZUNzVmpPcWNRNE5qM1o4SkZ",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQeDlmcmJaUEY3YklhZWxVcUJwNUtRMmc1ZWFBWjZjWHNCaWE4cllHd3ZNSnRQWHdORHNGeXRBQWJiYV8ybTVCS0tweExLbENveDVleFNGbmF1VE5BNDgwNV9zTHJFSl9jOG1FX1JJQXdxOUZwWnUtSTZBQU1FLTRrM3B6cFhoamY2T0prazA0eWltblJvRmFrVVpWNlpIWElGcWloeXF6ZUNzVmpPcWNRNE5qM1o4SkZYU3lOMGpqWdIBwwFBVV95cUxPRG5GUlBNcFU1Uy1pUWZmanRURzRQSmhmcmNQdEk3RkFEM1lROG9XMG1LNV9XZnM3YUItMVAydjB4MVpSNnVMYXBCVjhLX2JDV2JMMC1MbWxoSUF4M0lTZXNTb1JrcEJLRDlEU0QxWHhsVUFHb0RVX1N1aHNWYXhwS05tZXFHMGpQWS1LeWJRNTFFR1RxOHR5TW9wNGotX2p3SEZTOTdQc1JEYjRsbVdhMEJha0xSd09hSGhLNnAtNl81SFE?oc=5",
+      "source": "Le Monde Informatique",
+      "publishedAt": "2025-12-22T08:00:00.000Z",
+      "theme": "Développement"
+    }
+  ],
+  "fetchedAt": "2026-03-06T09:32:02.971Z"
+}

@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Theme {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  slug     String    @unique
+  icon     String    @default("Settings")
+  subjects Subject[]
+  articles NewsArticle[]
+
+  createdAt DateTime @default(now())
+}
+
+model Subject {
+  id       Int    @id @default(autoincrement())
+  type     String
+  domaine  String
+  sujet    String
+  themeId  Int
+  theme    Theme  @relation(fields: [themeId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model NewsArticle {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  content     String?
+  url         String
+  source      String
+  publishedAt DateTime
+  themeId     Int
+  theme       Theme    @relation(fields: [themeId], references: [id])
+
+  fetchedAt   DateTime @default(now())
+
+  @@unique([url, themeId])
+}
