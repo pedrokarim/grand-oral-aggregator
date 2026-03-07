@@ -180,9 +180,9 @@ export function DesktopWindow({
           width: size.width,
           height: size.height,
           zIndex,
+          x: position.x,
+          y: position.y,
         }}
-        animate={{ x: position.x, y: position.y }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
         drag
         dragControls={dragControls}
         dragListener={false}
@@ -285,10 +285,8 @@ function WindowTitleBar({
         <button
           className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default"
           tabIndex={-1}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            onMinimize();
-          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={onMinimize}
         >
           <Minus className="w-4 h-4 relative top-[1px]" />
         </button>
@@ -385,10 +383,8 @@ function WindowTitleBar({
         <button
           className="inline-flex items-center justify-center px-1.5 py-1 rounded-[5px] border border-transparent hover:border-[#9EA096] text-[#4D4F46] dark:text-[#9EA096] transition-colors cursor-default"
           tabIndex={-1}
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={onClose}
         >
           <X className="w-4 h-4" />
         </button>

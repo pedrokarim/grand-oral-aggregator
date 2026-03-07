@@ -7,6 +7,107 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  displayName   String?
+  status        String    @default("online")
+  globalMentionOptOut  Boolean @default(false)
+  chatMentionOptOut    Boolean @default(false)
+  commentMentionOptOut Boolean @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  chatMessages  ChatMessage[]
+  comments      Comment[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  mentions  String[]
+  deleted   Boolean   @default(false)
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  themeId   Int
+  theme     Theme     @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  parentId  Int?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  content   String
+  mentions  String[]
+  depth     Int       @default(0)
+  deleted   Boolean   @default(false)
+  editedAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([themeId, parentId])
+  @@index([themeId, createdAt])
+}
+
+model EditHistory {
+  id         Int      @id @default(autoincrement())
+  entityType String
+  entityId   Int
+  oldContent String
+  editedAt   DateTime @default(now())
+
+  @@index([entityType, entityId])
+}
+
 model Theme {
   id       Int       @id @default(autoincrement())
   name     String    @unique
@@ -14,6 +115,7 @@ model Theme {
   icon     String    @default("Settings")
   subjects Subject[]
   articles NewsArticle[]
+  comments Comment[]
 
   createdAt DateTime @default(now())
 }

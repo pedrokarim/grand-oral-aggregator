@@ -81,7 +81,7 @@ export default function SettingsPage() {
             <Bell className="h-4 w-4" />
             Actualités
           </TabsTrigger>
-          <TabsTrigger value="reset" className="gap-2">
+<TabsTrigger value="reset" className="gap-2">
             <RotateCcw className="h-4 w-4" />
             Réinitialisation
           </TabsTrigger>

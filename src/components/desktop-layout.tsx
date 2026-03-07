@@ -14,7 +14,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeStats } from "@/lib/data";
 import { useWindowManager } from "@/lib/use-window-manager";
 import { ActiveWindowsPanel } from "./active-windows-panel";
-import { GraduationCap, Search, Bell, User } from "lucide-react";
+import { GraduationCap, Search, Bell, MessageCircle } from "lucide-react";
+import { AuthButton } from "./auth-button";
+import { ChatPanel } from "./chat-panel";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
 const themeIconMap: Record<string, string> = {
@@ -73,6 +75,7 @@ function getAllApps(): DesktopApp[] {
       href: `/themes/${slug}`,
       side: "left" as const,
     })),
+    { icon: "/icons/contact.png", label: "Profil", href: "/profile", side: "left" },
     { icon: "/icons/settings.png", label: "Paramètres", href: "/settings", side: "left" },
   ];
 
@@ -136,6 +139,7 @@ const routeTitles: Record<string, string> = {
   "/": "home.mdx",
   "/actualites": "actualites.mdx",
   "/settings": "settings.mdx",
+  "/profile": "profil",
   "/demo": "Demo - Grand Oral",
 };
 
@@ -175,6 +179,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   const [iconPositions, setIconPositions] = useState<IconPositions>({});
 
   const [activeWindowsPanelOpen, setActiveWindowsPanelOpen] = useState(false);
+  const [chatPanelOpen, setChatPanelOpen] = useState(false);
 
   const {
     windows,
@@ -238,17 +243,25 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     }
   }, [windows.length]);
 
+  // Refs for stable postMessage handler (avoid re-attaching on every state change)
+  const openWindowRef = useRef(openWindow);
+  const updateWindowRouteRef = useRef(updateWindowRoute);
+  const computePositionsRef = useRef(computePositions);
+  openWindowRef.current = openWindow;
+  updateWindowRouteRef.current = updateWindowRoute;
+  computePositionsRef.current = computePositions;
+
   // Listen for postMessage from iframes (e.g. reset-icons from settings)
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === "reset-icons") {
         localStorage.removeItem(STORAGE_KEY);
-        const fresh = computePositions();
+        const fresh = computePositionsRef.current();
         setIconPositions(fresh);
       }
       if (e.data?.type === "open-window" && e.data.path) {
         const title = getWindowTitle(e.data.path);
-        openWindow(e.data.path, title);
+        openWindowRef.current(e.data.path, title);
       }
       if (e.data?.type === "update-window-route" && e.data.path) {
         // Find which iframe sent this message using e.source
@@ -258,7 +271,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
             const windowId = frame.getAttribute("data-window-id");
             if (windowId) {
               const newTitle = getWindowTitle(e.data.path);
-              updateWindowRoute(windowId, e.data.path, newTitle);
+              updateWindowRouteRef.current(windowId, e.data.path, newTitle);
             }
             break;
           }
@@ -267,7 +280,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [computePositions, windows, updateWindowRoute]);
+  }, []);
 
   const handlePositionChange = (label: string, pos: { x: number; y: number }) => {
     const next = { ...iconPositions, [label]: pos };
@@ -322,6 +335,13 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
             <Bell className="w-3.5 h-3.5" />
           </button>
           <button
+            onClick={() => setChatPanelOpen(!chatPanelOpen)}
+            className={`p-1 transition-colors cursor-default ${chatPanelOpen ? "text-[#FDFDF8]" : "text-[#9EA096] hover:text-[#FDFDF8]"}`}
+            tabIndex={-1}
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => setActiveWindowsPanelOpen(!activeWindowsPanelOpen)}
             className={`min-w-6 h-5 px-1.5 ml-0.5 inline-flex justify-center items-center rounded
               border-[1.5px] border-t-4 transition-colors cursor-default
@@ -332,9 +352,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
           >
             <span className="text-[13px] font-semibold relative -top-px">{windows.length}</span>
           </button>
-          <button className="p-1 text-[#9EA096] hover:text-[#FDFDF8] transition-colors cursor-default" tabIndex={-1}>
-            <User className="w-3.5 h-3.5" />
-          </button>
+          <AuthButton />
         </div>
       </header>
 
@@ -421,6 +439,12 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
         onWindowClick={(id) => bringToFront(id)}
         onWindowClose={(id) => closeWindow(id)}
         onCloseAll={closeAllWindows}
+      />
+
+      {/* Chat panel */}
+      <ChatPanel
+        open={chatPanelOpen}
+        onClose={() => setChatPanelOpen(false)}
       />
     </div>
   );

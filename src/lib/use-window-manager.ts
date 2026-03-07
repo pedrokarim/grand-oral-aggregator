@@ -2,15 +2,34 @@
 
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { windowsAtom, focusedWindowAtom, type AppWindow } from "./atoms";
 
-let nextId = 1;
+function genId() {
+  return `win-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
 
 export function useWindowManager() {
   const [windows, setWindows] = useAtom(windowsAtom);
   const focusedWindow = useAtomValue(focusedWindowAtom);
   const router = useRouter();
+
+  // Deduplicate windows once on mount (fixes corrupt localStorage state)
+  useEffect(() => {
+    setWindows((prev) => {
+      const seen = new Set<string>();
+      const hasDupes = prev.some((w) => {
+        if (seen.has(w.id)) return true;
+        seen.add(w.id);
+        return false;
+      });
+      if (!hasDupes) return prev;
+      const unique = new Map<string, AppWindow>();
+      for (const w of prev) unique.set(w.id, w);
+      return [...unique.values()];
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Open a new window or bring existing one to front */
   const openWindow = useCallback(
@@ -38,7 +57,7 @@ export function useWindowManager() {
         const offset = (prev.length % 6) * 30;
 
         const newWindow: AppWindow = {
-          id: `win-${nextId++}`,
+          id: genId(),
           path,
           initialPath: path,
           title,

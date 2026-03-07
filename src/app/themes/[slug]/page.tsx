@@ -8,6 +8,7 @@ import {
 import { getThemeColor } from "@/lib/theme-colors";
 import { SubjectCard } from "@/components/subject-card";
 import { NewsFeed } from "@/components/news-feed";
+import { ThemeComments } from "@/components/theme-comments";
 import {
   Leaf, Shield, Cloud, Database, Code, Smartphone,
   Briefcase, Link as LinkIcon, Brain, Settings,
@@ -77,6 +78,9 @@ export default async function ThemePage({
         <h2 className="text-lg font-semibold text-[#23251D] dark:text-[#EAECF6] mb-4">Actualités liées</h2>
         <NewsFeed theme={themeStat.theme} />
       </div>
+
+      {/* Comments */}
+      <ThemeComments themeName={themeStat.theme} />
     </div>
   );
 }
