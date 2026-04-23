@@ -4,11 +4,17 @@ import {
   getSubjectsByTheme,
   themeStats,
   themeIcons,
+  slugifySubject,
+  toBuiltIn,
+  type CustomSubject,
 } from "@/lib/data";
 import { getThemeColor } from "@/lib/theme-colors";
-import { SubjectCard } from "@/components/subject-card";
+import { SubjectsSection } from "@/components/subjects-section";
 import { NewsFeed } from "@/components/news-feed";
 import { ThemeComments } from "@/components/theme-comments";
+import { ThemeFiche } from "@/components/theme-fiche";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "@/lib/auth-server";
 import {
   Leaf, Shield, Cloud, Database, Code, Smartphone,
   Briefcase, Link as LinkIcon, Brain, Settings,
@@ -19,10 +25,6 @@ const iconMap: Record<string, React.ElementType> = {
   Briefcase, Link: LinkIcon, Brain, Settings,
 };
 
-export function generateStaticParams() {
-  return themeStats.map(({ slug }) => ({ slug }));
-}
-
 export default async function ThemePage({
   params,
 }: {
@@ -32,9 +34,56 @@ export default async function ThemePage({
   const themeStat = getThemeBySlug(slug);
   if (!themeStat) notFound();
 
-  const subjects = getSubjectsByTheme(themeStat.theme);
+  const builtInSubjectsRaw = getSubjectsByTheme(themeStat.theme);
+  const builtInSubjects = builtInSubjectsRaw.map(toBuiltIn);
   const Icon = iconMap[themeIcons[themeStat.theme]] ?? Settings;
   const color = getThemeColor(themeStat.theme);
+
+  const session = await getServerSession();
+  const userId = session?.user?.id ?? null;
+
+  const customRows = await prisma.subject.findMany({
+    where: {
+      theme: { name: themeStat.theme },
+      ...(userId
+        ? { OR: [{ isPublic: true }, { userId }] }
+        : { isPublic: true }),
+    },
+    include: {
+      theme: { select: { name: true } },
+      user: { select: { id: true, name: true, displayName: true, image: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const initialCustomSubjects: CustomSubject[] = customRows.map((r) => ({
+    source: "user",
+    id: r.id,
+    type: r.type,
+    domaine: r.domaine,
+    theme: r.theme.name,
+    sujet: r.sujet,
+    slug: slugifySubject(r.theme.name, r.sujet),
+    isPublic: r.isPublic,
+    createdAt: r.createdAt.toISOString(),
+    author: r.user
+      ? {
+          id: r.user.id,
+          name: r.user.name,
+          displayName: r.user.displayName,
+          image: r.user.image,
+        }
+      : null,
+    isMine: !!userId && r.userId === userId,
+  }));
+
+  // Combined subjects list passed to ThemeFiche (built-in + publicly visible customs)
+  const subjectsForFiche = [
+    ...initialCustomSubjects.map((s) => s.sujet),
+    ...builtInSubjects.map((s) => s.sujet),
+  ];
+
+  const totalCount = builtInSubjects.length + initialCustomSubjects.length;
 
   return (
     <div className="space-y-8 p-6">
@@ -49,29 +98,23 @@ export default async function ThemePage({
               {themeStat.theme}
             </h1>
             <p className="text-[15px] text-[#9EA096]">
-              {themeStat.count} sujet{themeStat.count > 1 ? "s" : ""} de préparation
+              {totalCount} sujet{totalCount > 1 ? "s" : ""} de préparation
             </p>
           </div>
         </div>
       </div>
 
-      {/* Subjects list */}
-      <div>
-        <h2 className="text-lg font-semibold text-[#23251D] dark:text-[#EAECF6] mb-4">Sujets</h2>
-        <ul className="list-none m-0 p-0 space-y-3">
-          {subjects.map((subject, i) => (
-            <li key={i}>
-              <SubjectCard
-                sujet={subject.sujet}
-                type={subject.type}
-                domaine={subject.domaine}
-                theme={subject.theme}
-                color={color}
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
+      {/* Theme fiche generator */}
+      <ThemeFiche theme={themeStat.theme} subjects={subjectsForFiche} />
+
+      {/* Subjects list (built-ins + custom) */}
+      <SubjectsSection
+        theme={themeStat.theme}
+        themeSlug={themeStat.slug}
+        color={color}
+        builtInSubjects={builtInSubjects}
+        initialCustomSubjects={initialCustomSubjects}
+      />
 
       {/* Related news */}
       <div>

@@ -25,6 +25,7 @@ model User {
   accounts      Account[]
   chatMessages  ChatMessage[]
   comments      Comment[]
+  subjects      Subject[]
 }
 
 model Session {
@@ -127,8 +128,13 @@ model Subject {
   sujet    String
   themeId  Int
   theme    Theme  @relation(fields: [themeId], references: [id])
+  userId   String?
+  user     User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  isPublic Boolean @default(true)
 
   createdAt DateTime @default(now())
+
+  @@index([themeId, isPublic])
 }
 
 model NewsArticle {
@@ -164,13 +170,15 @@ model NewsHistory {
 }
 
 model AiSummary {
-  id        Int         @id @default(autoincrement())
-  articleId Int
-  article   NewsArticle @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  provider  String
-  model     String
-  content   String
-  createdAt DateTime    @default(now())
+  id         Int          @id @default(autoincrement())
+  articleId  Int?
+  article    NewsArticle? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  subjectKey String?
+  provider   String
+  model      String
+  content    String
+  createdAt  DateTime     @default(now())
 
   @@unique([articleId, provider, model])
+  @@unique([subjectKey, provider, model])
 }
