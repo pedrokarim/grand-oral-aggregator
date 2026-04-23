@@ -11,7 +11,7 @@ function LayoutInner({ children }: { children: ReactNode }) {
 
   if (isEmbed) {
     return (
-      <div className="bg-[#FDFDF8] dark:bg-[#1E1F23] h-screen">
+      <div className="bg-[#FDFDF8] dark:bg-[#1E1F23] min-h-screen">
         <EmbedRouteSync />
         {children}
       </div>

@@ -1,5 +1,7 @@
 export type AIProvider = "openai" | "anthropic" | "google" | "mistral" | "ollama";
 
+export type SummaryLength = "short" | "medium" | "long";
+
 export interface AIProviderConfig {
   provider: AIProvider;
   apiKey: string;
@@ -7,9 +9,20 @@ export interface AIProviderConfig {
   baseUrl?: string;
 }
 
+export interface TTSConfig {
+  voiceURI: string;
+  lang: string;
+  rate: number;
+  pitch: number;
+  volume: number;
+  autoPlay: boolean;
+}
+
 export interface AppSettings {
   ai: AIProviderConfig;
   autoSummarize: boolean;
+  summaryLength: SummaryLength;
+  tts: TTSConfig;
   theme: "light" | "dark" | "system";
   newsRefreshInterval: number;
   language: "fr" | "en";
@@ -18,9 +31,24 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   ai: { provider: "openai", apiKey: "", model: "gpt-4o-mini" },
   autoSummarize: false,
+  summaryLength: "medium",
+  tts: {
+    voiceURI: "",
+    lang: "fr-FR",
+    rate: 1,
+    pitch: 1,
+    volume: 1,
+    autoPlay: false,
+  },
   theme: "system",
   newsRefreshInterval: 360,
   language: "fr",
+};
+
+export const summaryLengthLabels: Record<SummaryLength, string> = {
+  short: "Court (3-5 phrases)",
+  medium: "Moyen (résumé structuré)",
+  long: "Long (analyse détaillée)",
 };
 
 export const providerLabels: Record<AIProvider, string> = {

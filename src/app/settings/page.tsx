@@ -16,16 +16,45 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSettings } from "@/hooks/use-settings";
 import {
   type AIProvider,
+  type SummaryLength,
   providerLabels,
   providerModels,
+  summaryLengthLabels,
 } from "@/lib/settings";
-import { Settings, Brain, Palette, Bell, RotateCcw, RefreshCw, Loader2 } from "lucide-react";
+import { Settings, Brain, Palette, Bell, RotateCcw, RefreshCw, Loader2, Volume2, Play, Square } from "lucide-react";
+import { useVoices } from "@/hooks/use-voices";
+import { speak, stopSpeaking } from "@/lib/tts";
+
+const TTS_SAMPLE = "Bonjour, ceci est un test de la synthèse vocale pour le Grand Oral.";
 
 export default function SettingsPage() {
   const [settings, updateSettings] = useSettings();
   const [ollamaModels, setOllamaModels] = useState<string[]>([]);
   const [ollamaLoading, setOllamaLoading] = useState(false);
   const [ollamaError, setOllamaError] = useState<string | null>(null);
+  const voices = useVoices();
+  const [ttsTesting, setTtsTesting] = useState(false);
+
+  const filteredVoices = voices.filter((v) =>
+    settings.tts.lang ? v.lang.startsWith(settings.tts.lang.slice(0, 2)) : true
+  );
+  const allLangs = Array.from(new Set(voices.map((v) => v.lang))).sort();
+
+  function testVoice() {
+    setTtsTesting(true);
+    const utter = speak(TTS_SAMPLE, settings.tts);
+    if (!utter) {
+      setTtsTesting(false);
+      return;
+    }
+    utter.onend = () => setTtsTesting(false);
+    utter.onerror = () => setTtsTesting(false);
+  }
+
+  function stopTest() {
+    stopSpeaking();
+    setTtsTesting(false);
+  }
 
   const fetchOllamaModels = useCallback(async () => {
     const baseUrl = settings.ai.baseUrl || "http://localhost:11434";
@@ -76,6 +105,10 @@ export default function SettingsPage() {
           <TabsTrigger value="preferences" className="gap-2">
             <Palette className="h-4 w-4" />
             Préférences
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="gap-2">
+            <Volume2 className="h-4 w-4" />
+            Synthèse vocale
           </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="h-4 w-4" />
@@ -250,6 +283,40 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Longueur des résumés</CardTitle>
+              <CardDescription>
+                Contrôle le niveau de détail des résumés IA générés
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label>Format</Label>
+                <Select
+                  value={settings.summaryLength}
+                  onValueChange={(v) =>
+                    updateSettings({ summaryLength: v as SummaryLength })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(summaryLengthLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Les résumés déjà générés sont mis en cache par longueur — changer ici régénérera lors du prochain clic.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="preferences" className="space-y-4">
@@ -303,6 +370,172 @@ export default function SettingsPage() {
                     <SelectItem value="en">English</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="voice" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Synthèse vocale</CardTitle>
+              <CardDescription>
+                Lit les résumés IA et les articles à voix haute via le navigateur (Web Speech API)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Langue</Label>
+                <Select
+                  value={settings.tts.lang}
+                  onValueChange={(v) => {
+                    const matching = voices.find((vc) => vc.lang.startsWith(v.slice(0, 2)));
+                    updateSettings({
+                      tts: {
+                        lang: v,
+                        voiceURI: matching?.voiceURI ?? "",
+                      },
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allLangs.length === 0 ? (
+                      <SelectItem value="fr-FR">fr-FR</SelectItem>
+                    ) : (
+                      allLangs.map((lang) => (
+                        <SelectItem key={lang} value={lang}>
+                          {lang}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Voix</Label>
+                {filteredVoices.length === 0 ? (
+                  <p className="text-[13px] text-muted-foreground">
+                    Aucune voix disponible pour cette langue. Installez une voix système ou changez de langue.
+                  </p>
+                ) : (
+                  <Select
+                    value={settings.tts.voiceURI || filteredVoices[0]?.voiceURI || ""}
+                    onValueChange={(v) => updateSettings({ tts: { voiceURI: v } })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredVoices.map((v) => (
+                        <SelectItem key={v.voiceURI} value={v.voiceURI}>
+                          {v.name} ({v.lang}){v.default ? " — défaut" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Vitesse</Label>
+                  <span className="text-[12px] text-muted-foreground tabular-nums">
+                    {settings.tts.rate.toFixed(2)}x
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0.5}
+                  max={2}
+                  step={0.05}
+                  value={settings.tts.rate}
+                  onChange={(e) => updateSettings({ tts: { rate: parseFloat(e.target.value) } })}
+                  className="w-full accent-[#EB9D2A]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Hauteur (pitch)</Label>
+                  <span className="text-[12px] text-muted-foreground tabular-nums">
+                    {settings.tts.pitch.toFixed(2)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={2}
+                  step={0.05}
+                  value={settings.tts.pitch}
+                  onChange={(e) => updateSettings({ tts: { pitch: parseFloat(e.target.value) } })}
+                  className="w-full accent-[#EB9D2A]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Volume</Label>
+                  <span className="text-[12px] text-muted-foreground tabular-nums">
+                    {Math.round(settings.tts.volume * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={settings.tts.volume}
+                  onChange={(e) => updateSettings({ tts: { volume: parseFloat(e.target.value) } })}
+                  className="w-full accent-[#EB9D2A]"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-[#D2D3CC] dark:border-[#3a3b3f]">
+                <div>
+                  <p className="font-medium">Lecture automatique</p>
+                  <p className="text-sm text-muted-foreground">
+                    Lit automatiquement les résumés IA dès leur génération
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.tts.autoPlay}
+                  onCheckedChange={(v) => updateSettings({ tts: { autoPlay: v } })}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-2">
+                {!ttsTesting ? (
+                  <button
+                    onClick={testVoice}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-md
+                      border border-[#D2D3CC] dark:border-[#3a3b3f]
+                      text-[#4D4F46] dark:text-[#9EA096]
+                      hover:bg-[#E5E7E0]/50 dark:hover:bg-[#2a2b2f]
+                      transition-colors cursor-default"
+                  >
+                    <Play className="h-3.5 w-3.5" />
+                    Tester la voix
+                  </button>
+                ) : (
+                  <button
+                    onClick={stopTest}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium rounded-md
+                      border border-[#D2D3CC] dark:border-[#3a3b3f]
+                      text-[#4D4F46] dark:text-[#9EA096]
+                      hover:bg-[#E5E7E0]/50 dark:hover:bg-[#2a2b2f]
+                      transition-colors cursor-default"
+                  >
+                    <Square className="h-3.5 w-3.5" />
+                    Arrêter
+                  </button>
+                )}
+                <span className="text-[12px] text-muted-foreground italic">
+                  &laquo; {TTS_SAMPLE} &raquo;
+                </span>
               </div>
             </CardContent>
           </Card>
