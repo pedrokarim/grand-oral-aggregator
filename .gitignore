@@ -40,3 +40,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # reference repos
 .reference
+
+# agent tooling
+.agents
+.claude
+skills-lock.json
