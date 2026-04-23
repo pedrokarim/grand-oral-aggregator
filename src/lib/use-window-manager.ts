@@ -37,11 +37,20 @@ export function useWindowManager() {
       setWindows((prev) => {
         const existing = prev.find((w) => w.path === path || w.initialPath === path);
         if (existing) {
-          // Bring to front
+          // Bring to front. Also re-pin initialPath to the current path so that
+          // the iframe src reflects the active URL on next mount (page reload
+          // restores windows with a stale initialPath otherwise).
           const maxZ = Math.max(...prev.map((w) => w.zIndex), 0);
           return prev.map((w) =>
             w.id === existing.id
-              ? { ...w, zIndex: maxZ + 1, minimized: false }
+              ? {
+                  ...w,
+                  zIndex: maxZ + 1,
+                  minimized: false,
+                  path,
+                  initialPath: path,
+                  title,
+                }
               : w,
           );
         }

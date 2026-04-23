@@ -7,10 +7,9 @@
 import "dotenv/config";
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
-import { Readability } from "@mozilla/readability";
-import { parseHTML } from "linkedom";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { scrapeArticle as scrapeArticleShared } from "../src/lib/scraper";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -101,69 +100,9 @@ function extractBingRealUrl(bingLink: string): string {
   return decoded;
 }
 
-/** Fetch HTML from a URL with browser-like headers */
-async function fetchHtml(url: string): Promise<string | null> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": BROWSER_UA,
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.5",
-      },
-      redirect: "follow",
-    });
-    clearTimeout(timeout);
-    if (!res.ok) return null;
-    const contentType = res.headers.get("content-type") ?? "";
-    if (!contentType.includes("text/html") && !contentType.includes("xhtml")) return null;
-    return await res.text();
-  } catch {
-    return null;
-  }
-}
-
-interface ScrapedContent {
-  content: string;
-  image: string;
-}
-
-/** Extract article content and OG image using Readability */
-function extractArticle(html: string): ScrapedContent {
-  try {
-    const { document } = parseHTML(html);
-
-    // OG image
-    let image = "";
-    const ogMeta = document.querySelector('meta[property="og:image"]');
-    if (ogMeta) image = ogMeta.getAttribute("content") ?? "";
-
-    const reader = new Readability(document, { charThreshold: 100 });
-    const article = reader.parse();
-
-    if (!article?.textContent) return { content: "", image };
-
-    const content = article.textContent
-      .split(/\n{2,}/)
-      .map((p: string) => p.replace(/\s+/g, " ").trim())
-      .filter((p: string) => p.length > 30)
-      .slice(0, 20)
-      .join("\n\n");
-
-    return { content, image };
-  } catch {
-    return { content: "", image: "" };
-  }
-}
-
-/** Scrape article content from its URL */
-async function scrapeArticle(url: string): Promise<ScrapedContent> {
+async function scrapeArticle(url: string) {
   console.log(`    [scrape] ${url.slice(0, 80)}...`);
-  const html = await fetchHtml(url);
-  if (!html) return { content: "", image: "" };
-  return extractArticle(html);
+  return scrapeArticleShared(url);
 }
 
 /* ============================================================

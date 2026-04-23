@@ -150,6 +150,18 @@ function getWindowTitle(pathname: string): string {
     const theme = themeStats.find((t) => t.slug === slug);
     return theme ? `${theme.theme.toLowerCase().replace(/\s+/g, "-")}.mdx` : "theme.mdx";
   }
+  if (pathname.startsWith("/actualites/")) {
+    const slug = pathname.replace("/actualites/", "");
+    return slug ? `${slug}.mdx` : "actualites.mdx";
+  }
+  if (pathname.startsWith("/sujets/")) {
+    const slug = pathname.replace("/sujets/", "");
+    return slug ? `${slug}.mdx` : "sujets.mdx";
+  }
+  const mesSujetsMatch = pathname.match(/^\/themes\/([^/]+)\/mes-sujets$/);
+  if (mesSujetsMatch) {
+    return `mes-sujets-${mesSujetsMatch[1]}.mdx`;
+  }
   return "page.mdx";
 }
 
@@ -234,14 +246,17 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("resize", handleResize);
   }, [computePositions]);
 
-  // Auto-open a window for the current route on first load (only if no windows restored from storage)
+  // Auto-open/focus a window for the current route on first load.
+  // openWindow dedupes by path, so if a restored window matches, it is brought
+  // to front; otherwise a new window is created for the current URL. This
+  // ensures reloading a deep link (e.g. /actualites/<slug>) always surfaces
+  // the right content, even when other windows were persisted in localStorage.
   const hasAutoOpened = useRef(false);
   useEffect(() => {
-    if (!hasAutoOpened.current && windows.length === 0) {
-      hasAutoOpened.current = true;
-      openWindow(pathname, getWindowTitle(pathname));
-    }
-  }, [windows.length]);
+    if (hasAutoOpened.current) return;
+    hasAutoOpened.current = true;
+    openWindow(pathname, getWindowTitle(pathname));
+  }, []);
 
   // Refs for stable postMessage handler (avoid re-attaching on every state change)
   const openWindowRef = useRef(openWindow);
