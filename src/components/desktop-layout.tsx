@@ -17,6 +17,7 @@ import { ActiveWindowsPanel } from "./active-windows-panel";
 import { GraduationCap, Search, Bell, MessageCircle } from "lucide-react";
 import { AuthButton } from "./auth-button";
 import { ChatPanel } from "./chat-panel";
+import { setSiteMode } from "@/hooks/use-site-mode";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
 const themeIconMap: Record<string, string> = {
@@ -66,7 +67,7 @@ interface DesktopApp {
 function getAllApps(): DesktopApp[] {
   const left: DesktopApp[] = [
     { icon: "/icons/doc.png", label: "home.mdx", href: "/", side: "left" },
-    { icon: "/icons/folder.png", label: "Product OS", href: "/", side: "left" },
+    { icon: "/icons/search.png", label: "Recherche", href: "/recherche", side: "left" },
     { icon: "/icons/invite.png", label: "Actualités", href: "/actualites", side: "left" },
     { icon: "/icons/video.png", label: "demo.mov", href: "/demo", side: "left", customIcon: true },
     ...themeStats.slice(0, 6).map(({ theme, slug }) => ({
@@ -87,7 +88,7 @@ function getAllApps(): DesktopApp[] {
       href: `/themes/${slug}`,
       side: "right" as const,
     })),
-    { icon: "/icons/switch.png", label: "Mode site", href: "/", side: "right" },
+    { icon: "/icons/switch.png", label: "Mode site", href: "#mode-site", side: "right" },
   ];
 
   return [...left, ...right];
@@ -141,6 +142,8 @@ const routeTitles: Record<string, string> = {
   "/settings": "settings.mdx",
   "/profile": "profil",
   "/demo": "Demo - Grand Oral",
+  "/recherche": "recherche.mdx",
+  "/docs": "docs.mdx",
 };
 
 function getWindowTitle(pathname: string): string {
@@ -310,6 +313,10 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   };
 
   const handleIconOpen = (href: string, label: string) => {
+    if (href === "#mode-site") {
+      setSiteMode("site");
+      return;
+    }
     const title = getWindowTitle(href);
     openWindow(href, title);
   };

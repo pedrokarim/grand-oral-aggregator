@@ -4,9 +4,18 @@ import { getSessionId } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
   const theme = request.nextUrl.searchParams.get("theme");
+  const q = request.nextUrl.searchParams.get("q")?.trim() || null;
 
   try {
-    const where = theme ? { theme: { name: theme } } : {};
+    const where: Record<string, unknown> = {};
+    if (theme) where.theme = { name: theme };
+    if (q) {
+      where.OR = [
+        { title: { contains: q, mode: "insensitive" } },
+        { description: { contains: q, mode: "insensitive" } },
+        { content: { contains: q, mode: "insensitive" } },
+      ];
+    }
 
     const articles = await prisma.newsArticle.findMany({
       where,

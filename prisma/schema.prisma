@@ -15,9 +15,11 @@ model User {
   image         String?
   displayName   String?
   status        String    @default("online")
+  role          String    @default("user")
   globalMentionOptOut  Boolean @default(false)
   chatMentionOptOut    Boolean @default(false)
   commentMentionOptOut Boolean @default(false)
+  searchLayout  String    @default("masonry-editorial")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

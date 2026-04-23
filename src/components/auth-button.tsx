@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
-import { LogIn, LogOut, User, Settings } from "lucide-react";
+import { useUserRole } from "@/hooks/use-user-role";
+import { LogIn, LogOut, User, Settings, Shield, ShieldCheck } from "lucide-react";
 
 const statusColors: Record<string, string> = {
   online: "bg-green-500",
@@ -13,6 +14,7 @@ const statusColors: Record<string, string> = {
 
 export function AuthButton() {
   const { data: session, isPending } = useSession();
+  const role = useUserRole();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -73,15 +75,38 @@ export function AuthButton() {
         <span
           className={`absolute bottom-0 right-0 w-2 h-2 rounded-full border border-[#23251D] ${statusColors[status] ?? statusColors.online}`}
         />
+        {role.isSuperAdmin ? (
+          <span
+            className="absolute -top-0.5 -left-0.5 w-2.5 h-2.5 rounded-full bg-[#EB9D2A] border border-[#23251D]"
+            title="Super Admin"
+          />
+        ) : role.isAdmin ? (
+          <span
+            className="absolute -top-0.5 -left-0.5 w-2.5 h-2.5 rounded-full bg-[#8B5CF6] border border-[#23251D]"
+            title="Admin"
+          />
+        ) : null}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-48 rounded-[5px] border border-[#BFC1B7] dark:border-[#3a3b3f] bg-[#FDFDF8] dark:bg-[#1E1F23] shadow-xl z-[9999] overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 w-52 rounded-[5px] border border-[#BFC1B7] dark:border-[#3a3b3f] bg-[#FDFDF8] dark:bg-[#1E1F23] shadow-xl z-[9999] overflow-hidden">
           <div className="px-3 py-2 border-b border-[#E5E7E0] dark:border-[#2a2b2f]">
             <p className="text-[13px] font-semibold text-[#23251D] dark:text-[#EAECF6] truncate">
               {(user as Record<string, unknown>).displayName as string || user.name}
             </p>
             <p className="text-[12px] text-[#9EA096] truncate">{user.email}</p>
+            {role.isSuperAdmin && (
+              <span className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[11px] font-semibold bg-[#EB9D2A]/15 text-[#B17816] dark:text-[#EB9D2A]">
+                <ShieldCheck className="w-3 h-3" />
+                Super Admin
+              </span>
+            )}
+            {!role.isSuperAdmin && role.isAdmin && (
+              <span className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm text-[11px] font-semibold bg-[#8B5CF6]/15 text-[#7C3AED] dark:text-[#A78BFA]">
+                <Shield className="w-3 h-3" />
+                Admin
+              </span>
+            )}
           </div>
           <div className="py-1">
             <button

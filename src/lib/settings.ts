@@ -2,6 +2,25 @@ export type AIProvider = "openai" | "anthropic" | "google" | "mistral" | "ollama
 
 export type SummaryLength = "short" | "medium" | "long";
 
+export type SearchLayout =
+  | "centered-minimal"
+  | "sidebar-list"
+  | "top-grid"
+  | "split-hero"
+  | "command-palette"
+  | "masonry-editorial";
+
+export const SEARCH_LAYOUTS: { id: SearchLayout; label: string; description: string }[] = [
+  { id: "centered-minimal", label: "Centered minimal", description: "Barre centrée + liste sobre" },
+  { id: "sidebar-list", label: "Sidebar + liste", description: "Filtres à gauche, liste dense à droite" },
+  { id: "top-grid", label: "Top bar + grille", description: "Onglets + cartes visuelles" },
+  { id: "split-hero", label: "Split hero", description: "Top résultat mis en avant" },
+  { id: "command-palette", label: "Command palette", description: "Modal centré, catégories groupées" },
+  { id: "masonry-editorial", label: "Masonry éditorial", description: "Grille magazine, blocs variés" },
+];
+
+export const SEARCH_LAYOUT_IDS: SearchLayout[] = SEARCH_LAYOUTS.map((l) => l.id);
+
 export interface AIProviderConfig {
   provider: AIProvider;
   apiKey: string;
@@ -26,6 +45,7 @@ export interface AppSettings {
   theme: "light" | "dark" | "system";
   newsRefreshInterval: number;
   language: "fr" | "en";
+  searchLayout: SearchLayout;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -43,7 +63,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   theme: "system",
   newsRefreshInterval: 360,
   language: "fr",
+  searchLayout: "masonry-editorial",
 };
+
+/** Fields persisted server-side (per-user) via /api/user/preferences.
+ *  Other AppSettings fields stay local-only. */
+export const SERVER_BACKED_FIELDS = ["searchLayout"] as const satisfies readonly (keyof AppSettings)[];
 
 export const summaryLengthLabels: Record<SummaryLength, string> = {
   short: "Court (3-5 phrases)",

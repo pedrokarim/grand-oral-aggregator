@@ -86,19 +86,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ subject: serialize(match, userId) });
   }
 
-  if (!themeName) {
-    return NextResponse.json({ error: "theme required" }, { status: 400 });
-  }
+  const q = params.get("q")?.trim() || null;
 
+  // No theme and no q → "trending" mode: return the most recent visible subjects, capped.
   const rows = await prisma.subject.findMany({
     where: {
-      theme: { name: themeName },
+      ...(themeName ? { theme: { name: themeName } } : {}),
+      ...(q ? { sujet: { contains: q, mode: "insensitive" as const } } : {}),
       ...(userId
         ? { OR: [{ isPublic: true }, { userId }] }
         : { isPublic: true }),
     },
     include: { theme: { select: { name: true } }, user: { select: authorSelect } },
     orderBy: { createdAt: "desc" },
+    take: q ? 30 : themeName ? undefined : 12,
   });
 
   return NextResponse.json({ subjects: rows.map((r) => serialize(r, userId)) });
