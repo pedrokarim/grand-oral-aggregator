@@ -14,9 +14,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeStats } from "@/lib/data";
 import { useWindowManager } from "@/lib/use-window-manager";
 import { ActiveWindowsPanel } from "./active-windows-panel";
-import { GraduationCap, Search, Bell, MessageCircle } from "lucide-react";
+import { GraduationCap, Search, Bell, MessageCircle, LayoutGrid } from "lucide-react";
 import { AuthButton } from "./auth-button";
 import { ChatPanel } from "./chat-panel";
+import { WidgetsLayer } from "./widgets-layer";
+import { WidgetsPanel } from "./widgets-panel";
 import { setSiteMode } from "@/hooks/use-site-mode";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
@@ -195,6 +197,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 
   const [activeWindowsPanelOpen, setActiveWindowsPanelOpen] = useState(false);
   const [chatPanelOpen, setChatPanelOpen] = useState(false);
+  const [widgetsPanelOpen, setWidgetsPanelOpen] = useState(false);
 
   const {
     windows,
@@ -357,6 +360,14 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
             <Bell className="w-3.5 h-3.5" />
           </button>
           <button
+            onClick={() => setWidgetsPanelOpen(!widgetsPanelOpen)}
+            className={`p-1 transition-colors cursor-default ${widgetsPanelOpen ? "text-[#FDFDF8]" : "text-[#9EA096] hover:text-[#FDFDF8]"}`}
+            tabIndex={-1}
+            aria-label="Gérer les widgets"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => setChatPanelOpen(!chatPanelOpen)}
             className={`p-1 transition-colors cursor-default ${chatPanelOpen ? "text-[#FDFDF8]" : "text-[#9EA096] hover:text-[#FDFDF8]"}`}
             tabIndex={-1}
@@ -406,6 +417,13 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
               })}
             </motion.ul>
           </nav>
+
+          {/* Widgets layer — between icons (z-10) and windows (z-20+) */}
+          <div className="hidden md:block">
+            <WidgetsLayer
+              onOpenRoute={(path, title) => openWindow(path, title)}
+            />
+          </div>
 
           {/* Windows — each rendered with iframe for independent content */}
           {windows
@@ -467,6 +485,12 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       <ChatPanel
         open={chatPanelOpen}
         onClose={() => setChatPanelOpen(false)}
+      />
+
+      {/* Widgets panel */}
+      <WidgetsPanel
+        open={widgetsPanelOpen}
+        onClose={() => setWidgetsPanelOpen(false)}
       />
     </div>
   );
