@@ -47,6 +47,16 @@ export async function PATCH(request: NextRequest) {
     if (key in body) data[key] = body[key];
   }
 
+  if (typeof data.displayName === "string") {
+    const dn = data.displayName.trim().slice(0, 64);
+    if (!dn) {
+      return NextResponse.json({ error: "displayName invalide" }, { status: 400 });
+    }
+    data.displayName = dn;
+  } else if ("displayName" in data && data.displayName !== null) {
+    return NextResponse.json({ error: "displayName invalide" }, { status: 400 });
+  }
+
   if (data.status && !["online", "idle", "dnd", "invisible"].includes(data.status as string)) {
     return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
   }

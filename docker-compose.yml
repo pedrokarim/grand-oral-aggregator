@@ -3,14 +3,38 @@ services:
     image: postgres:17-alpine
     container_name: grand-oral-db
     restart: unless-stopped
-    ports:
-      - "5432:5432"
     environment:
-      POSTGRES_USER: grandoral
-      POSTGRES_PASSWORD: grandoral
-      POSTGRES_DB: grandoral
+      POSTGRES_USER: ${POSTGRES_USER:-grandoral}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-grandoral}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-grandoral}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build: .
+    container_name: grand-oral-web
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-grandoral}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-grandoral}?schema=public
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID is required}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET is required}
+      SUPER_ADMIN_DISCORD_IDS: ${SUPER_ADMIN_DISCORD_IDS:-}
+      CRON_SECRET: ${CRON_SECRET:?CRON_SECRET is required}
+      NEWS_API_KEY: ${NEWS_API_KEY:-}
+    ports:
+      # Bind to localhost only — terminate TLS with a reverse proxy on the host.
+      - "127.0.0.1:3000:3000"
 
 volumes:
   pgdata:

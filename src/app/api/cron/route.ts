@@ -1,31 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { execSync } from "child_process";
+import { spawn } from "child_process";
+import { timingSafeEqual } from "crypto";
 
 /**
- * API route to trigger news fetching.
- * Can be called by an external cron service (e.g., Vercel Cron, cron-job.org).
+ * Trigger news fetching.
+ * Requires CRON_SECRET env var. The route refuses requests when the secret
+ * is not configured — never leave it unset in production.
  *
- * GET /api/cron?secret=YOUR_CRON_SECRET
+ * GET /api/cron?secret=$CRON_SECRET
  */
 export async function GET(request: NextRequest) {
-  const secret = request.nextUrl.searchParams.get("secret");
   const expectedSecret = process.env.CRON_SECRET;
+  if (!expectedSecret) {
+    return NextResponse.json({ error: "Cron disabled" }, { status: 503 });
+  }
 
-  if (expectedSecret && secret !== expectedSecret) {
+  const provided = request.nextUrl.searchParams.get("secret") ?? "";
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expectedSecret);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  try {
-    execSync("bun run scripts/fetch-news.ts", {
-      cwd: process.cwd(),
-      timeout: 120_000,
-    });
+  // Detached fire-and-forget so the HTTP request doesn't tie up a worker
+  // for the full duration of the scrape.
+  const child = spawn("bun", ["run", "scripts/fetch-news.ts"], {
+    cwd: process.cwd(),
+    detached: true,
+    stdio: "ignore",
+  });
+  child.unref();
 
-    return NextResponse.json({ success: true, message: "News fetched successfully" });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch news", details: String(error) },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({ success: true, message: "News fetch scheduled" });
 }

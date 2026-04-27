@@ -56,10 +56,17 @@ export async function POST(request: NextRequest) {
   }
 
   const { themeId, parentId, content, mentions } = await request.json();
+  const trimmed = typeof content === "string" ? content.trim() : "";
 
-  if (!themeId || !content?.trim()) {
+  if (!themeId || !trimmed) {
     return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
   }
+  if (trimmed.length > 4000) {
+    return NextResponse.json({ error: "Commentaire trop long" }, { status: 413 });
+  }
+  const cleanMentions = Array.isArray(mentions)
+    ? mentions.filter((m): m is string => typeof m === "string").slice(0, 32)
+    : [];
 
   // Calculate depth from parent
   let depth = 0;
@@ -82,8 +89,8 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       themeId,
       parentId: parentId ?? null,
-      content: content.trim(),
-      mentions: mentions ?? [],
+      content: trimmed,
+      mentions: cleanMentions,
       depth,
     },
     include: {
@@ -105,8 +112,12 @@ export async function PATCH(request: NextRequest) {
   }
 
   const { commentId, content } = await request.json();
-  if (!commentId || !content?.trim()) {
+  const trimmed = typeof content === "string" ? content.trim() : "";
+  if (!commentId || !trimmed) {
     return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
+  }
+  if (trimmed.length > 4000) {
+    return NextResponse.json({ error: "Commentaire trop long" }, { status: 413 });
   }
 
   const existing = await prisma.comment.findUnique({ where: { id: commentId } });
@@ -123,7 +134,7 @@ export async function PATCH(request: NextRequest) {
     }),
     prisma.comment.update({
       where: { id: commentId },
-      data: { content: content.trim(), editedAt: new Date() },
+      data: { content: trimmed, editedAt: new Date() },
       include: { user: { select: commentUserSelect } },
     }),
   ]);

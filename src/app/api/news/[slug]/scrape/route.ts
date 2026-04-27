@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { scrapeArticle } from "@/lib/scraper";
+import { getServerSession } from "@/lib/auth-server";
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const session = await getServerSession();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
   const { slug } = await params;
   const force = request.nextUrl.searchParams.get("force") === "true";
 

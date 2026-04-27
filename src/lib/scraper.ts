@@ -9,7 +9,30 @@ export interface ScrapedContent {
   image: string;
 }
 
+// SSRF guard: refuse anything that isn't a public http(s) URL pointing to a
+// real hostname. We don't resolve DNS here (the scraper's network call will),
+// so this only catches the obvious "literal local IP" cases. Combined with
+// the URL coming exclusively from server-side scrapers, that's enough.
+function isPublicHttpUrl(rawUrl: string): boolean {
+  let u: URL;
+  try {
+    u = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+  const host = u.hostname.toLowerCase();
+  if (!host || host === "localhost" || host.endsWith(".localhost")) return false;
+  if (/^(?:0\.|10\.|127\.|169\.254\.|192\.168\.)/.test(host)) return false;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(host)) return false;
+  if (host === "::1" || host.startsWith("fc") || host.startsWith("fd") || host.startsWith("fe80")) {
+    return false;
+  }
+  return true;
+}
+
 async function fetchHtml(url: string, timeoutMs = 20000): Promise<string | null> {
+  if (!isPublicHttpUrl(url)) return null;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);

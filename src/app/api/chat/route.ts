@@ -31,15 +31,22 @@ export async function POST(request: NextRequest) {
   }
 
   const { content, mentions } = await request.json();
-  if (!content?.trim()) {
+  const trimmed = typeof content === "string" ? content.trim() : "";
+  if (!trimmed) {
     return NextResponse.json({ error: "Message vide" }, { status: 400 });
   }
+  if (trimmed.length > 4000) {
+    return NextResponse.json({ error: "Message trop long" }, { status: 413 });
+  }
+  const cleanMentions = Array.isArray(mentions)
+    ? mentions.filter((m): m is string => typeof m === "string").slice(0, 32)
+    : [];
 
   const message = await prisma.chatMessage.create({
     data: {
       userId: session.user.id,
-      content: content.trim(),
-      mentions: mentions ?? [],
+      content: trimmed,
+      mentions: cleanMentions,
     },
     include: {
       user: {
@@ -62,8 +69,12 @@ export async function PATCH(request: NextRequest) {
   }
 
   const { messageId, content } = await request.json();
-  if (!messageId || !content?.trim()) {
+  const trimmed = typeof content === "string" ? content.trim() : "";
+  if (!messageId || !trimmed) {
     return NextResponse.json({ error: "Données manquantes" }, { status: 400 });
+  }
+  if (trimmed.length > 4000) {
+    return NextResponse.json({ error: "Message trop long" }, { status: 413 });
   }
 
   const existing = await prisma.chatMessage.findUnique({ where: { id: messageId } });
@@ -80,7 +91,7 @@ export async function PATCH(request: NextRequest) {
     }),
     prisma.chatMessage.update({
       where: { id: messageId },
-      data: { content: content.trim(), editedAt: new Date() },
+      data: { content: trimmed, editedAt: new Date() },
       include: { user: { select: userSelect } },
     }),
   ]);
