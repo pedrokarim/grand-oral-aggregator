@@ -84,26 +84,25 @@ grandoral.example.com {
 
 Caddy gère le certificat Let's Encrypt automatiquement.
 
-### Option B — nginx
+### Option B — nginx + Cloudflare
 
-Un fichier `nginx.conf` modèle (gitignoré) est fourni à la racine du repo. Il proxy un domaine vers `127.0.0.1:${HOST_PORT}` avec :
-- HTTP → HTTPS redirect
-- TLS via Let's Encrypt (chemins certbot par défaut)
+Un fichier `nginx.conf` modèle (gitignoré) est fourni à la racine du repo. Le TLS est terminé par Cloudflare ; l'origine nginx reste en HTTP sur le port 80 et proxy vers `127.0.0.1:${HOST_PORT}` avec :
 - Headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`)
-- Support SSE (`proxy_buffering off`, `proxy_read_timeout 24h`) pour les flux chat/commentaires
+- `X-Real-IP` lu depuis `CF-Connecting-IP`
+- `X-Forwarded-Proto: https` forcé (Cloudflare termine TLS) pour que Better Auth émette des cookies sécurisés
+- Support SSE (`proxy_buffering off`, `proxy_read_timeout 24h`) pour le chat / les commentaires temps réel
 
-Pour l'utiliser :
+**Cloudflare** : enregistrement A pour `grand-oral` → IP du serveur, proxy orange activé. SSL/TLS mode "Flexible" (ou "Full" avec un Origin Certificate si tu préfères chiffrer aussi Cloudflare ↔ origine).
+
+Sur le serveur :
 
 ```sh
 sudo cp nginx.conf /etc/nginx/sites-available/grand-oral.conf
 sudo ln -s /etc/nginx/sites-available/grand-oral.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
-
-# Certificat Let's Encrypt (la première fois)
-sudo certbot --nginx -d grand-oral.ascencia.re
 ```
 
-Le fichier est volontairement gitignoré : il contient des éléments spécifiques à un déploiement (domaine, chemins de certs).
+Le fichier est volontairement gitignoré : il contient le domaine en dur.
 
 ## 4. Cron — fetch des news toutes les 24h
 
