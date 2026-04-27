@@ -40,6 +40,10 @@ CRON_SECRET=<32+ bytes hex>
 
 # Optionnel : si défini, fetch-news.ts utilise NewsAPI au lieu de Bing News RSS
 # NEWS_API_KEY=
+
+# Optionnel : port hôte sur lequel exposer l'app (défaut 3000). Adapter si le
+# port est déjà pris par un autre service.
+# HOST_PORT=4070
 ```
 
 Le `docker-compose.yml` lit ces variables et **refuse de démarrer** si les secrets obligatoires manquent (`POSTGRES_PASSWORD`, `BETTER_AUTH_SECRET`, `CRON_SECRET`, etc.).
@@ -64,7 +68,11 @@ docker exec grand-oral-web bun run scripts/seed.ts
 
 Le seed est idempotent (upserts) — on peut le rejouer sans danger.
 
-## 3. Reverse proxy (exemple Caddy)
+## 3. Reverse proxy
+
+L'app n'expose pas de TLS — il faut un reverse proxy sur le host.
+
+### Option A — Caddy (le plus simple)
 
 `/etc/caddy/Caddyfile` :
 
@@ -75,6 +83,27 @@ grandoral.example.com {
 ```
 
 Caddy gère le certificat Let's Encrypt automatiquement.
+
+### Option B — nginx
+
+Un fichier `nginx.conf` modèle (gitignoré) est fourni à la racine du repo. Il proxy un domaine vers `127.0.0.1:${HOST_PORT}` avec :
+- HTTP → HTTPS redirect
+- TLS via Let's Encrypt (chemins certbot par défaut)
+- Headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`)
+- Support SSE (`proxy_buffering off`, `proxy_read_timeout 24h`) pour les flux chat/commentaires
+
+Pour l'utiliser :
+
+```sh
+sudo cp nginx.conf /etc/nginx/sites-available/grand-oral.conf
+sudo ln -s /etc/nginx/sites-available/grand-oral.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+
+# Certificat Let's Encrypt (la première fois)
+sudo certbot --nginx -d grand-oral.ascencia.re
+```
+
+Le fichier est volontairement gitignoré : il contient des éléments spécifiques à un déploiement (domaine, chemins de certs).
 
 ## 4. Cron — fetch des news toutes les 24h
 

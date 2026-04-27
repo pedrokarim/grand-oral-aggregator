@@ -45,3 +45,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .agents
 .claude
 skills-lock.json
+
+# host-specific deploy artifacts
+nginx.conf

@@ -34,7 +34,8 @@ services:
       NEWS_API_KEY: ${NEWS_API_KEY:-}
     ports:
       # Bind to localhost only — terminate TLS with a reverse proxy on the host.
-      - "127.0.0.1:3000:3000"
+      # Override HOST_PORT in .env if 3000 is taken on the host.
+      - "127.0.0.1:${HOST_PORT:-3000}:3000"
 
 volumes:
   pgdata:
