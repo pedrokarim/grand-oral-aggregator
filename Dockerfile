@@ -34,12 +34,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/resources ./resources
 COPY --from=builder --chown=nextjs:nodejs /app/src/lib ./src/lib
 COPY --from=builder --chown=nextjs:nodejs /app/src/generated ./src/generated
 COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 USER nextjs
 EXPOSE 3000
 
 # Apply migrations at startup, then run the standalone server.
-CMD ["sh", "-c", "bunx prisma migrate deploy && bun run server.js"]
+CMD ["sh", "-c", "bun ./node_modules/prisma/build/index.js migrate deploy && bun run server.js"]

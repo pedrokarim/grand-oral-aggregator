@@ -23,7 +23,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-grandoral}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-grandoral}?schema=public
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:?BETTER_AUTH_URL is required}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL is required}
@@ -32,10 +32,28 @@ services:
       SUPER_ADMIN_DISCORD_IDS: ${SUPER_ADMIN_DISCORD_IDS:-}
       CRON_SECRET: ${CRON_SECRET:?CRON_SECRET is required}
       NEWS_API_KEY: ${NEWS_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-}
+      RUNNING_IN_DOCKER: "1"
     ports:
       # Bind to localhost only — terminate TLS with a reverse proxy on the host.
       # Override HOST_PORT in .env if 3000 is taken on the host.
       - "127.0.0.1:${HOST_PORT:-3000}:3000"
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: grand-oral-ollama
+    profiles: ["ai"]
+    restart: "no"
+    environment:
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-5m}
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      # Localhost only: never expose Ollama directly to the internet.
+      - "127.0.0.1:${OLLAMA_HOST_PORT:-11434}:11434"
+    mem_limit: ${OLLAMA_MEM_LIMIT:-6g}
+    cpus: ${OLLAMA_CPUS:-2}
+
 volumes:
   pgdata:
+  ollama:

@@ -19,6 +19,9 @@ Exemple de `.env` complet :
 POSTGRES_USER=grandoral
 POSTGRES_PASSWORD=<mot de passe fort généré>
 POSTGRES_DB=grandoral
+# Encoder le mot de passe pour l'URL si celui-ci contient des caractères
+# réservés comme #, @, :, /, ?, &, %.
+DATABASE_URL=postgresql://grandoral:<mot de passe URL-encodé>@postgres:5432/grandoral?schema=public
 
 # App URLs (mettre l'URL publique réelle, pas localhost)
 NEXT_PUBLIC_APP_URL=https://grandoral.example.com
@@ -46,7 +49,7 @@ CRON_SECRET=<32+ bytes hex>
 # HOST_PORT=4070
 ```
 
-Le `docker-compose.yml` lit ces variables et **refuse de démarrer** si les secrets obligatoires manquent (`POSTGRES_PASSWORD`, `BETTER_AUTH_SECRET`, `CRON_SECRET`, etc.).
+Le `docker-compose.yml` lit ces variables et **refuse de démarrer** si les secrets obligatoires manquent (`POSTGRES_PASSWORD`, `DATABASE_URL`, `BETTER_AUTH_SECRET`, `CRON_SECRET`, etc.).
 
 ## 2. Build et démarrage
 
@@ -133,6 +136,35 @@ La route `/api/cron` :
 - lance le script en arrière-plan (`spawn` détaché) pour ne pas bloquer le worker.
 
 ⚠️ Ne jamais déployer en prod sans `CRON_SECRET`.
+
+## 4bis. Ollama ponctuel pour les résumés IA
+
+L'app supporte Ollama sans clé API. Le service est optionnel et désactivé par défaut via un profil Compose `ai`, pour éviter qu'un modèle local consomme la RAM/CPU de la prod en permanence.
+
+Démarrer Ollama seulement quand tu veux générer :
+
+```sh
+docker compose --profile ai up -d ollama
+docker exec grand-oral-ollama ollama pull qwen3:4b
+```
+
+Dans l'app, Réglages → IA :
+
+```text
+Fournisseur: Ollama (Local)
+URL du serveur Ollama: laisser vide
+Modèle: qwen3:4b
+```
+
+En local hors Docker, l'app utilisera `http://localhost:11434`. En Docker, elle détecte le conteneur et utilise `http://ollama:11434`. Si tu veux forcer une autre URL, définir `OLLAMA_BASE_URL` dans `.env`.
+
+Quand les résumés voulus sont générés et mis en cache en base :
+
+```sh
+docker compose stop ollama
+```
+
+Le port Ollama est bindé sur `127.0.0.1` seulement. Ne pas l'exposer publiquement derrière nginx/Cloudflare.
 
 ## 5. Mise à jour
 

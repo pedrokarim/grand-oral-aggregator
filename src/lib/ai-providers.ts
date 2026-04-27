@@ -1,4 +1,5 @@
 import type { AIProviderConfig, SummaryLength } from "./settings";
+import { existsSync } from "fs";
 
 const SHORT_SUBJECT_PROMPT = `Tu es un assistant spécialisé dans la préparation au Grand Oral de dernière année de Master en informatique.
 Donne un résumé très court (3 à 5 phrases) du sujet proposé, en markdown, avec **les mots-clés en gras**.
@@ -242,7 +243,7 @@ async function callMistral(config: AIProviderConfig, systemPrompt: string, promp
 }
 
 async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
-  const baseUrl = config.baseUrl || "http://localhost:11434";
+  const baseUrl = resolveOllamaBaseUrl(config.baseUrl);
   const res = await fetch(`${baseUrl}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -257,4 +258,28 @@ async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt
   });
   const data = await res.json();
   return data.message.content;
+}
+
+function isLoopbackUrl(value: string) {
+  try {
+    const { hostname } = new URL(value);
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+  } catch {
+    return false;
+  }
+}
+
+function isDockerRuntime() {
+  return process.env.RUNNING_IN_DOCKER === "1" || existsSync("/.dockerenv");
+}
+
+export function resolveOllamaBaseUrl(baseUrl?: string) {
+  const configured = baseUrl?.trim();
+  const envUrl = process.env.OLLAMA_BASE_URL?.trim();
+
+  if (envUrl) return envUrl;
+  if (configured && !(isDockerRuntime() && isLoopbackUrl(configured))) return configured;
+  if (isDockerRuntime()) return "http://ollama:11434";
+
+  return configured || "http://localhost:11434";
 }

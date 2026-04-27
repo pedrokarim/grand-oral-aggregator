@@ -57,11 +57,13 @@ export default function SettingsPage() {
   }
 
   const fetchOllamaModels = useCallback(async () => {
-    const baseUrl = settings.ai.baseUrl || "http://localhost:11434";
     setOllamaLoading(true);
     setOllamaError(null);
     try {
-      const res = await fetch(`${baseUrl}/api/tags`);
+      const params = new URLSearchParams();
+      if (settings.ai.baseUrl) params.set("baseUrl", settings.ai.baseUrl);
+      const res = await fetch(`/api/ai/ollama/tags?${params}`);
+      if (!res.ok) throw new Error("Impossible de joindre Ollama");
       const data = await res.json();
       const models = (data.models ?? []).map((m: { name: string }) => m.name);
       setOllamaModels(models);
@@ -216,11 +218,17 @@ export default function SettingsPage() {
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p className="text-[13px] text-muted-foreground">
-                        {ollamaLoading
-                          ? "Chargement des modèles..."
-                          : "Aucun modèle installé. Lancez `ollama pull qwen3:8b` pour en installer un."}
-                      </p>
+                      <Input
+                        placeholder={
+                          ollamaLoading
+                            ? "Chargement des modèles..."
+                            : "Nom du modèle, ex: qwen3:4b"
+                        }
+                        value={settings.ai.model}
+                        onChange={(e) =>
+                          updateSettings({ ai: { ...settings.ai, model: e.target.value } })
+                        }
+                      />
                     )}
                   </>
                 ) : (

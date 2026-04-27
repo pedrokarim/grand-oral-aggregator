@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 /**
  * A Link that, when inside an iframe (_embed=1), navigates in-place
@@ -10,6 +10,32 @@ import { type ReactNode } from "react";
  * is not duplicated inside the window.
  */
 export function EmbedLink({
+  href,
+  children,
+  className,
+  ...props
+}: {
+  href: string;
+  children?: ReactNode;
+  className?: string;
+  [key: string]: unknown;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <Link href={href} className={className} {...props}>
+          {children}
+        </Link>
+      }
+    >
+      <EmbedLinkInner href={href} className={className} {...props}>
+        {children}
+      </EmbedLinkInner>
+    </Suspense>
+  );
+}
+
+function EmbedLinkInner({
   href,
   children,
   className,
