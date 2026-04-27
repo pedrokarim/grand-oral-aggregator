@@ -32,5 +32,10 @@ export interface WidgetDef {
   defaultPosition: { x: number; y: number };
   defaultSize: { width: number; height: number };
   minSize: { width: number; height: number };
+  /** When set, the layer recomputes the default x at mount based on the
+   *  viewport so the widget sits flush against the chosen edge without
+   *  overlapping the icon column. Only applied while the widget is still
+   *  at its registry default position. */
+  defaultAnchor?: "left" | "right";
   Component: ComponentType<WidgetComponentProps>;
 }

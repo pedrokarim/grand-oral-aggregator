@@ -53,7 +53,7 @@ export function NewsWidget({ onOpenRoute }: WidgetComponentProps) {
       <div className="flex items-center gap-2 px-3 py-1.5 border-b border-[#D2D3CC] dark:border-[#3a3b3f] shrink-0">
         <Newspaper className="w-3.5 h-3.5 text-[#9EA096]" />
         <span className="text-[11px] uppercase tracking-wider text-[#9EA096] font-semibold">
-          Toutes catégories
+          Tous thèmes
         </span>
         <button
           onClick={load}

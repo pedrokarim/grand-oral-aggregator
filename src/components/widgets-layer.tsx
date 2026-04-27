@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { WidgetFrame } from "./widgets/widget-frame";
 import { WIDGETS, useWidgets } from "@/lib/widgets";
 
@@ -8,10 +8,35 @@ interface WidgetsLayerProps {
   onOpenRoute: (path: string, title: string) => void;
 }
 
+// Right icon column width (cf. desktop-layout): 1 column × COL_SPACING (128)
+// + a small extra margin so the widget doesn't kiss the icons.
+const RIGHT_ICON_COLUMN_RESERVED = 128 + 24;
+
 export function WidgetsLayer({ onOpenRoute }: WidgetsLayerProps) {
   const { state, patchWidget } = useWidgets();
   // Bring-to-front order. Higher = on top.
   const [order, setOrder] = useState<string[]>(() => WIDGETS.map((w) => w.id));
+
+  // First-mount: resolve right-anchored default positions against viewport
+  // width. Only applied while a widget is still at its registry default.
+  const initOnceRef = useRef(false);
+  useEffect(() => {
+    if (initOnceRef.current) return;
+    initOnceRef.current = true;
+    const vw = window.innerWidth;
+    for (const def of WIDGETS) {
+      if (def.defaultAnchor !== "right") continue;
+      const ws = state[def.id];
+      if (!ws) continue;
+      const isPristine =
+        ws.position.x === def.defaultPosition.x &&
+        ws.position.y === def.defaultPosition.y;
+      if (!isPristine) continue;
+      const rightX = Math.max(20, vw - ws.size.width - RIGHT_ICON_COLUMN_RESERVED);
+      patchWidget(def.id, { position: { x: rightX, y: ws.position.y } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const focus = useCallback((id: string) => {
     setOrder((prev) => [...prev.filter((x) => x !== id), id]);

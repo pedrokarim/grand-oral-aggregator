@@ -12,9 +12,10 @@ export const WIDGETS: WidgetDef[] = [
     label: "Dernières actualités",
     description: "Flux des derniers articles scrapés, tous thèmes confondus.",
     defaultEnabled: true,
-    defaultPosition: { x: 20, y: 20 },
-    defaultSize: { width: 380, height: 480 },
-    minSize: { width: 300, height: 240 },
+    defaultPosition: { x: 0, y: 20 },
+    defaultSize: { width: 285, height: 360 },
+    minSize: { width: 260, height: 220 },
+    defaultAnchor: "right",
     Component: NewsWidget,
   },
   {
@@ -22,9 +23,10 @@ export const WIDGETS: WidgetDef[] = [
     label: "Horloge",
     description: "Heure et date du jour, format minimal.",
     defaultEnabled: false,
-    defaultPosition: { x: 20, y: 520 },
+    defaultPosition: { x: 0, y: 400 },
     defaultSize: { width: 240, height: 140 },
     minSize: { width: 200, height: 110 },
+    defaultAnchor: "right",
     Component: ClockWidget,
   },
   {
@@ -32,14 +34,17 @@ export const WIDGETS: WidgetDef[] = [
     label: "Sujet aléatoire",
     description: "Tire un sujet de préparation au hasard pour t'inspirer.",
     defaultEnabled: false,
-    defaultPosition: { x: 280, y: 520 },
+    defaultPosition: { x: 0, y: 560 },
     defaultSize: { width: 320, height: 220 },
     minSize: { width: 260, height: 180 },
+    defaultAnchor: "right",
     Component: SubjectsWidget,
   },
 ];
 
-const STORAGE_KEY = "desktop-widgets";
+// Bump suffix (-v2) when default positions change so existing users get the
+// new layout without manual reset. Old keys remain in localStorage but unused.
+const STORAGE_KEY = "desktop-widgets-v2";
 
 const DEFAULT_STATE: WidgetsState = Object.fromEntries(
   WIDGETS.map((w) => [
