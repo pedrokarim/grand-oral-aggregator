@@ -48,3 +48,4 @@ skills-lock.json
 
 # host-specific deploy artifacts
 nginx.conf
+docker-compose.override.yml
