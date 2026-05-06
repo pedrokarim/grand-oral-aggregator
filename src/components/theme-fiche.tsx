@@ -5,6 +5,7 @@ import { Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
 import { MarkdownContent } from "@/components/markdown-content";
 import { SpeakButton } from "@/components/speak-button";
+import { streamAISummary } from "@/lib/ai-stream-client";
 
 interface ThemeFicheProps {
   theme: string;
@@ -17,6 +18,24 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+
+  async function generateWithStream(force: boolean) {
+    setFiche("");
+    setOpen(true);
+
+    await streamAISummary(
+      {
+        kind: "theme",
+        theme,
+        subjects,
+        provider: settings.ai.provider,
+        model: settings.ai.model,
+        baseUrl: settings.ai.baseUrl,
+        force,
+      },
+      setFiche
+    );
+  }
 
   // On mount: check for cached fiche
   useEffect(() => {
@@ -50,6 +69,11 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
     setLoading(true);
     setError(null);
     try {
+      if (settings.ai.provider === "ollama") {
+        await generateWithStream(force);
+        return;
+      }
+
       const res = await fetch("/api/ai/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,7 +88,13 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
           force,
         }),
       });
+      const contentType = res.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error(text.slice(0, 120) || "Réponse invalide du serveur");
+      }
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur de génération");
       if (data.error) throw new Error(data.error);
       setFiche(data.summary);
       setOpen(true);
@@ -120,7 +150,7 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
             {open && fiche && <SpeakButton text={fiche} />}
           </div>
 
-          {loading && (
+          {loading && !fiche && (
             <div className="space-y-3 py-2">
               <p className="text-[12px] text-[#9EA096] animate-pulse">
                 Génération de la fiche complète… ({subjects.length} sujets pris en compte)
@@ -131,6 +161,12 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
               <div className="h-3 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
               <div className="h-3 w-3/4 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
             </div>
+          )}
+
+          {loading && fiche && (
+            <p className="text-[12px] text-[#9EA096] animate-pulse">
+              Génération en cours… la fiche s&apos;écrit au fur et à mesure.
+            </p>
           )}
 
           {error && (

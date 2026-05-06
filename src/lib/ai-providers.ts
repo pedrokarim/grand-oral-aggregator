@@ -75,7 +75,7 @@ const ARTICLE_PROMPTS: Record<SummaryLength, string> = {
   long: LONG_ARTICLE_PROMPT,
 };
 
-const THEME_FICHE_PROMPT = `Tu es un assistant spécialisé dans la préparation au Grand Oral de dernière année de Master en informatique.
+export const THEME_FICHE_PROMPT = `Tu es un assistant spécialisé dans la préparation au Grand Oral de dernière année de Master en informatique.
 Rédige une **fiche de révision complète** en **markdown** pour ce thème. Un étudiant doit pouvoir s'en servir pour couvrir le thème entier à l'oral.
 
 Structure obligatoire avec des titres ## et des listes :
@@ -116,6 +116,26 @@ const MAX_TOKENS_BY_LENGTH: Record<SummaryLength, number> = {
 
 const MAX_TOKENS_THEME_FICHE = 6000;
 
+export function buildThemeFicheUserPrompt(theme: string, subjects: string[]) {
+  const subjectsList = subjects.slice(0, 25).map((s, i) => `${i + 1}. ${s}`).join("\n");
+  return `Thème : ${theme}\n\nListe des sujets de préparation du thème :\n${subjectsList}`;
+}
+
+export function buildSummaryPrompts(
+  subject: string,
+  theme: string,
+  articleContent?: string,
+  length: SummaryLength = "medium",
+) {
+  const sysPrompt = articleContent ? ARTICLE_PROMPTS[length] : SUBJECT_PROMPTS[length];
+  const contentLimit = length === "long" ? 6000 : length === "medium" ? 3000 : 1500;
+  const userPrompt = articleContent
+    ? `Thème : ${theme}\nArticle : ${subject}\n\nContenu :\n${articleContent.slice(0, contentLimit)}`
+    : `Thème : ${theme}\nSujet : ${subject}`;
+
+  return { sysPrompt, userPrompt };
+}
+
 export async function generateSummary(
   config: AIProviderConfig,
   subject: string,
@@ -123,11 +143,7 @@ export async function generateSummary(
   articleContent?: string,
   length: SummaryLength = "medium"
 ): Promise<string> {
-  const sysPrompt = articleContent ? ARTICLE_PROMPTS[length] : SUBJECT_PROMPTS[length];
-  const contentLimit = length === "long" ? 6000 : length === "medium" ? 3000 : 1500;
-  const userPrompt = articleContent
-    ? `Thème : ${theme}\nArticle : ${subject}\n\nContenu :\n${articleContent.slice(0, contentLimit)}`
-    : `Thème : ${theme}\nSujet : ${subject}`;
+  const { sysPrompt, userPrompt } = buildSummaryPrompts(subject, theme, articleContent, length);
   const maxTokens = MAX_TOKENS_BY_LENGTH[length];
 
   return callProvider(config, sysPrompt, userPrompt, maxTokens);
@@ -138,8 +154,7 @@ export async function generateThemeFiche(
   theme: string,
   subjects: string[],
 ): Promise<string> {
-  const subjectsList = subjects.slice(0, 25).map((s, i) => `${i + 1}. ${s}`).join("\n");
-  const userPrompt = `Thème : ${theme}\n\nListe des sujets de préparation du thème :\n${subjectsList}`;
+  const userPrompt = buildThemeFicheUserPrompt(theme, subjects);
   return callProvider(config, THEME_FICHE_PROMPT, userPrompt, MAX_TOKENS_THEME_FICHE);
 }
 
@@ -256,7 +271,29 @@ async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt
       stream: false,
     }),
   });
-  const data = await res.json();
+  const contentType = res.headers.get("content-type") ?? "";
+  const text = await res.text();
+
+  if (!contentType.includes("application/json")) {
+    throw new Error(
+      `Ollama ne renvoie pas du JSON sur ${baseUrl}. Vérifie que l'URL pointe bien vers le serveur Ollama, pas vers l'application.`
+    );
+  }
+
+  let data: { error?: string; message?: { content?: string } };
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`Réponse JSON invalide depuis Ollama sur ${baseUrl}`);
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || `Ollama a répondu ${res.status}`);
+  }
+  if (!data.message?.content) {
+    throw new Error("Ollama n'a pas renvoyé de contenu");
+  }
+
   return data.message.content;
 }
 

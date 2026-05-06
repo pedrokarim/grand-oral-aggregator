@@ -12,6 +12,7 @@ import { sanitizeDescription } from "@/lib/utils";
 import { useSettings } from "@/hooks/use-settings";
 import { addToHistory } from "@/lib/news-history";
 import type { NewsArticle } from "@/lib/news";
+import { streamAISummary } from "@/lib/ai-stream-client";
 
 export default function ArticleDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -97,20 +98,34 @@ export default function ArticleDetailPage() {
         );
       }
 
+      const payload = {
+        slug: article.slug,
+        subject: article.title,
+        theme: article.theme,
+        articleContent: articleContent || undefined,
+        provider: settings.ai.provider,
+        apiKey: settings.ai.apiKey,
+        model: settings.ai.model,
+        baseUrl: settings.ai.baseUrl,
+        length: settings.summaryLength,
+      };
+
+      if (settings.ai.provider === "ollama") {
+        setSummary("");
+        setSummaryOpen(true);
+        const streamedSummary = await streamAISummary(payload, setSummary);
+        setSummaryError(null);
+
+        if (settings.tts.autoPlay && streamedSummary) {
+          speak(stripMarkdown(streamedSummary), settings.tts);
+        }
+        return;
+      }
+
       const res = await fetch("/api/ai/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slug: article.slug,
-          subject: article.title,
-          theme: article.theme,
-          articleContent: articleContent || undefined,
-          provider: settings.ai.provider,
-          apiKey: settings.ai.apiKey,
-          model: settings.ai.model,
-          baseUrl: settings.ai.baseUrl,
-          length: settings.summaryLength,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -336,7 +351,7 @@ export default function ArticleDetailPage() {
             {summaryOpen && summary && <SpeakButton text={summary} />}
           </div>
 
-          {summaryLoading && (
+          {summaryLoading && !summary && (
             <div className="space-y-3 py-2">
               <p className="text-[12px] text-[#9EA096] animate-pulse">
                 {!article.content
@@ -347,6 +362,12 @@ export default function ArticleDetailPage() {
               <div className="h-3 w-5/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
               <div className="h-3 w-4/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
             </div>
+          )}
+
+          {summaryLoading && summary && (
+            <p className="text-[12px] text-[#9EA096] animate-pulse">
+              Génération en cours… le résumé s&apos;écrit au fur et à mesure.
+            </p>
           )}
 
           {summaryError && (

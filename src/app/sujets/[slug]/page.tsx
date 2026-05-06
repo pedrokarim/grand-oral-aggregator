@@ -11,6 +11,7 @@ import { getThemeColor } from "@/lib/theme-colors";
 import { useSettings } from "@/hooks/use-settings";
 import { getSubjectBySlug, slugify, type CustomSubject } from "@/lib/data";
 import type { Subject } from "@/lib/data";
+import { streamAISummary } from "@/lib/ai-stream-client";
 
 type AnySubject =
   | (Subject & { source: "builtin" })
@@ -77,18 +78,30 @@ export default function SubjectDetailPage() {
     setSummaryLoading(true);
     setSummaryError(null);
     try {
+      const payload = {
+        subject: subject.sujet,
+        theme: subject.theme,
+        provider: settings.ai.provider,
+        apiKey: settings.ai.apiKey,
+        model: settings.ai.model,
+        baseUrl: settings.ai.baseUrl,
+        length: settings.summaryLength,
+      };
+
+      if (settings.ai.provider === "ollama") {
+        setSummary("");
+        setSummaryOpen(true);
+        const streamedSummary = await streamAISummary(payload, setSummary);
+        if (settings.tts.autoPlay && streamedSummary) {
+          speak(stripMarkdown(streamedSummary), settings.tts);
+        }
+        return;
+      }
+
       const res = await fetch("/api/ai/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          subject: subject.sujet,
-          theme: subject.theme,
-          provider: settings.ai.provider,
-          apiKey: settings.ai.apiKey,
-          model: settings.ai.model,
-          baseUrl: settings.ai.baseUrl,
-          length: settings.summaryLength,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -208,7 +221,7 @@ export default function SubjectDetailPage() {
             {summaryOpen && summary && <SpeakButton text={summary} />}
           </div>
 
-          {summaryLoading && (
+          {summaryLoading && !summary && (
             <div className="space-y-3 py-2">
               <p className="text-[12px] text-[#9EA096] animate-pulse">
                 Génération du résumé IA...
@@ -217,6 +230,12 @@ export default function SubjectDetailPage() {
               <div className="h-3 w-5/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
               <div className="h-3 w-4/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
             </div>
+          )}
+
+          {summaryLoading && summary && (
+            <p className="text-[12px] text-[#9EA096] animate-pulse">
+              Génération en cours… le résumé s&apos;écrit au fur et à mesure.
+            </p>
           )}
 
           {summaryError && (

@@ -19,6 +19,7 @@ import { EmbedLink } from "@/components/embed-link";
 import { speak, stripMarkdown } from "@/lib/tts";
 import { slugifySubject, type SubjectAuthor } from "@/lib/data";
 import type { ThemeColor } from "@/lib/theme-colors";
+import { streamAISummary } from "@/lib/ai-stream-client";
 
 interface SubjectCardProps {
   sujet: string;
@@ -94,18 +95,34 @@ export function SubjectCard({
     setError(null);
 
     try {
+      const payload = {
+        subject: sujet,
+        theme,
+        provider: settings.ai.provider,
+        apiKey: settings.ai.apiKey,
+        model: settings.ai.model,
+        baseUrl: settings.ai.baseUrl,
+        length: settings.summaryLength,
+      };
+
+      if (settings.ai.provider === "ollama") {
+        setSummary("");
+        if (forceOpen) setOpen(true);
+        const streamedSummary = await streamAISummary(payload, (text) => {
+          setSummary(text);
+          if (forceOpen) setOpen(true);
+        });
+
+        if (forceOpen && settings.tts.autoPlay && streamedSummary) {
+          speak(stripMarkdown(streamedSummary), settings.tts);
+        }
+        return;
+      }
+
       const res = await fetch("/api/ai/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          subject: sujet,
-          theme,
-          provider: settings.ai.provider,
-          apiKey: settings.ai.apiKey,
-          model: settings.ai.model,
-          baseUrl: settings.ai.baseUrl,
-          length: settings.summaryLength,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -254,12 +271,18 @@ export function SubjectCard({
         )}
       </div>
 
-      {loading && (
+      {loading && !summary && (
         <div className="space-y-2 pt-3">
           <div className="h-4 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
           <div className="h-4 w-5/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
           <div className="h-4 w-4/6 rounded bg-[#E5E7E0] dark:bg-[#2a2b2f] animate-pulse" />
         </div>
+      )}
+
+      {loading && summary && (
+        <p className="pt-3 text-[12px] text-[#9EA096] animate-pulse">
+          Génération en cours…
+        </p>
       )}
 
       {error && (
