@@ -174,7 +174,7 @@ function callProvider(
     case "mistral":
       return callMistral(config, sysPrompt, userPrompt, maxTokens);
     case "ollama":
-      return callOllama(config, sysPrompt, userPrompt);
+      return callOllama(config, sysPrompt, userPrompt, maxTokens);
     default:
       throw new Error(`Provider inconnu: ${config.provider}`);
   }
@@ -257,7 +257,7 @@ async function callMistral(config: AIProviderConfig, systemPrompt: string, promp
   return data.choices[0].message.content;
 }
 
-async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt: string): Promise<string> {
+async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt: string, maxTokens: number): Promise<string> {
   const baseUrl = resolveOllamaBaseUrl(config.baseUrl);
   const res = await fetch(`${baseUrl}/api/chat`, {
     method: "POST",
@@ -269,6 +269,14 @@ async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt
         { role: "user", content: prompt },
       ],
       stream: false,
+      think: false,
+      keep_alive: "30m",
+      options: {
+        num_ctx: 2048,
+        num_predict: Math.min(maxTokens, 1800),
+        temperature: 0.4,
+        top_p: 0.9,
+      },
     }),
   });
   const contentType = res.headers.get("content-type") ?? "";

@@ -14,6 +14,13 @@ const PROMPT_VERSION = "v2-problematique";
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
+const OLLAMA_NUM_PREDICT_BY_LENGTH: Record<SummaryLength, number> = {
+  short: 350,
+  medium: 900,
+  long: 1500,
+};
+const OLLAMA_THEME_NUM_PREDICT = 1800;
+
 type CacheTarget =
   | {
       kind: "article";
@@ -175,6 +182,7 @@ export async function POST(request: NextRequest) {
   let systemPrompt: string;
   let userPrompt: string;
   let cacheTarget: CacheTarget | null = null;
+  let numPredict = OLLAMA_NUM_PREDICT_BY_LENGTH.medium;
 
   if (kind === "theme") {
     if (!theme || !Array.isArray(subjects)) {
@@ -186,6 +194,7 @@ export async function POST(request: NextRequest) {
 
     systemPrompt = THEME_FICHE_PROMPT;
     userPrompt = buildThemeFicheUserPrompt(theme, subjects as string[]);
+    numPredict = OLLAMA_THEME_NUM_PREDICT;
     cacheTarget = {
       kind: "subject",
       subjectKey: themeFicheKeyFor(theme),
@@ -202,6 +211,7 @@ export async function POST(request: NextRequest) {
 
     const lengthRaw = body.length as SummaryLength;
     const length = VALID_LENGTHS.includes(lengthRaw) ? lengthRaw : "medium";
+    numPredict = OLLAMA_NUM_PREDICT_BY_LENGTH[length];
     const prompts = buildSummaryPrompts(subject, theme, articleContent, length);
     systemPrompt = prompts.sysPrompt;
     userPrompt = prompts.userPrompt;
@@ -276,6 +286,14 @@ export async function POST(request: NextRequest) {
               { role: "user", content: userPrompt },
             ],
             stream: true,
+            think: false,
+            keep_alive: "30m",
+            options: {
+              num_ctx: 2048,
+              num_predict: numPredict,
+              temperature: 0.4,
+              top_p: 0.9,
+            },
           }),
         });
 
