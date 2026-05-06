@@ -116,6 +116,26 @@ const MAX_TOKENS_BY_LENGTH: Record<SummaryLength, number> = {
 
 const MAX_TOKENS_THEME_FICHE = 6000;
 
+const OLLAMA_STOP_SEQUENCES = [
+  "\n\nOkay",
+  "\nOkay",
+  "Okay, the user",
+  "Okay,",
+  " the user",
+];
+
+export function buildOllamaPrompt(systemPrompt: string, prompt: string) {
+  return [
+    systemPrompt,
+    "",
+    "Consigne importante : réponds directement en français et en markdown. Ne montre jamais ton raisonnement, n'analyse pas la consigne, et ne commence pas par du texte en anglais comme \"Okay, the user\".",
+    "",
+    prompt,
+    "",
+    "Réponse :",
+  ].join("\n");
+}
+
 export function buildThemeFicheUserPrompt(theme: string, subjects: string[]) {
   const subjectsList = subjects.slice(0, 25).map((s, i) => `${i + 1}. ${s}`).join("\n");
   return `Thème : ${theme}\n\nListe des sujets de préparation du thème :\n${subjectsList}`;
@@ -259,15 +279,13 @@ async function callMistral(config: AIProviderConfig, systemPrompt: string, promp
 
 async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt: string, maxTokens: number): Promise<string> {
   const baseUrl = resolveOllamaBaseUrl(config.baseUrl);
-  const res = await fetch(`${baseUrl}/api/chat`, {
+  const res = await fetch(`${baseUrl}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: config.model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: prompt },
-      ],
+      prompt: buildOllamaPrompt(systemPrompt, prompt),
+      raw: true,
       stream: false,
       think: false,
       keep_alive: "30m",
@@ -276,6 +294,7 @@ async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt
         num_predict: Math.min(maxTokens, 1800),
         temperature: 0.4,
         top_p: 0.9,
+        stop: OLLAMA_STOP_SEQUENCES,
       },
     }),
   });
@@ -288,7 +307,7 @@ async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt
     );
   }
 
-  let data: { error?: string; message?: { content?: string } };
+  let data: { error?: string; response?: string; message?: { content?: string } };
   try {
     data = JSON.parse(text);
   } catch {
@@ -298,11 +317,12 @@ async function callOllama(config: AIProviderConfig, systemPrompt: string, prompt
   if (!res.ok) {
     throw new Error(data.error || `Ollama a répondu ${res.status}`);
   }
-  if (!data.message?.content) {
+  const content = data.response ?? data.message?.content;
+  if (!content) {
     throw new Error("Ollama n'a pas renvoyé de contenu");
   }
 
-  return data.message.content;
+  return content.trim();
 }
 
 function isLoopbackUrl(value: string) {

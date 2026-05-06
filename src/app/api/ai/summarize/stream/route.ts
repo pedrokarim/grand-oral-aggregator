@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  buildOllamaPrompt,
   buildSummaryPrompts,
   buildThemeFicheUserPrompt,
   resolveOllamaBaseUrl,
@@ -20,6 +21,13 @@ const OLLAMA_NUM_PREDICT_BY_LENGTH: Record<SummaryLength, number> = {
   long: 1500,
 };
 const OLLAMA_THEME_NUM_PREDICT = 1800;
+const OLLAMA_STOP_SEQUENCES = [
+  "\n\nOkay",
+  "\nOkay",
+  "Okay, the user",
+  "Okay,",
+  " the user",
+];
 
 type CacheTarget =
   | {
@@ -80,6 +88,7 @@ function parseOllamaLine(line: string) {
     return JSON.parse(line) as {
       error?: string;
       done?: boolean;
+      response?: string;
       message?: { content?: string };
     };
   } catch {
@@ -276,15 +285,13 @@ export async function POST(request: NextRequest) {
       }, 15000);
 
       try {
-        const ollamaRes = await fetch(`${ollamaBaseUrl}/api/chat`, {
+        const ollamaRes = await fetch(`${ollamaBaseUrl}/api/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
+            prompt: buildOllamaPrompt(systemPrompt, userPrompt),
+            raw: true,
             stream: true,
             think: false,
             keep_alive: "30m",
@@ -293,6 +300,7 @@ export async function POST(request: NextRequest) {
               num_predict: numPredict,
               temperature: 0.4,
               top_p: 0.9,
+              stop: OLLAMA_STOP_SEQUENCES,
             },
           }),
         });
@@ -320,7 +328,7 @@ export async function POST(request: NextRequest) {
             if (!data) continue;
             if (data.error) throw new Error(data.error);
 
-            const chunk = data.message?.content ?? "";
+            const chunk = data.response ?? data.message?.content ?? "";
             if (chunk) {
               fullText += chunk;
               enqueue({ type: "chunk", content: chunk });
@@ -331,7 +339,7 @@ export async function POST(request: NextRequest) {
         const remaining = buffer.trim();
         if (remaining) {
           const data = parseOllamaLine(remaining);
-          const chunk = data?.message?.content ?? "";
+          const chunk = data?.response ?? data?.message?.content ?? "";
           if (data?.error) throw new Error(data.error);
           if (chunk) {
             fullText += chunk;
