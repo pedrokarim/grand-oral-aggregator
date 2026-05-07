@@ -21,14 +21,14 @@ export default function ActualitesPage() {
   };
 
   return (
-    <div className="space-y-8 p-6">
-      <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] bg-[#E5E7E0]/30 dark:bg-[#2a2b2f]/30 p-6">
-        <div className="flex items-center gap-4">
-          <div className="rounded-lg bg-[#EB9D2A]/10 p-3">
-            <Newspaper className="h-8 w-8 text-[#EB9D2A]" />
+    <div className="space-y-6 p-4 sm:space-y-8 sm:p-6">
+      <div className="rounded-md border border-[#D2D3CC] bg-[#E5E7E0]/30 p-4 dark:border-[#3a3b3f] dark:bg-[#2a2b2f]/30 sm:p-6">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="rounded-lg bg-[#EB9D2A]/10 p-2.5 sm:p-3">
+            <Newspaper className="h-6 w-6 text-[#EB9D2A] sm:h-8 sm:w-8" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[#23251D] dark:text-[#EAECF6]">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-[#23251D] dark:text-[#EAECF6] sm:text-2xl">
               Actualités
             </h1>
             <p className="text-[15px] text-[#9EA096]">

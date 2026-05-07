@@ -15,10 +15,10 @@ const iconMap: Record<string, React.ElementType> = {
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-5 p-4 sm:space-y-8 sm:p-6">
       {/* Hero header */}
-      <div className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] bg-[#E5E7E0]/30 dark:bg-[#2a2b2f]/30 p-6">
-        <h1 className="text-2xl font-bold text-[#23251D] dark:text-[#EAECF6]">
+      <div className="rounded-md border border-[#D2D3CC] bg-[#E5E7E0]/30 p-4 dark:border-[#3a3b3f] dark:bg-[#2a2b2f]/30 sm:p-6">
+        <h1 className="text-xl font-bold text-[#23251D] dark:text-[#EAECF6] sm:text-2xl">
           Dashboard
         </h1>
         <p className="text-[15px] text-[#9EA096] mt-1">
@@ -27,7 +27,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats row */}
-      <ul className="list-none m-0 p-0 grid grid-cols-3 gap-4">
+      <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-3 sm:gap-4">
         {[
           { label: "Total Sujets", value: subjects.length, icon: BookOpen, color: "text-[#EB9D2A]" },
           { label: "Thèmes", value: themeStats.length, icon: Layers, color: "text-[#8B5CF6]" },
@@ -35,13 +35,13 @@ export default function DashboardPage() {
         ].map(({ label, value, icon: Icon, color }) => (
           <li
             key={label}
-            className="rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-4 bg-[#FDFDF8] dark:bg-[#1E1F23]"
+            className="rounded-md border border-[#D2D3CC] bg-[#FDFDF8] p-4 dark:border-[#3a3b3f] dark:bg-[#1E1F23]"
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[13px] text-[#9EA096] font-medium">{label}</span>
               <Icon className={`h-4 w-4 ${color}`} />
             </div>
-            <div className="text-3xl font-bold text-[#23251D] dark:text-[#EAECF6]">{value}</div>
+            <div className="text-2xl font-bold text-[#23251D] dark:text-[#EAECF6] sm:text-3xl">{value}</div>
           </li>
         ))}
       </ul>
@@ -49,7 +49,7 @@ export default function DashboardPage() {
       {/* Themes grid */}
       <div>
         <h2 className="text-lg font-semibold text-[#23251D] dark:text-[#EAECF6] mb-4">Thèmes</h2>
-        <ul className="list-none m-0 p-0 grid gap-3 sm:grid-cols-2">
+        <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2 sm:gap-3">
           {themeStats.map(({ theme, slug, count }) => {
             const Icon = iconMap[themeIcons[theme]] ?? Settings;
             const color = getThemeColor(theme);
@@ -58,7 +58,8 @@ export default function DashboardPage() {
                 <Suspense>
                   <EmbedLink
                     href={`/themes/${slug}`}
-                    className="flex items-center gap-3 p-3 rounded-md border border-transparent
+                    className="flex items-center gap-3 rounded-md border border-[#D2D3CC]/70 bg-[#FDFDF8] p-3
+                      dark:border-[#3a3b3f]/70 dark:bg-[#25262B] sm:border-transparent sm:bg-transparent sm:dark:bg-transparent
                       hover:border-[#D2D3CC] dark:hover:border-[#3a3b3f] hover:bg-[#E5E7E0]/30 dark:hover:bg-[#2a2b2f]/30
                       hover:translate-y-[-1px] active:translate-y-[1px] active:scale-[.99]
                       transition-all relative group"

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import {
   getThemeBySlug,
   getSubjectsByTheme,
-  themeStats,
   themeIcons,
   slugifySubject,
   toBuiltIn,
@@ -86,15 +85,15 @@ export default async function ThemePage({
   const totalCount = builtInSubjects.length + initialCustomSubjects.length;
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-6 p-4 sm:space-y-8 sm:p-6">
       {/* Theme header */}
-      <div className={`rounded-md border border-[#D2D3CC] dark:border-[#3a3b3f] p-6 ${color.bgLight}`}>
-        <div className="flex items-center gap-4">
-          <div className={`rounded-lg p-3 ${color.bg}`}>
-            <Icon className="h-8 w-8 text-white" />
+      <div className={`rounded-md border border-[#D2D3CC] p-4 dark:border-[#3a3b3f] sm:p-6 ${color.bgLight}`}>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className={`rounded-lg p-2.5 sm:p-3 ${color.bg}`}>
+            <Icon className="h-6 w-6 text-white sm:h-8 sm:w-8" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[#23251D] dark:text-[#EAECF6]">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold leading-tight text-[#23251D] dark:text-[#EAECF6] sm:text-2xl">
               {themeStat.theme}
             </h1>
             <p className="text-[15px] text-[#9EA096]">

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +25,11 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Grand Oral Agregator",
   description: "Plateforme de préparation au Grand Oral - Thèmes, sujets et actualités",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 const themeInitScript = `

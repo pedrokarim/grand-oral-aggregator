@@ -10,7 +10,6 @@ import { DesktopIcon } from "./desktop-icon";
 import { DesktopWallpaper } from "./desktop-wallpaper";
 import { MobileDock } from "./mobile-dock";
 import { DesktopContextMenu } from "./desktop-context-menu";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { themeStats } from "@/lib/data";
 import { useWindowManager } from "@/lib/use-window-manager";
 import { ActiveWindowsPanel } from "./active-windows-panel";
@@ -188,6 +187,7 @@ function PngIcon({ src, alt }: { src: string; alt: string }) {
 }
 
 export function DesktopLayout({ children }: { children: ReactNode }) {
+  void children;
   const pathname = usePathname();
   const desktopRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(false);
@@ -220,22 +220,24 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 
   // Load positions from localStorage on mount (like PostHog)
   useEffect(() => {
-    const savedPositions = localStorage.getItem(STORAGE_KEY);
-    if (savedPositions) {
-      try {
-        const parsed = JSON.parse(savedPositions);
-        const allExist = allApps.every((a) => parsed[a.label]);
-        if (allExist) {
-          setIconPositions(parsed);
-        } else {
+    const loadPositions = () => {
+      const savedPositions = localStorage.getItem(STORAGE_KEY);
+      if (savedPositions) {
+        try {
+          const parsed = JSON.parse(savedPositions);
+          const allExist = allApps.every((a) => parsed[a.label]);
+          if (allExist) {
+            setIconPositions(parsed);
+          } else {
+            setIconPositions(generateInitial());
+          }
+        } catch {
           setIconPositions(generateInitial());
         }
-      } catch {
+      } else {
         setIconPositions(generateInitial());
       }
-    } else {
-      setIconPositions(generateInitial());
-    }
+    };
 
     function generateInitial() {
       const pos = computePositions();
@@ -247,9 +249,14 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       setIconPositions(computePositions());
     };
 
-    setTimeout(() => setRendered(true), 400);
+    const loadTimer = setTimeout(loadPositions, 0);
+    const renderTimer = setTimeout(() => setRendered(true), 400);
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(loadTimer);
+      clearTimeout(renderTimer);
+      window.removeEventListener("resize", handleResize);
+    };
   }, [computePositions]);
 
   // Auto-open/focus a window for the current route on first load.
@@ -268,9 +275,12 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   const openWindowRef = useRef(openWindow);
   const updateWindowRouteRef = useRef(updateWindowRoute);
   const computePositionsRef = useRef(computePositions);
-  openWindowRef.current = openWindow;
-  updateWindowRouteRef.current = updateWindowRoute;
-  computePositionsRef.current = computePositions;
+
+  useEffect(() => {
+    openWindowRef.current = openWindow;
+    updateWindowRouteRef.current = updateWindowRoute;
+    computePositionsRef.current = computePositions;
+  }, [openWindow, updateWindowRoute, computePositions]);
 
   // Listen for postMessage from iframes (e.g. reset-icons from settings)
   useEffect(() => {
@@ -316,6 +326,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   };
 
   const handleIconOpen = (href: string, label: string) => {
+    void label;
     if (href === "#mode-site") {
       setSiteMode("site");
       return;
@@ -325,7 +336,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="hidden h-screen flex-col overflow-hidden md:flex">
       <DesktopWallpaper />
 
       {/* ===== Top header bar ===== */}
@@ -426,43 +437,33 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Windows — each rendered with iframe for independent content */}
-          {windows
-            .filter((w) => !w.minimized)
-            .map((win) => (
-              <DesktopWindow
-                key={win.id}
-                id={win.id}
-                title={win.title}
-                zIndex={win.zIndex + 20}
-                position={win.position}
-                size={win.size}
-                isFocused={focusedWindow?.id === win.id}
-                onFocus={() => bringToFront(win.id)}
-                onClose={() => closeWindow(win.id)}
-                onMinimize={() => minimizeWindow(win.id)}
-                onPositionChange={(pos) => updatePosition(win.id, pos)}
-                onSizeChange={(size) => updateSize(win.id, size)}
-                toolbar={win.path === "/demo" ? undefined : <EditorToolbar />}
-              >
-                <iframe
-                  data-window-id={win.id}
-                  src={`${win.initialPath ?? win.path}${(win.initialPath ?? win.path).includes("?") ? "&" : "?"}_embed=1`}
-                  className="w-full h-full border-0"
+          <div className="hidden md:block">
+            {windows
+              .filter((w) => !w.minimized)
+              .map((win) => (
+                <DesktopWindow
+                  key={win.id}
+                  id={win.id}
                   title={win.title}
-                />
-              </DesktopWindow>
-            ))}
-
-          {/* Mobile fallback — single window */}
-          <div className="md:hidden absolute inset-0 flex items-stretch py-2 px-2 z-20">
-            <div className="flex-1 min-h-0 flex flex-col rounded-lg border border-[#BFC1B7] bg-[#FDFDF8] shadow-2xl overflow-hidden">
-              <div className="flex items-center h-9 px-3 bg-[#E5E7E0] border-b border-[#BFC1B7] shrink-0">
-                <span className="text-sm font-semibold text-[#23251D]">{getWindowTitle(pathname)}</span>
-              </div>
-              <ScrollArea className="flex-1">
-                {children}
-              </ScrollArea>
-            </div>
+                  zIndex={win.zIndex + 20}
+                  position={win.position}
+                  size={win.size}
+                  isFocused={focusedWindow?.id === win.id}
+                  onFocus={() => bringToFront(win.id)}
+                  onClose={() => closeWindow(win.id)}
+                  onMinimize={() => minimizeWindow(win.id)}
+                  onPositionChange={(pos) => updatePosition(win.id, pos)}
+                  onSizeChange={(size) => updateSize(win.id, size)}
+                  toolbar={win.path === "/demo" ? undefined : <EditorToolbar />}
+                >
+                  <iframe
+                    data-window-id={win.id}
+                    src={`${win.initialPath ?? win.path}${(win.initialPath ?? win.path).includes("?") ? "&" : "?"}_embed=1`}
+                    className="w-full h-full border-0"
+                    title={win.title}
+                  />
+                </DesktopWindow>
+              ))}
           </div>
         </div>
       </DesktopContextMenu>
