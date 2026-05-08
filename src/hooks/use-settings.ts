@@ -40,16 +40,32 @@ export function useSettings(): [AppSettings, (update: SettingsUpdate) => void] {
   const userId = session.data?.user?.id ?? null;
   const lastSyncedUserIdRef = useRef<string | null>(null);
 
-  // Hydrate from localStorage on mount
+  // Hydrate from localStorage on mount + listen for cross-context updates.
+  // The settings page is rendered inside an iframe (the "fake" window), so a
+  // change there doesn't notify the parent desktop's React state on its own.
+  // The browser fires `storage` events on every OTHER same-origin context
+  // when localStorage is written, so we re-hydrate whenever it touches our
+  // key. Without this, picking "Grille" inside /settings updates the iframe
+  // but the desktop in the parent stays in "free" mode.
   useEffect(() => {
-    const parsed = readFromStorage();
-    if (!parsed) return;
-    setSettings({
-      ...DEFAULT_SETTINGS,
-      ...parsed,
-      ai: { ...DEFAULT_SETTINGS.ai, ...parsed.ai },
-      tts: { ...DEFAULT_SETTINGS.tts, ...parsed.tts },
-    });
+    const hydrate = () => {
+      const parsed = readFromStorage();
+      if (!parsed) return;
+      setSettings({
+        ...DEFAULT_SETTINGS,
+        ...parsed,
+        ai: { ...DEFAULT_SETTINGS.ai, ...parsed.ai },
+        tts: { ...DEFAULT_SETTINGS.tts, ...parsed.tts },
+      });
+    };
+    hydrate();
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== null && e.key !== STORAGE_KEY) return;
+      hydrate();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
   }, []);
 
   // On login transition (null -> id): fetch server prefs and override local

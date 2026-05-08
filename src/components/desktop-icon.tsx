@@ -13,6 +13,9 @@ interface DesktopIconProps {
   selected?: boolean;
   onPositionChange?: (position: { x: number; y: number }) => void;
   onOpen: (href: string, label: string) => void;
+  /** Fired with `true` when a drag starts and `false` when it ends.
+   *  Lets the parent reveal the grid overlay only while an icon is moving. */
+  onDragStateChange?: (dragging: boolean) => void;
 }
 
 export function DesktopIcon({
@@ -24,6 +27,7 @@ export function DesktopIcon({
   selected = false,
   onPositionChange,
   onOpen,
+  onDragStateChange,
 }: DesktopIconProps) {
   const pathname = usePathname();
   const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
@@ -39,6 +43,7 @@ export function DesktopIcon({
 
   const handleDragEnd = (_: unknown, info: { offset: { x: number; y: number } }) => {
     setIsDragging(false);
+    onDragStateChange?.(false);
     if (!constraintsRef?.current) return;
 
     const bounds = constraintsRef.current.getBoundingClientRect();
@@ -76,7 +81,11 @@ export function DesktopIcon({
       dragListener={false}
       dragMomentum={false}
       dragConstraints={constraintsRef}
-      onDragStart={() => { setIsDragging(true); setHasDragged(false); }}
+      onDragStart={() => {
+        setIsDragging(true);
+        setHasDragged(false);
+        onDragStateChange?.(true);
+      }}
       onDrag={(_, info) => {
         if (!isDragging) setIsDragging(true);
         if (Math.abs(info.offset.x) > 5 || Math.abs(info.offset.y) > 5) {

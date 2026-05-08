@@ -17,9 +17,11 @@ import { useSettings } from "@/hooks/use-settings";
 import {
   type AIProvider,
   type SummaryLength,
+  type DesktopLayout,
   providerLabels,
   providerModels,
   summaryLengthLabels,
+  desktopLayoutLabels,
 } from "@/lib/settings";
 import { Settings, Brain, Palette, Bell, RotateCcw, RefreshCw, Loader2, Volume2, Play, Square } from "lucide-react";
 import { useVoices } from "@/hooks/use-voices";
@@ -378,6 +380,40 @@ export default function SettingsPage() {
                     <SelectItem value="en">English</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Bureau</CardTitle>
+              <CardDescription>
+                Choisis comment les icônes du bureau se posent quand tu les déplaces
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label>Mode de placement</Label>
+                <Select
+                  value={settings.desktopLayout}
+                  onValueChange={(v) =>
+                    updateSettings({ desktopLayout: v as DesktopLayout })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(desktopLayoutLabels).map(([key, label]) => (
+                      <SelectItem key={key} value={key}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  En mode grille, les icônes s&apos;accrochent automatiquement à la cellule la plus proche au moment du dépôt. Passer de libre à grille range les icônes existantes.
+                </p>
               </div>
             </CardContent>
           </Card>

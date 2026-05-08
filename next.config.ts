@@ -13,6 +13,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Prisma 7 + Next 16 needs @prisma/client server-external so Node resolves
+  // it natively at runtime — used by webpack dev (we currently avoid
+  // Turbopack because of its hashed-external bug, see CLAUDE memory).
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

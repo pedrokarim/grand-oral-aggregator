@@ -108,22 +108,59 @@ const PADDING_V = 20;
 const COL_SPACING = 128;
 const ICON_WIDTH = 112;
 
-/** Snap a free position to the nearest cell in the desktop grid.
- *  Cells are anchored to (PADDING_H, PADDING_V) and stepped by
- *  (COL_SPACING, ICON_HEIGHT) — same anchors generatePositions uses. */
-function snapToGrid(
+/** Convert a free position to grid cell coordinates (col,row). */
+function posToCell(
   pos: { x: number; y: number },
   containerWidth: number,
   containerHeight: number,
-): { x: number; y: number } {
+): { col: number; row: number } {
   const col = Math.round((pos.x - PADDING_H) / COL_SPACING);
   const row = Math.round((pos.y - PADDING_V) / ICON_HEIGHT);
   const maxCol = Math.max(0, Math.floor((containerWidth - PADDING_H - ICON_WIDTH) / COL_SPACING));
   const maxRow = Math.max(0, Math.floor((containerHeight - PADDING_V - ICON_HEIGHT) / ICON_HEIGHT));
   return {
-    x: PADDING_H + Math.max(0, Math.min(maxCol, col)) * COL_SPACING,
-    y: PADDING_V + Math.max(0, Math.min(maxRow, row)) * ICON_HEIGHT,
+    col: Math.max(0, Math.min(maxCol, col)),
+    row: Math.max(0, Math.min(maxRow, row)),
   };
+}
+
+function cellToPos(cell: { col: number; row: number }): { x: number; y: number } {
+  return {
+    x: PADDING_H + cell.col * COL_SPACING,
+    y: PADDING_V + cell.row * ICON_HEIGHT,
+  };
+}
+
+/** Snap a free position to the nearest grid cell, avoiding cells already in
+ *  `occupied`. If the natural target cell is taken, spiral outwards (Chebyshev
+ *  distance) to find the closest free one. Returns the chosen cell key so the
+ *  caller can record it in the occupied set for subsequent placements. */
+function snapToGridSafe(
+  pos: { x: number; y: number },
+  occupied: Set<string>,
+  containerWidth: number,
+  containerHeight: number,
+): { x: number; y: number; key: string } {
+  const target = posToCell(pos, containerWidth, containerHeight);
+  const maxCol = Math.max(0, Math.floor((containerWidth - PADDING_H - ICON_WIDTH) / COL_SPACING));
+  const maxRow = Math.max(0, Math.floor((containerHeight - PADDING_V - ICON_HEIGHT) / ICON_HEIGHT));
+  const SEARCH_LIMIT = 50;
+  for (let dist = 0; dist <= SEARCH_LIMIT; dist++) {
+    for (let dc = -dist; dc <= dist; dc++) {
+      for (let dr = -dist; dr <= dist; dr++) {
+        if (Math.max(Math.abs(dc), Math.abs(dr)) !== dist) continue;
+        const c = target.col + dc;
+        const r = target.row + dr;
+        if (c < 0 || r < 0 || c > maxCol || r > maxRow) continue;
+        const key = `${c},${r}`;
+        if (occupied.has(key)) continue;
+        return { ...cellToPos({ col: c, row: r }), key };
+      }
+    }
+  }
+  // No free cell anywhere within the search radius — accept the overlap.
+  const key = `${target.col},${target.row}`;
+  return { ...cellToPos(target), key };
 }
 
 function generatePositions(
@@ -358,6 +395,9 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  // ===== Drag tracking (for grid overlay reveal) =====
+  const [draggingIconCount, setDraggingIconCount] = useState(0);
+
   // ===== Marquee selection state =====
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [marquee, setMarquee] = useState<{
@@ -382,14 +422,33 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 
     setIconPositions((prev) => {
       const oldPos = prev[label];
+      const movingLabels = new Set<string>([label]);
+      if (oldPos && selected.has(label) && selected.size > 1) {
+        for (const other of selected) movingLabels.add(other);
+      }
+
+      // Build the occupied-cells set in grid mode from icons NOT being moved,
+      // so the moving group can land on cells previously occupied by itself.
+      const occupied = new Set<string>();
+      if (desktopLayout === "grid") {
+        for (const [otherLabel, otherPos] of Object.entries(prev)) {
+          if (movingLabels.has(otherLabel)) continue;
+          const c = posToCell(otherPos, w, h);
+          occupied.add(`${c.col},${c.row}`);
+        }
+      }
+
       let final = pos;
-      if (desktopLayout === "grid") final = snapToGrid(pos, w, h);
+      if (desktopLayout === "grid") {
+        const snapped = snapToGridSafe(pos, occupied, w, h);
+        final = { x: snapped.x, y: snapped.y };
+        occupied.add(snapped.key);
+      }
       const next: IconPositions = { ...prev, [label]: final };
 
-      // Group drag: if the dragged icon belongs to a multi-selection,
-      // shift every other selected icon by the same delta so they all move
-      // together. Computed at drop time (no live preview, by design — keeps
-      // the implementation simple and avoids fighting framer-motion drag).
+      // Group drag: shift every other selected icon by the same delta so the
+      // group moves together. In grid mode each icon is then snapped, with
+      // collision avoidance against the freshly-built occupied set.
       if (oldPos && selected.has(label) && selected.size > 1) {
         const dx = final.x - oldPos.x;
         const dy = final.y - oldPos.y;
@@ -402,7 +461,13 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
               x: Math.max(0, Math.min(maxX, o.x + dx)),
               y: Math.max(0, Math.min(maxY, o.y + dy)),
             };
-            next[other] = desktopLayout === "grid" ? snapToGrid(moved, w, h) : moved;
+            if (desktopLayout === "grid") {
+              const snapped = snapToGridSafe(moved, occupied, w, h);
+              next[other] = { x: snapped.x, y: snapped.y };
+              occupied.add(snapped.key);
+            } else {
+              next[other] = moved;
+            }
           }
         }
       }
@@ -479,7 +544,10 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   };
 
   // When the user switches to grid mode, snap every existing icon to its
-  // nearest grid cell. Switching back to free leaves icons where they are.
+  // nearest grid cell with collision avoidance — icons that would land on the
+  // same cell get pushed outward (Chebyshev spiral) until a free cell is
+  // found. Icons closer to the top-left win conflicts. Switching back to
+  // free leaves icons where they are.
   const lastLayoutRef = useRef(desktopLayout);
   useEffect(() => {
     if (lastLayoutRef.current === desktopLayout) return;
@@ -490,11 +558,19 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     const h = rect?.height ?? window.innerHeight;
     setIconPositions((prev) => {
       const out: IconPositions = {};
+      const occupied = new Set<string>();
       let changed = false;
-      for (const [label, pos] of Object.entries(prev)) {
-        const snapped = snapToGrid(pos, w, h);
+      // Sort top-to-bottom, left-to-right so visually higher icons get cell
+      // priority on conflicts — feels more natural than label order.
+      const sorted = Object.entries(prev).sort(([, a], [, b]) => {
+        if (a.y !== b.y) return a.y - b.y;
+        return a.x - b.x;
+      });
+      for (const [label, pos] of sorted) {
+        const snapped = snapToGridSafe(pos, occupied, w, h);
+        occupied.add(snapped.key);
         if (snapped.x !== pos.x || snapped.y !== pos.y) changed = true;
-        out[label] = snapped;
+        out[label] = { x: snapped.x, y: snapped.y };
       }
       if (!changed) return prev;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
@@ -588,9 +664,27 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       <DesktopContextMenu onResetIcons={resetIcons}>
         <div ref={desktopRef} className="flex-1 relative overflow-hidden">
 
+          {/* Grid overlay — only visible while at least one icon is being
+              dragged in grid mode. Cells match the snapToGrid anchors exactly
+              (PADDING_H, PADDING_V, COL_SPACING, ICON_HEIGHT) so the user
+              sees where the icon will land. Hidden the rest of the time so
+              the desktop stays clean. */}
+          {desktopLayout === "grid" && draggingIconCount > 0 && (
+            <div
+              className="hidden md:block absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, rgba(160,160,160,0.18) 1px, transparent 1px), linear-gradient(to bottom, rgba(160,160,160,0.18) 1px, transparent 1px)",
+                backgroundSize: `${COL_SPACING}px ${ICON_HEIGHT}px`,
+                backgroundPosition: `${PADDING_H}px ${PADDING_V}px`,
+                zIndex: 9,
+              }}
+            />
+          )}
+
           {/* Icons — absolutely positioned on the desktop */}
           <nav
-            className="hidden md:block absolute inset-0 z-10"
+            className="hidden md:block absolute inset-0 z-10 select-none"
             onPointerDown={handleNavPointerDown}
           >
             <motion.ul
@@ -611,6 +705,9 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
                     selected={selected.has(app.label)}
                     onPositionChange={(p) => handlePositionChange(app.label, p)}
                     onOpen={handleIconOpen}
+                    onDragStateChange={(d) =>
+                      setDraggingIconCount((n) => Math.max(0, n + (d ? 1 : -1)))
+                    }
                   />
                 );
               })}
