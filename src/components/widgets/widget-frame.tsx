@@ -118,7 +118,6 @@ export function WidgetFrame({
     <motion.div
       className={`absolute flex flex-col rounded-lg overflow-hidden select-none ${FRAME[state.style]}`}
       style={{ zIndex, x: state.position.x, y: state.position.y }}
-      animate={{ x: state.position.x, y: state.position.y }}
       drag
       dragControls={dragControls}
       dragListener={false}

@@ -13,6 +13,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
+import { useUserRole } from "@/hooks/use-user-role";
 import { MarkdownContent } from "@/components/markdown-content";
 import { SpeakButton } from "@/components/speak-button";
 import { EmbedLink } from "@/components/embed-link";
@@ -56,6 +57,7 @@ export function SubjectCard({
   onTogglePublic,
 }: SubjectCardProps) {
   const [settings] = useSettings();
+  const { isSuperAdmin } = useUserRole();
   const [summary, setSummary] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +66,7 @@ export function SubjectCard({
 
   // Load cached summary for this subject under current AI config.
   useEffect(() => {
+    if (!isSuperAdmin) return;
     const { provider, model } = settings.ai;
     if (!provider || !model) return;
     const ctrl = new AbortController();
@@ -81,7 +84,7 @@ export function SubjectCard({
       })
       .catch(() => {});
     return () => ctrl.abort();
-  }, [sujet, theme, settings.ai.provider, settings.ai.model, settings.summaryLength]);
+  }, [sujet, theme, settings.ai.provider, settings.ai.model, settings.summaryLength, isSuperAdmin]);
 
   const hasAIConfig = settings.ai.apiKey || settings.ai.provider === "ollama";
 
@@ -145,13 +148,14 @@ export function SubjectCard({
   const autoGenFired = useRef(false);
   useEffect(() => {
     if (!autoGenerate || autoGenFired.current) return;
+    if (!isSuperAdmin) return;
     if (!hasAIConfig) return;
     if (summary || loading) return;
     autoGenFired.current = true;
     // Generate silently; don't auto-open so the list stays compact.
     void generateSummary(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoGenerate, hasAIConfig, summary, loading]);
+  }, [autoGenerate, hasAIConfig, summary, loading, isSuperAdmin]);
 
   const authorLabel = author?.displayName || author?.name || "utilisateur";
   const slug = slugifySubject(theme, sujet);
@@ -174,7 +178,7 @@ export function SubjectCard({
           {sujet}
         </EmbedLink>
         <div className="flex items-center gap-2 shrink-0 relative">
-          {hasAIConfig && (
+          {isSuperAdmin && hasAIConfig && (
             <button
               onClick={() => generateSummary(true)}
               disabled={loading}

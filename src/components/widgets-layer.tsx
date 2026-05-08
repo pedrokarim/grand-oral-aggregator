@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { WidgetFrame } from "./widgets/widget-frame";
-import { WIDGETS, useWidgets } from "@/lib/widgets";
+import { WIDGETS, useWidgets, WIDGETS_STORAGE_KEY } from "@/lib/widgets";
 
 interface WidgetsLayerProps {
   onOpenRoute: (path: string, title: string) => void;
@@ -18,20 +18,27 @@ export function WidgetsLayer({ onOpenRoute }: WidgetsLayerProps) {
   const [order, setOrder] = useState<string[]>(() => WIDGETS.map((w) => w.id));
 
   // First-mount: resolve right-anchored default positions against viewport
-  // width. Only applied while a widget is still at its registry default.
+  // width. Reads localStorage *directly* (not via the atom) to bypass jotai's
+  // hydration timing — otherwise the effect can race the atom hydration,
+  // see DEFAULT_STATE, and overwrite the user's saved position. As soon as
+  // any entry exists for a widget in localStorage, we leave it alone.
   const initOnceRef = useRef(false);
   useEffect(() => {
     if (initOnceRef.current) return;
     initOnceRef.current = true;
+    let raw: Record<string, unknown> = {};
+    try {
+      const r = localStorage.getItem(WIDGETS_STORAGE_KEY);
+      if (r) raw = JSON.parse(r) ?? {};
+    } catch {
+      raw = {};
+    }
     const vw = window.innerWidth;
     for (const def of WIDGETS) {
       if (def.defaultAnchor !== "right") continue;
+      if (raw[def.id]) continue;
       const ws = state[def.id];
       if (!ws) continue;
-      const isPristine =
-        ws.position.x === def.defaultPosition.x &&
-        ws.position.y === def.defaultPosition.y;
-      if (!isPristine) continue;
       const rightX = Math.max(20, vw - ws.size.width - RIGHT_ICON_COLUMN_RESERVED);
       patchWidget(def.id, { position: { x: rightX, y: ws.position.y } });
     }

@@ -5,20 +5,25 @@ import { usePathname } from "next/navigation";
 import {
   Home, Newspaper, Search, Settings,
 } from "lucide-react";
+import { useUserRole } from "@/hooks/use-user-role";
 
-const dockItems = [
+const baseDockItems = [
   { icon: Home, label: "Accueil", href: "/" },
   { icon: Search, label: "Recherche", href: "/recherche" },
   { icon: Newspaper, label: "Actus", href: "/actualites" },
-  { icon: Settings, label: "Config", href: "/settings" },
 ];
+
+const settingsItem = { icon: Settings, label: "Config", href: "/settings" };
 
 export function MobileDock() {
   const pathname = usePathname();
+  const { isSuperAdmin } = useUserRole();
+  const dockItems = isSuperAdmin ? [...baseDockItems, settingsItem] : baseDockItems;
+  const colsClass = dockItems.length === 4 ? "grid-cols-4" : "grid-cols-3";
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 md:hidden">
-      <div className="grid grid-cols-4 gap-1 border-t border-[#BFC1B7] bg-[#EEEFE9]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur dark:border-[#3a3b3f] dark:bg-[#25262B]/95">
+      <div className={`grid ${colsClass} gap-1 border-t border-[#BFC1B7] bg-[#EEEFE9]/95 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 backdrop-blur dark:border-[#3a3b3f] dark:bg-[#25262B]/95`}>
         {dockItems.map(({ icon: Icon, label, href }) => {
           const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
           return (

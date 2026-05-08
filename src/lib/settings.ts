@@ -2,6 +2,8 @@ export type AIProvider = "openai" | "anthropic" | "google" | "mistral" | "ollama
 
 export type SummaryLength = "short" | "medium" | "long";
 
+export type DesktopLayout = "free" | "grid";
+
 export type SearchLayout =
   | "centered-minimal"
   | "sidebar-list"
@@ -46,6 +48,7 @@ export interface AppSettings {
   newsRefreshInterval: number;
   language: "fr" | "en";
   searchLayout: SearchLayout;
+  desktopLayout: DesktopLayout;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -64,6 +67,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
   newsRefreshInterval: 360,
   language: "fr",
   searchLayout: "masonry-editorial",
+  desktopLayout: "free",
+};
+
+export const desktopLayoutLabels: Record<DesktopLayout, string> = {
+  free: "Libre — pose les icônes où tu veux",
+  grid: "Grille — accroche les icônes à la grille",
 };
 
 /** Fields persisted server-side (per-user) via /api/user/preferences.

@@ -10,6 +10,7 @@ interface DesktopIconProps {
   href: string;
   constraintsRef?: RefObject<HTMLElement | null>;
   initialPosition: { x: number; y: number };
+  selected?: boolean;
   onPositionChange?: (position: { x: number; y: number }) => void;
   onOpen: (href: string, label: string) => void;
 }
@@ -20,6 +21,7 @@ export function DesktopIcon({
   href,
   constraintsRef,
   initialPosition,
+  selected = false,
   onPositionChange,
   onOpen,
 }: DesktopIconProps) {
@@ -65,6 +67,7 @@ export function DesktopIcon({
 
   return (
     <motion.li
+      data-desktop-icon
       className={`absolute w-28 flex justify-center items-center list-none
         ${isDragging ? "z-50" : "z-10"}`}
       animate={{ x: position.x, y: position.y, scale: 1, opacity: 1 }}
@@ -90,7 +93,10 @@ export function DesktopIcon({
         controls.start(e);
       }}
     >
-      <div className="relative cursor-move">
+      <div
+        className={`relative cursor-move rounded-md px-1 py-0.5 transition-colors
+          ${selected ? "bg-[#EB9D2A]/20 ring-2 ring-[#EB9D2A]/70" : ""}`}
+      >
         <button
           onClick={handleClick}
           className="flex flex-col items-center gap-0.5 group"

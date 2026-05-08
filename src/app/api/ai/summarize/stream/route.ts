@@ -6,7 +6,7 @@ import {
   resolveOllamaBaseUrl,
   THEME_FICHE_PROMPT,
 } from "@/lib/ai-providers";
-import { getServerSession } from "@/lib/auth-server";
+import { resolveCurrentRole } from "@/lib/roles";
 import { prisma } from "@/lib/prisma";
 import type { SummaryLength } from "@/lib/settings";
 
@@ -162,9 +162,9 @@ async function saveCachedContent(target: CacheTarget, content: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  const role = await resolveCurrentRole();
+  if (!role.isSuperAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const body = await request.json();

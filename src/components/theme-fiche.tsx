@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { useSettings } from "@/hooks/use-settings";
+import { useUserRole } from "@/hooks/use-user-role";
 import { MarkdownContent } from "@/components/markdown-content";
 import { SpeakButton } from "@/components/speak-button";
 import { streamAISummary } from "@/lib/ai-stream-client";
@@ -14,6 +15,7 @@ interface ThemeFicheProps {
 
 export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
   const [settings] = useSettings();
+  const { isSuperAdmin } = useUserRole();
   const [fiche, setFiche] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
 
   // On mount: check for cached fiche
   useEffect(() => {
+    if (!isSuperAdmin) return;
     const { provider, model } = settings.ai;
     if (!provider || !model) return;
     const ctrl = new AbortController();
@@ -58,7 +61,7 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
       })
       .catch(() => {});
     return () => ctrl.abort();
-  }, [theme, settings.ai.provider, settings.ai.model]);
+  }, [theme, settings.ai.provider, settings.ai.model, isSuperAdmin]);
 
   async function generate(force = false) {
     if (loading) return;
@@ -106,6 +109,7 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
   }
 
   const hasAIConfig = settings.ai.apiKey || settings.ai.provider === "ollama";
+  if (!isSuperAdmin) return null;
   if (!hasAIConfig) return null;
 
   const buttonBase =

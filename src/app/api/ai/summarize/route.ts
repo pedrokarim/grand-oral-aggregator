@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSummary, generateThemeFiche } from "@/lib/ai-providers";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "@/lib/auth-server";
+import { resolveCurrentRole } from "@/lib/roles";
 import type { AIProviderConfig, SummaryLength } from "@/lib/settings";
 
 const VALID_LENGTHS: SummaryLength[] = ["short", "medium", "long"];
@@ -74,9 +74,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getServerSession();
-  if (!session?.user) {
-    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  const role = await resolveCurrentRole();
+  if (!role.isSuperAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {

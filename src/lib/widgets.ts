@@ -44,7 +44,8 @@ export const WIDGETS: WidgetDef[] = [
 
 // Bump suffix (-v2) when default positions change so existing users get the
 // new layout without manual reset. Old keys remain in localStorage but unused.
-const STORAGE_KEY = "desktop-widgets-v2";
+export const WIDGETS_STORAGE_KEY = "desktop-widgets-v2";
+const STORAGE_KEY = WIDGETS_STORAGE_KEY;
 
 const DEFAULT_STATE: WidgetsState = Object.fromEntries(
   WIDGETS.map((w) => [

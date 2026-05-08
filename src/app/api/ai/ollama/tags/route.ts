@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveOllamaBaseUrl } from "@/lib/ai-providers";
+import { resolveCurrentRole } from "@/lib/roles";
 
 export async function GET(request: NextRequest) {
+  const role = await resolveCurrentRole();
+  if (!role.isSuperAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
   const baseUrl = resolveOllamaBaseUrl(request.nextUrl.searchParams.get("baseUrl") ?? undefined);
 
   try {

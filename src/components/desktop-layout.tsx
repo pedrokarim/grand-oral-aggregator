@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useRef, useState, useEffect, useCallback } from "react";
+import { type ReactNode, useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { DesktopWindow } from "./desktop-window";
 import { EditorToolbar } from "./editor-toolbar";
@@ -19,6 +19,8 @@ import { ChatPanel } from "./chat-panel";
 import { WidgetsLayer } from "./widgets-layer";
 import { WidgetsPanel } from "./widgets-panel";
 import { setSiteMode } from "@/hooks/use-site-mode";
+import { useUserRole } from "@/hooks/use-user-role";
+import { useSettings } from "@/hooks/use-settings";
 
 /* ---- Theme → PostHog PNG icon mapping ---- */
 const themeIconMap: Record<string, string> = {
@@ -65,7 +67,7 @@ interface DesktopApp {
   side: "left" | "right";
 }
 
-function getAllApps(): DesktopApp[] {
+function getAllApps(isSuperAdmin: boolean): DesktopApp[] {
   const left: DesktopApp[] = [
     { icon: "/icons/doc.png", label: "home.mdx", href: "/", side: "left" },
     { icon: "/icons/search.png", label: "Recherche", href: "/recherche", side: "left" },
@@ -78,7 +80,9 @@ function getAllApps(): DesktopApp[] {
       side: "left" as const,
     })),
     { icon: "/icons/contact.png", label: "Profil", href: "/profile", side: "left" },
-    { icon: "/icons/settings.png", label: "Paramètres", href: "/settings", side: "left" },
+    ...(isSuperAdmin
+      ? [{ icon: "/icons/settings.png", label: "Paramètres", href: "/settings", side: "left" as const }]
+      : []),
   ];
 
   const right: DesktopApp[] = [
@@ -103,6 +107,24 @@ const PADDING_H = 4;
 const PADDING_V = 20;
 const COL_SPACING = 128;
 const ICON_WIDTH = 112;
+
+/** Snap a free position to the nearest cell in the desktop grid.
+ *  Cells are anchored to (PADDING_H, PADDING_V) and stepped by
+ *  (COL_SPACING, ICON_HEIGHT) — same anchors generatePositions uses. */
+function snapToGrid(
+  pos: { x: number; y: number },
+  containerWidth: number,
+  containerHeight: number,
+): { x: number; y: number } {
+  const col = Math.round((pos.x - PADDING_H) / COL_SPACING);
+  const row = Math.round((pos.y - PADDING_V) / ICON_HEIGHT);
+  const maxCol = Math.max(0, Math.floor((containerWidth - PADDING_H - ICON_WIDTH) / COL_SPACING));
+  const maxRow = Math.max(0, Math.floor((containerHeight - PADDING_V - ICON_HEIGHT) / ICON_HEIGHT));
+  return {
+    x: PADDING_H + Math.max(0, Math.min(maxCol, col)) * COL_SPACING,
+    y: PADDING_V + Math.max(0, Math.min(maxRow, row)) * ICON_HEIGHT,
+  };
+}
 
 function generatePositions(
   apps: DesktopApp[],
@@ -192,7 +214,10 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
   const desktopRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(false);
 
-  const allApps = getAllApps();
+  const { isSuperAdmin } = useUserRole();
+  const [settings] = useSettings();
+  const desktopLayout = settings.desktopLayout;
+  const allApps = useMemo(() => getAllApps(isSuperAdmin), [isSuperAdmin]);
   const [iconPositions, setIconPositions] = useState<IconPositions>({});
 
   const [activeWindowsPanelOpen, setActiveWindowsPanelOpen] = useState(false);
@@ -216,7 +241,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     const w = desktopRef.current?.getBoundingClientRect().width ?? (typeof window !== "undefined" ? window.innerWidth : 1200);
     const h = desktopRef.current?.getBoundingClientRect().height ?? (typeof window !== "undefined" ? window.innerHeight : 800);
     return generatePositions(allApps, w, h);
-  }, []);
+  }, [allApps]);
 
   // Load positions from localStorage on mount (like PostHog)
   useEffect(() => {
@@ -245,8 +270,28 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       return pos;
     }
 
+    // On resize, never regenerate the grid — that would wipe user-placed
+    // icons. Instead, just clamp every icon back inside the new viewport.
+    // Icons that are still inside their bounds are left untouched.
     const handleResize = () => {
-      setIconPositions(computePositions());
+      const rect = desktopRef.current?.getBoundingClientRect();
+      const w = rect?.width ?? window.innerWidth;
+      const h = rect?.height ?? window.innerHeight;
+      const maxX = Math.max(0, w - ICON_WIDTH);
+      const maxY = Math.max(0, h - ICON_HEIGHT);
+      setIconPositions((prev) => {
+        let changed = false;
+        const out: IconPositions = {};
+        for (const [label, pos] of Object.entries(prev)) {
+          const nx = Math.max(0, Math.min(maxX, pos.x));
+          const ny = Math.max(0, Math.min(maxY, pos.y));
+          if (nx !== pos.x || ny !== pos.y) changed = true;
+          out[label] = { x: nx, y: ny };
+        }
+        if (!changed) return prev;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+        return out;
+      });
     };
 
     const loadTimer = setTimeout(loadPositions, 0);
@@ -313,11 +358,149 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  // ===== Marquee selection state =====
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [marquee, setMarquee] = useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+  } | null>(null);
+
+  // Visual icon footprint for hit-testing. ICON_WIDTH is the rendered card
+  // width; using ICON_HEIGHT (the grid cell height) keeps the hit area in
+  // line with what the user sees on the desktop.
+  const ICON_HIT_W = ICON_WIDTH;
+  const ICON_HIT_H = ICON_HEIGHT;
+
   const handlePositionChange = (label: string, pos: { x: number; y: number }) => {
-    const next = { ...iconPositions, [label]: pos };
-    setIconPositions(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    const rect = desktopRef.current?.getBoundingClientRect();
+    const w = rect?.width ?? window.innerWidth;
+    const h = rect?.height ?? window.innerHeight;
+    const maxX = Math.max(0, w - ICON_WIDTH);
+    const maxY = Math.max(0, h - ICON_HEIGHT);
+
+    setIconPositions((prev) => {
+      const oldPos = prev[label];
+      let final = pos;
+      if (desktopLayout === "grid") final = snapToGrid(pos, w, h);
+      const next: IconPositions = { ...prev, [label]: final };
+
+      // Group drag: if the dragged icon belongs to a multi-selection,
+      // shift every other selected icon by the same delta so they all move
+      // together. Computed at drop time (no live preview, by design — keeps
+      // the implementation simple and avoids fighting framer-motion drag).
+      if (oldPos && selected.has(label) && selected.size > 1) {
+        const dx = final.x - oldPos.x;
+        const dy = final.y - oldPos.y;
+        if (dx !== 0 || dy !== 0) {
+          for (const other of selected) {
+            if (other === label) continue;
+            const o = prev[other];
+            if (!o) continue;
+            const moved = {
+              x: Math.max(0, Math.min(maxX, o.x + dx)),
+              y: Math.max(0, Math.min(maxY, o.y + dy)),
+            };
+            next[other] = desktopLayout === "grid" ? snapToGrid(moved, w, h) : moved;
+          }
+        }
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
   };
+
+  // Clear selection on Escape.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && selected.size > 0) setSelected(new Set());
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected.size]);
+
+  // Marquee: pointer-down on the empty desktop background starts a drag-to-
+  // select rectangle. We attach pointermove/up to window so the marquee keeps
+  // updating even if the cursor wanders over a window or the title bar.
+  const handleNavPointerDown = (e: React.PointerEvent<HTMLElement>) => {
+    if (e.button !== 0) return;
+    // Only start when the pointerdown landed on the empty bg, not on an icon.
+    // Icon <li> elements stop propagation in their own handler, so this guard
+    // mostly catches the motion.ul vs nav distinction.
+    const t = e.target as HTMLElement;
+    if (t.closest("[data-desktop-icon]")) return;
+
+    const rect = desktopRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const startX = e.clientX - rect.left;
+    const startY = e.clientY - rect.top;
+    setMarquee({ startX, startY, endX: startX, endY: startY });
+
+    const onMove = (ev: PointerEvent) => {
+      setMarquee((m) =>
+        m
+          ? { ...m, endX: ev.clientX - rect.left, endY: ev.clientY - rect.top }
+          : m,
+      );
+    };
+
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      setMarquee((m) => {
+        if (!m) return null;
+        const minX = Math.min(m.startX, m.endX);
+        const maxX = Math.max(m.startX, m.endX);
+        const minY = Math.min(m.startY, m.endY);
+        const maxY = Math.max(m.startY, m.endY);
+        // Tiny movement = treated as a plain click on the bg → clear selection
+        if (maxX - minX < 4 && maxY - minY < 4) {
+          setSelected(new Set());
+          return null;
+        }
+        const hits = new Set<string>();
+        for (const [label, pos] of Object.entries(iconPositions)) {
+          const ix1 = pos.x;
+          const iy1 = pos.y;
+          const ix2 = pos.x + ICON_HIT_W;
+          const iy2 = pos.y + ICON_HIT_H;
+          if (ix2 < minX || ix1 > maxX || iy2 < minY || iy1 > maxY) continue;
+          hits.add(label);
+        }
+        setSelected(hits);
+        return null;
+      });
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+  };
+
+  // When the user switches to grid mode, snap every existing icon to its
+  // nearest grid cell. Switching back to free leaves icons where they are.
+  const lastLayoutRef = useRef(desktopLayout);
+  useEffect(() => {
+    if (lastLayoutRef.current === desktopLayout) return;
+    lastLayoutRef.current = desktopLayout;
+    if (desktopLayout !== "grid") return;
+    const rect = desktopRef.current?.getBoundingClientRect();
+    const w = rect?.width ?? window.innerWidth;
+    const h = rect?.height ?? window.innerHeight;
+    setIconPositions((prev) => {
+      const out: IconPositions = {};
+      let changed = false;
+      for (const [label, pos] of Object.entries(prev)) {
+        const snapped = snapToGrid(pos, w, h);
+        if (snapped.x !== pos.x || snapped.y !== pos.y) changed = true;
+        out[label] = snapped;
+      }
+      if (!changed) return prev;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+      return out;
+    });
+  }, [desktopLayout]);
 
   const resetIcons = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -327,6 +510,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 
   const handleIconOpen = (href: string, label: string) => {
     void label;
+    if (selected.size > 0) setSelected(new Set());
     if (href === "#mode-site") {
       setSiteMode("site");
       return;
@@ -350,7 +534,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
             { label: "Thèmes", href: "/" },
             { label: "Actualités", href: "/actualites" },
             { label: "Docs", href: "/" },
-            { label: "Paramètres", href: "/settings" },
+            ...(isSuperAdmin ? [{ label: "Paramètres", href: "/settings" }] : []),
           ].map(({ label, href }) => (
             <button
               key={label}
@@ -405,7 +589,10 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
         <div ref={desktopRef} className="flex-1 relative overflow-hidden">
 
           {/* Icons — absolutely positioned on the desktop */}
-          <nav className="hidden md:block absolute inset-0 z-10">
+          <nav
+            className="hidden md:block absolute inset-0 z-10"
+            onPointerDown={handleNavPointerDown}
+          >
             <motion.ul
               initial={{ opacity: 0 }}
               animate={{ opacity: rendered ? 1 : 0 }}
@@ -421,12 +608,27 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
                     href={app.href}
                     constraintsRef={desktopRef}
                     initialPosition={pos}
+                    selected={selected.has(app.label)}
                     onPositionChange={(p) => handlePositionChange(app.label, p)}
                     onOpen={handleIconOpen}
                   />
                 );
               })}
             </motion.ul>
+
+            {/* Marquee rectangle (only visible while drag-selecting) */}
+            {marquee && (
+              <div
+                className="absolute pointer-events-none rounded-[2px] border border-[#EB9D2A]/80 bg-[#EB9D2A]/15"
+                style={{
+                  left: Math.min(marquee.startX, marquee.endX),
+                  top: Math.min(marquee.startY, marquee.endY),
+                  width: Math.abs(marquee.endX - marquee.startX),
+                  height: Math.abs(marquee.endY - marquee.startY),
+                  zIndex: 11,
+                }}
+              />
+            )}
           </nav>
 
           {/* Widgets layer — between icons (z-10) and windows (z-20+) */}
