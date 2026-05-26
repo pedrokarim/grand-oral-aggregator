@@ -31,6 +31,32 @@ function isPublicHttpUrl(rawUrl: string): boolean {
   return true;
 }
 
+function getCharsetFromContentType(contentType: string | null): string | null {
+  if (!contentType) return null;
+  const m = contentType.match(/charset\s*=\s*"?([^";\s]+)"?/i);
+  return m ? m[1] : null;
+}
+
+function getCharsetFromHtml(bytes: Uint8Array): string | null {
+  // Meta tags are ASCII, so latin1 decode of the head is lossless.
+  const head = new TextDecoder("latin1").decode(bytes.subarray(0, Math.min(bytes.length, 4096)));
+  const m =
+    head.match(/<meta\s+[^>]*charset\s*=\s*"?([\w-]+)"?/i) ??
+    head.match(/<meta\s+[^>]*content\s*=\s*["'][^"']*charset\s*=\s*"?([\w-]+)/i);
+  return m ? m[1] : null;
+}
+
+function decodeHtml(buf: ArrayBuffer, headerCharset: string | null): string {
+  const bytes = new Uint8Array(buf);
+  // HTTP Content-Type wins over <meta> per WHATWG; both fall back to UTF-8.
+  const label = (headerCharset ?? getCharsetFromHtml(bytes) ?? "utf-8").toLowerCase();
+  try {
+    return new TextDecoder(label).decode(bytes);
+  } catch {
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+}
+
 async function fetchHtml(url: string, timeoutMs = 20000): Promise<string | null> {
   if (!isPublicHttpUrl(url)) return null;
   try {
@@ -47,7 +73,11 @@ async function fetchHtml(url: string, timeoutMs = 20000): Promise<string | null>
     });
     clearTimeout(timeout);
     if (!res.ok) return null;
-    const text = await res.text();
+
+    const buf = await res.arrayBuffer();
+    const headerCharset = getCharsetFromContentType(res.headers.get("content-type"));
+    const text = decodeHtml(buf, headerCharset);
+
     if (!/<(?:body|html|article|main)\b/i.test(text)) return null;
     return text;
   } catch {
