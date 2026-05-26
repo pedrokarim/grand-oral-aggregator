@@ -1,0 +1,189 @@
+{
+  "main": {
+    "id": "6ef64164b8d87591",
+    "type": "split",
+    "children": [
+      {
+        "id": "5c780a761522ac8d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7634cc0d239cc765",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vue graphique"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "20e718e2e5a4786e",
+    "type": "split",
+    "children": [
+      {
+        "id": "5a317fcf24ee4b99",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "58df2f798e3c7e89",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorateur de fichiers"
+            }
+          },
+          {
+            "id": "2ca7a2fd777abc1a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Rechercher"
+            }
+          },
+          {
+            "id": "ce3b736277eab144",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Signets"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "f0eb34819313d8e6",
+    "type": "split",
+    "children": [
+      {
+        "id": "a8eebe69b633d0f0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "737a148178336eb3",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Rétroliens"
+            }
+          },
+          {
+            "id": "cafa5fed5044490f",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Liens sortants"
+            }
+          },
+          {
+            "id": "73bb22ac58f7093a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Mots-clés"
+            }
+          },
+          {
+            "id": "d4949e60f3a01013",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Toutes les propriétés"
+            }
+          },
+          {
+            "id": "23fd0e879a95bbc1",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Plan"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Ouvrir le sélecteur rapide": false,
+      "graph:Ouvrir la vue graphique": false,
+      "canvas:Créer une nouvelle toile": false,
+      "daily-notes:Ouvrir la note quotidienne": false,
+      "templates:Insérer le modèle": false,
+      "command-palette:Ouvrir la palette de commandes": false,
+      "bases:Créer une nouvelle base": false
+    }
+  },
+  "active": "58df2f798e3c7e89",
+  "lastOpenFiles": [
+    "répétition/big-data-surveillance-confiance/slides/08-crise-confiance.md",
+    "docs/rules/iframe-missing-sandbox.md",
+    "docs/rules",
+    "répétition/big-data-surveillance-confiance/slides/07-surveillance-multifacette.md",
+    "répétition/big-data-surveillance-confiance/slides/07-surveillance-multifacette.md.tmp.7956.eb67f7d2c747",
+    "répétition/big-data-surveillance-confiance/slides/06-donnee-surveillance.md",
+    "répétition/big-data-surveillance-confiance/slides/06-donnee-surveillance.md.tmp.7956.cddf7f59ac58"
+  ]
+}

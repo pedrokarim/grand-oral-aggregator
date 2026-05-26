@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 540" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="axisPast" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="axisFuture" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- No background rect = transparent canvas, blends on any slide -->
+
+  <!-- Title -->
+  <text x="640" y="42" font-size="24" font-weight="700" fill="#0f172a" text-anchor="middle">AI Act — calendrier d'application progressive</text>
+  <text x="640" y="68" font-size="13" fill="#64748b" text-anchor="middle">Règlement (UE) 2024/1689 — Commission européenne</text>
+
+  <!-- Year background gridlines (dashed, subtle) -->
+  <g stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 6" opacity="0.8">
+    <line x1="237" y1="120" x2="237" y2="470"/>
+    <line x1="567" y1="120" x2="567" y2="470"/>
+    <line x1="897" y1="120" x2="897" y2="470"/>
+  </g>
+
+  <!-- Year labels (above axis) -->
+  <g font-size="14" font-weight="700" fill="#64748b" text-anchor="middle" letter-spacing="2">
+    <text x="170" y="155">2024</text>
+    <text x="400" y="155">2025</text>
+    <text x="730" y="155">2026</text>
+    <text x="1050" y="155">2027</text>
+  </g>
+
+  <!-- Main axis -->
+  <line x1="100" y1="240" x2="696" y2="240" stroke="url(#axisPast)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="696" y1="240" x2="1190" y2="240" stroke="url(#axisFuture)" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 10"/>
+  <polygon points="1180,225 1215,240 1180,255" fill="#94a3b8"/>
+  <text x="1230" y="245" font-size="11" fill="#94a3b8" font-style="italic">temps</text>
+
+  <!-- AUJOURD'HUI marker -->
+  <g>
+    <line x1="696" y1="100" x2="696" y2="470" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3 5" opacity="0.6"/>
+    <circle cx="696" cy="240" r="9" fill="#dc2626" stroke="#ffffff" stroke-width="2"/>
+    <rect x="640" y="92" width="112" height="36" rx="6" fill="#dc2626"/>
+    <text x="696" y="108" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="2">AUJOURD'HUI</text>
+    <text x="696" y="122" font-size="11" font-weight="600" fill="#ffffff" text-anchor="middle">24 mai 2026</text>
+  </g>
+
+  <!-- Milestone 1 : 01/08/2024 — Entrée en vigueur -->
+  <g>
+    <circle cx="100" cy="240" r="8" fill="#3b82f6" stroke="#ffffff" stroke-width="2"/>
+    <line x1="100" y1="248" x2="100" y2="295" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect x="35" y="295" width="130" height="68" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="100" y="316" font-size="13" font-weight="700" fill="#1d4ed8" text-anchor="middle">01/08/2024</text>
+    <text x="100" y="335" font-size="11" fill="#334155" text-anchor="middle">Entrée en</text>
+    <text x="100" y="350" font-size="11" fill="#334155" text-anchor="middle">vigueur</text>
+  </g>
+
+  <!-- Milestone 2 : 02/02/2025 — Pratiques interdites -->
+  <g>
+    <circle cx="265" cy="240" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+    <line x1="265" y1="248" x2="265" y2="295" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="195" y="295" width="140" height="86" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="265" y="316" font-size="13" font-weight="700" fill="#b91c1c" text-anchor="middle">02/02/2025</text>
+    <text x="265" y="335" font-size="11" fill="#334155" text-anchor="middle">Art. 5 — pratiques</text>
+    <text x="265" y="350" font-size="11" fill="#334155" text-anchor="middle">interdites</text>
+    <text x="265" y="370" font-size="10" fill="#b45309" font-style="italic" text-anchor="middle">(biométrie temps réel)</text>
+  </g>
+
+  <!-- Milestone 3 : 02/08/2025 — GPAI -->
+  <g>
+    <circle cx="430" cy="240" r="8" fill="#8b5cf6" stroke="#ffffff" stroke-width="2"/>
+    <line x1="430" y1="248" x2="430" y2="295" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect x="365" y="295" width="130" height="68" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1.5"/>
+    <text x="430" y="316" font-size="13" font-weight="700" fill="#6d28d9" text-anchor="middle">02/08/2025</text>
+    <text x="430" y="335" font-size="11" fill="#334155" text-anchor="middle">Chap. V —</text>
+    <text x="430" y="350" font-size="11" fill="#334155" text-anchor="middle">modèles GPAI</text>
+  </g>
+
+  <!-- Milestone 4 : 02/08/2026 — Application complète (MAJEUR) -->
+  <g>
+    <circle cx="760" cy="240" r="11" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+    <line x1="760" y1="232" x2="760" y2="195" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect x="685" y="160" width="150" height="40" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+    <text x="760" y="183" font-size="14" font-weight="700" fill="#b45309" text-anchor="middle">02/08/2026</text>
+    <line x1="760" y1="248" x2="760" y2="295" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect x="685" y="295" width="150" height="68" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+    <text x="760" y="319" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">Application</text>
+    <text x="760" y="338" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">complète</text>
+    <text x="760" y="355" font-size="10" fill="#64748b" font-style="italic" text-anchor="middle">dans ~2 mois</text>
+  </g>
+
+  <!-- Milestone 5 : 02/12/2027 — Annexe III -->
+  <g>
+    <circle cx="1090" cy="240" r="8" fill="#64748b" stroke="#ffffff" stroke-width="2"/>
+    <line x1="1090" y1="248" x2="1090" y2="295" stroke="#64748b" stroke-width="1.5"/>
+    <rect x="1015" y="295" width="150" height="86" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+    <text x="1090" y="316" font-size="13" font-weight="700" fill="#475569" text-anchor="middle">02/12/2027</text>
+    <text x="1090" y="335" font-size="11" fill="#334155" text-anchor="middle">Annexe III —</text>
+    <text x="1090" y="350" font-size="11" fill="#334155" text-anchor="middle">haut risque</text>
+    <text x="1090" y="370" font-size="10" fill="#64748b" font-style="italic" text-anchor="middle">(reporté · Digital Omnibus)</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(100, 495)">
+    <rect x="0" y="0" width="32" height="6" rx="3" fill="#3b82f6"/>
+    <text x="42" y="9" font-size="12" fill="#64748b">Passé · en vigueur</text>
+    <rect x="200" y="2" width="32" height="2" fill="#f59e0b"/>
+    <rect x="208" y="2" width="6" height="2" fill="#ffffff"/>
+    <rect x="222" y="2" width="6" height="2" fill="#ffffff"/>
+    <text x="242" y="9" font-size="12" fill="#64748b">Futur · à venir</text>
+  </g>
+
+  <!-- Footer note -->
+  <text x="1180" y="525" font-size="11" fill="#94a3b8" text-anchor="end" font-style="italic">Sanction max : 35 M€ ou 7 % CA mondial</text>
+</svg>
