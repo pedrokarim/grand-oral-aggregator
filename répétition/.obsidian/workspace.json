@@ -11,14 +11,10 @@
             "id": "c76fcb068ec1d9b3",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "big-data-surveillance-confiance/slides/(X) 11-leviers-techniques.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "(X) 11-leviers-techniques"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Vue graphique"
             }
           }
         ]
@@ -185,19 +181,25 @@
   },
   "active": "c76fcb068ec1d9b3",
   "lastOpenFiles": [
-    "big-data-surveillance-confiance/slides/13-sources.md",
-    "big-data-surveillance-confiance/slides/12-conclusion.md",
-    "big-data-surveillance-confiance/slides/(X) 11-leviers-techniques.md",
-    "big-data-surveillance-confiance/slides/10-ai-act.md",
-    "big-data-surveillance-confiance/slides/09-rgpd-bilan.md",
+    "big-data-surveillance-confiance/README.md",
+    "big-data-surveillance-confiance/questions-jury.md",
+    "big-data-surveillance-confiance/sources.md",
+    "aide-memoire-grand-oral.md",
+    "restitution-28-05-26.md",
     "big-data-surveillance-confiance/slides/08-crise-confiance.md",
+    "aide-memoire-grand-oral.md.tmp.26136.fb979933cc2c",
     "big-data-surveillance-confiance/slides/07-surveillance-multifacette.md",
     "big-data-surveillance-confiance/slides/06-donnee-surveillance.md",
+    "big-data-surveillance-confiance/slides/02-accroche.md",
+    "big-data-surveillance-confiance/slides/01-titre.md",
+    "big-data-surveillance-confiance/slides/(X) 11-leviers-techniques.md",
+    "big-data-surveillance-confiance/slides/13-sources.md",
+    "big-data-surveillance-confiance/slides/12-conclusion.md",
+    "big-data-surveillance-confiance/slides/10-ai-act.md",
+    "big-data-surveillance-confiance/slides/09-rgpd-bilan.md",
     "big-data-surveillance-confiance/slides/05-big-data-moteur.md",
     "big-data-surveillance-confiance/slides/04-definitions.md",
     "big-data-surveillance-confiance/slides/03-problematique-plan.md",
-    "big-data-surveillance-confiance/slides/02-accroche.md",
-    "big-data-surveillance-confiance/slides/01-titre.md",
     "big-data-surveillance-confiance/assets/charts/chart-04-ai-act-timeline.svg.tmp.7956.3114e726a626",
     "big-data-surveillance-confiance/assets/charts/_render.html",
     "big-data-surveillance-confiance/assets/charts/_render.html.tmp.7956.1178fd317312",
@@ -217,13 +219,9 @@
     "big-data-surveillance-confiance/assets/charts/chart-03-confiance-fr-ue.png",
     "big-data-surveillance-confiance/assets/charts/chart-02-cnil-violations.png",
     "big-data-surveillance-confiance/assets/_convert_svg_to_png.py",
-    "big-data-surveillance-confiance/slides.html.tmp.7956.d20b703579d3",
     "big-data-surveillance-confiance/00-plan.md",
-    "big-data-surveillance-confiance/README.md",
-    "big-data-surveillance-confiance/questions-jury.md",
     "big-data-surveillance-confiance/slides/14-sources.md",
     "big-data-surveillance-confiance/slides/13-conclusion.md",
-    "big-data-surveillance-confiance/sources.md",
     "big-data-surveillance-confiance/slides/12-illustration-projet.md"
   ]
 }
