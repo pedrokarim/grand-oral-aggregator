@@ -59,7 +59,14 @@ export async function GET(request: NextRequest) {
     const cached = await prisma.aiSummary.findUnique({
       where: { articleId_provider_model: { articleId: article.id, provider, model: cacheModel } },
     });
-    return NextResponse.json({ summary: cached?.content ?? null });
+    if (cached) return NextResponse.json({ summary: cached.content });
+    // Fallback : afficher un résumé pré-généré (autre provider/modèle/longueur)
+    // s'il existe, pour ne pas dépendre des réglages exacts de l'utilisateur.
+    const anySummary = await prisma.aiSummary.findFirst({
+      where: { articleId: article.id },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json({ summary: anySummary?.content ?? null });
   }
 
   if (subject && theme) {

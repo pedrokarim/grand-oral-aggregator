@@ -62,7 +62,10 @@ export default function ArticleDetailPage() {
     fetch(`/api/ai/summarize?${params.toString()}`, { signal: ctrl.signal })
       .then((r) => r.json())
       .then((data) => {
-        if (data?.summary) setSummary(data.summary);
+        if (data?.summary) {
+          setSummary(data.summary);
+          setSummaryOpen(true);
+        }
       })
       .catch(() => {});
     return () => ctrl.abort();
@@ -170,8 +173,6 @@ export default function ArticleDetailPage() {
       setRefetching(false);
     }
   }
-
-  const hasAIConfig = settings.ai.apiKey || settings.ai.provider === "ollama";
 
   if (loading) {
     return (
@@ -295,7 +296,7 @@ export default function ArticleDetailPage() {
                 Lire l&apos;article original
               </a>
 
-              {hasAIConfig && (
+              {(
                 <button
                   onClick={generateSummary}
                   disabled={summaryLoading}
