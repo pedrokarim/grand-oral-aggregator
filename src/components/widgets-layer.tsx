@@ -61,6 +61,7 @@ export function WidgetsLayer({ onOpenRoute }: WidgetsLayerProps) {
             <WidgetFrame
               id={def.id}
               label={def.label}
+              icon={def.icon}
               state={ws}
               minSize={def.minSize}
               zIndex={z}

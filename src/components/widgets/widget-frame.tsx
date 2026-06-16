@@ -6,10 +6,12 @@ import { GripVertical, X, Palette, Check } from "lucide-react";
 import { Popover } from "radix-ui";
 import type { WidgetState, WidgetStyle } from "@/lib/widgets-types";
 import { WIDGET_STYLES } from "@/lib/widgets-types";
+import { WidgetIcon } from "./widget-icon";
 
 interface WidgetFrameProps {
   id: string;
   label: string;
+  icon: string;
   state: WidgetState;
   minSize: { width: number; height: number };
   zIndex: number;
@@ -50,6 +52,7 @@ const TITLE: Record<WidgetStyle, string> = {
 
 export function WidgetFrame({
   label,
+  icon,
   state,
   minSize,
   zIndex,
@@ -136,7 +139,8 @@ export function WidgetFrame({
           className={`flex items-center h-8 px-1.5 shrink-0 cursor-grab active:cursor-grabbing ${HEADER_BG[state.style]} ${dragging ? "cursor-grabbing" : ""}`}
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <GripVertical className={`w-3.5 h-3.5 mr-1 opacity-60 ${TITLE[state.style]}`} />
+          <GripVertical className={`w-3.5 h-3.5 mr-0.5 opacity-60 ${TITLE[state.style]}`} />
+          <WidgetIcon src={icon} size="xs" className="mr-1.5" />
           <span className={`text-[12px] font-semibold flex-1 truncate ${TITLE[state.style]}`}>
             {label}
           </span>

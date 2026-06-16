@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, RotateCcw } from "lucide-react";
 import { WIDGETS, useWidgets } from "@/lib/widgets";
 import { WIDGET_STYLES, type WidgetStyle } from "@/lib/widgets-types";
+import { WidgetIcon } from "@/components/widgets/widget-icon";
 
 interface WidgetsPanelProps {
   open: boolean;
@@ -94,11 +95,14 @@ export function WidgetsPanel({ open, onClose }: WidgetsPanelProps) {
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="text-[13px] font-semibold text-[#23251D] dark:text-[#EAECF6]">
-                            {w.label}
+                        <div className="flex gap-2.5 min-w-0">
+                          <WidgetIcon src={w.icon} size="md" className="mt-0.5" />
+                          <div className="min-w-0">
+                            <div className="text-[13px] font-semibold text-[#23251D] dark:text-[#EAECF6]">
+                              {w.label}
+                            </div>
+                            <p className="text-[11px] text-[#9EA096] mt-0.5">{w.description}</p>
                           </div>
-                          <p className="text-[11px] text-[#9EA096] mt-0.5">{w.description}</p>
                         </div>
                         <Toggle
                           checked={ws.enabled}

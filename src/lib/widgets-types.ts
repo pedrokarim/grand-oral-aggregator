@@ -28,6 +28,8 @@ export interface WidgetDef {
   id: string;
   label: string;
   description: string;
+  /** Chemin vers l'icône PNG (style bureau, ex. /icons/invite.png). */
+  icon: string;
   defaultEnabled: boolean;
   defaultPosition: { x: number; y: number };
   defaultSize: { width: number; height: number };
