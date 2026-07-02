@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cybersécurité et IA : l'avenir d'un SI résilient — Karim, Grand Oral CESI</title>
+<style>
+  :root {
+    --bg-0: #0a0f1c;
+    --bg-1: #0f172a;
+    --bg-2: #1e293b;
+    --fg-0: #f1f5f9;
+    --fg-1: #cbd5e1;
+    --fg-2: #94a3b8;
+    --accent: #60a5fa;
+    --accent-2: #fbbf24;
+    --danger: #fca5a5;
+    --success: #34d399;
+    --border: #334155;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-0);
+    color: var(--fg-0);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    place-items: center;
+  }
+
+  /* Scène 16:9 fixe (1280×720) mise à l'échelle pour remplir la fenêtre.
+     Toutes les tailles ci-dessous sont donc pensées « à la taille d'une slide ». */
+  .deck {
+    position: relative;
+    width: 1280px;
+    height: 720px;
+    transform-origin: center center;
+    flex: none;
+  }
+
+  .slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 34px 52px 44px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at top left, rgba(59, 130, 246, 0.08), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(245, 158, 11, 0.06), transparent 50%),
+      linear-gradient(135deg, var(--bg-1), var(--bg-0));
+  }
+
+  .slide.active { display: flex; }
+
+  .slide-num { position: absolute; top: 28px; right: 36px; font-size: 12px; color: var(--fg-2); letter-spacing: 1px; font-weight: 600; }
+  .slide-num strong { color: var(--accent); }
+
+  .eyebrow { text-transform: uppercase; letter-spacing: 3px; font-size: 10.5px; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
+
+  h1 { font-size: 44px; font-weight: 800; margin: 0 0 14px 0; line-height: 1.1; letter-spacing: -1px; }
+  h2 { font-size: 28px; font-weight: 700; margin: 0 0 12px 0; line-height: 1.15; letter-spacing: -0.5px; }
+  h3 { font-size: 18px; font-weight: 600; margin: 0 0 10px 0; color: var(--fg-1); }
+  p, li { font-size: 15.5px; line-height: 1.5; color: var(--fg-1); }
+
+  .lead { font-size: 18px; color: var(--fg-0); font-weight: 500; }
+
+  .accent { color: var(--accent); font-weight: 700; }
+  .accent2 { color: var(--accent-2); font-weight: 700; }
+  .danger { color: var(--danger); font-weight: 700; }
+  .success { color: var(--success); font-weight: 700; }
+  .mono { font-family: 'JetBrains Mono', Consolas, monospace; }
+
+  ul { padding-left: 20px; margin: 0; }
+  li { margin-bottom: 7px; }
+  li strong { color: var(--fg-0); font-weight: 700; }
+
+  blockquote {
+    border-left: 4px solid var(--accent-2);
+    padding: 10px 18px;
+    margin: 12px 0;
+    background: rgba(245, 158, 11, 0.06);
+    border-radius: 0 8px 8px 0;
+    font-size: 15.5px;
+    color: var(--fg-0);
+    font-style: italic;
+  }
+  blockquote.muted { border-left-color: var(--fg-2); background: rgba(148, 163, 184, 0.06); font-style: normal; font-size: 14.5px; }
+
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 14px; }
+  th, td { padding: 7px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+  td { color: var(--fg-1); }
+
+  .grid { display: grid; gap: 18px; }
+  .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .stat { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; text-align: center; }
+  .stat-number { font-size: 38px; font-weight: 800; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 12.5px; color: var(--fg-2); line-height: 1.4; }
+
+  .source { position: absolute; bottom: 18px; left: 52px; right: 52px; font-size: 11.5px; color: var(--fg-2); border-top: 1px solid var(--border); padding-top: 8px; letter-spacing: 0.3px; }
+  .source strong { color: var(--fg-1); }
+
+  .chart-wrap { width: 100%; min-width: 0; margin: 0; display: block; }
+  .chart-wrap img, .chart-wrap object { width: 100%; height: auto; max-height: 460px; display: block; margin: 0 auto; }
+  .chart-full { width: 100%; display: block; margin: 16px 0; }
+  .chart-full img, .chart-full object { width: 100%; height: auto; max-height: 400px; display: block; margin: 0 auto; }
+
+  .nav { position: fixed; bottom: 12px; right: 24px; display: flex; gap: 8px; z-index: 100; }
+  .nav button { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); color: var(--fg-1); padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit; }
+  .nav button:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--accent); }
+
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); z-index: 100; transition: width 0.3s ease; }
+
+  .badge { display: inline-block; background: rgba(59, 130, 246, 0.15); color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-right: 6px; }
+
+  .image-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); }
+  .image-card img { width: 100%; height: 240px; object-fit: cover; display: block; }
+  .image-card .caption { padding: 8px 12px; font-size: 11.5px; color: var(--fg-2); line-height: 1.45; }
+
+  .part-icon { width: 58px; height: 58px; margin: 0 auto 14px; display: block; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.4)); position: relative; z-index: 2; }
+  #parts-grid.parts-hero { grid-template-columns: 1fr 1fr 1fr; gap: 24px; align-items: stretch; padding: 4px 0; }
+  #parts-grid.parts-hero .part-card:nth-child(1) { transform: translateY(-10px); }
+  #parts-grid.parts-hero .part-card:nth-child(2) { transform: translateY(10px); }
+  #parts-grid.parts-hero .part-card:nth-child(3) { transform: translateY(-10px); }
+  .part-card { background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)); border: 1px solid var(--border); border-radius: 16px; padding: 24px 20px 22px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative; overflow: hidden; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04); min-height: 288px; }
+  .part-card::before { content: attr(data-num); position: absolute; top: -44px; right: -14px; font-size: 200px; font-weight: 900; line-height: 1; color: var(--accent); opacity: 0.14; letter-spacing: -12px; pointer-events: none; z-index: 0; font-family: 'Inter', sans-serif; }
+  .part-card:nth-child(2)::before { color: var(--danger); opacity: 0.16; }
+  .part-card:nth-child(3)::before { color: var(--accent-2); opacity: 0.16; }
+  .part-card > * { position: relative; z-index: 1; }
+  .part-card .badge { margin: 0 0 12px; padding: 5px 12px; font-size: 11.5px; letter-spacing: 2px; }
+  .part-card h3 { font-size: 21px; line-height: 1.2; margin: 0 0 12px; color: var(--fg-0); font-weight: 800; letter-spacing: -0.5px; }
+  .part-card p { font-size: 14px; color: var(--fg-2); margin: 0; line-height: 1.5; max-width: 300px; }
+
+  .two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 28px; align-items: center; width: 100%; flex: 1; }
+  .two-col.text-left { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+  .two-col > * { min-width: 0; }
+
+  .title-slide { align-items: center; justify-content: center; text-align: center; }
+  .title-slide .eyebrow { font-size: 13px; letter-spacing: 4px; }
+  .title-slide h1 { font-size: 50px; max-width: 900px; }
+  .title-slide .author { margin-top: 24px; color: var(--fg-2); font-size: 15px; line-height: 1.7; }
+
+  .brandchip {
+    position: absolute;
+    top: 30px;
+    right: 118px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 3;
+  }
+  .brandchip .chip {
+    background: #fff;
+    border-radius: 8px;
+    padding: 7px 11px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+  }
+  .brandchip .chip img { height: 30px; width: auto; display: block; }
+
+  @page { size: 1280px 720px; margin: 0; }
+  @media print {
+    html, body { overflow: visible !important; height: auto !important; width: auto !important; display: block !important; }
+    .deck { transform: none !important; width: 1280px !important; height: auto !important; }
+    .slide { display: flex !important; page-break-after: always; position: relative !important; width: 1280px; height: 720px; }
+    .nav, .progress { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+<!-- ============================================================== -->
+<!-- SLIDE 01 — TITRE -->
+<!-- ============================================================== -->
+<section class="slide title-slide" data-num="01">
+  <span class="slide-num">01 / 13</span>
+  <div class="eyebrow">Grand Oral CESI · Sujet blanc · Thème Cybersécurité</div>
+  <h1>Cybersécurité et IA :<br/>l'avenir d'un <span class="accent2">SI résilient</span></h1>
+  <p class="lead" style="max-width:760px;color:var(--fg-2);font-style:italic;">Quand la même intelligence artificielle arme le défenseur… et l'attaquant.</p>
+  <div class="author">
+    <strong style="color:var(--fg-0)">Karim</strong> — Master Informatique CESI<br/>
+    Filière « Manager le SI »
+  </div>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 02 — PROBLÉMATIQUE & PLAN -->
+<!-- ============================================================== -->
+<section class="slide" data-num="02">
+  <span class="slide-num">02 / 13</span>
+  <div class="eyebrow">Problématique · Plan en trois temps</div>
+  <h2>Le fil rouge de cette soutenance</h2>
+
+  <blockquote style="font-size:24px;border-left-color:var(--accent);background:rgba(96,165,250,0.08);">
+    Comment le manager du SI peut-il faire de l'IA un <span class="accent">levier de résilience</span> — plutôt qu'un nouveau facteur de risque — sur les plans <span class="accent">technique</span>, <span class="accent2">organisationnel</span> et <span class="success">juridique</span> ?
+  </blockquote>
+
+  <div class="grid cols-3 parts-hero" id="parts-grid" style="margin-top:28px;">
+    <div class="part-card" data-num="01">
+      <svg class="part-icon" viewBox="0 0 64 64" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M32 4L10 12v16c0 14 9 25 22 32 13-7 22-18 22-32V12L32 4z"/>
+        <path d="M22 32l7 7 14-16"/>
+      </svg>
+      <div class="badge">Partie I</div>
+      <h3>L'IA,<br/>bouclier</h3>
+      <p>La cyberdéfense augmentée : détecter, trier, répondre plus vite.</p>
+    </div>
+    <div class="part-card" data-num="02">
+      <svg class="part-icon" viewBox="0 0 64 64" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M50 6l8 8-30 30-8-8L50 6z"/>
+        <path d="M20 36l-10 22 22-10"/>
+        <path d="M14 50l4 4"/>
+      </svg>
+      <div class="badge" style="background:rgba(239,68,68,0.15);color:var(--danger);">Partie II</div>
+      <h3>L'IA,<br/>arme</h3>
+      <p>La menace se réinvente — et l'IA devient elle-même une cible.</p>
+    </div>
+    <div class="part-card" data-num="03">
+      <svg class="part-icon" viewBox="0 0 64 64" fill="none" stroke="var(--accent-2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M32 6l20 8v14c0 8-4 15-10 20"/>
+        <path d="M32 6L12 14v14c0 13 9 24 20 30"/>
+        <path d="M42 40a10 10 0 1 0-20 0"/>
+        <path d="M32 40v8"/>
+      </svg>
+      <div class="badge" style="background:rgba(245,158,11,0.15);color:var(--accent-2);">Partie III</div>
+      <h3>Bâtir<br/>la résilience</h3>
+      <p>Technique, gouvernance et droit : « assume the breach ».</p>
+    </div>
+  </div>
+
+  <p class="source"><strong>Angle :</strong> manager du SI · volontairement équilibré — ni technophobe, ni naïf.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 03 — ACCROCHE -->
+<!-- ============================================================== -->
+<section class="slide" data-num="03">
+  <span class="slide-num">03 / 13</span>
+  <div class="eyebrow">Accroche · Trois faits, une même technologie</div>
+  <h2>L'épée à double tranchant, en trois chiffres</h2>
+
+  <div class="grid cols-3" style="margin-top:20px;">
+    <div class="stat">
+      <div class="stat-number success">− 1,9 M$</div>
+      <div class="stat-label">économisés par violation grâce à l'IA en défense — détection <strong>80 j</strong> plus rapide (IBM 2025)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number danger">80 %+</div>
+      <div class="stat-label">des e-mails de <strong>phishing</strong> sont dopés à l'IA (ENISA 2025)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number danger">25,6 M$</div>
+      <div class="stat-label">détournés par un <strong>deepfake</strong> de directeur financier en visio (Arup, 2024)</div>
+    </div>
+  </div>
+
+  <blockquote style="margin-top:36px;">
+    La même IA défend et attaque. Le vrai enjeu n'est plus l'outil — c'est la <span class="accent2">résilience</span>.
+  </blockquote>
+
+  <p class="source"><strong>Sources :</strong> IBM Cost of a Data Breach 2025 · ENISA Threat Landscape 2025 · CNN / Fortune (fraude deepfake Arup, Hong Kong 2024).</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 04 — DÉFINITIONS -->
+<!-- ============================================================== -->
+<section class="slide" data-num="04">
+  <span class="slide-num">04 / 13</span>
+  <div class="eyebrow">Cadrage conceptuel</div>
+  <h2>Trois mots, trois définitions précises</h2>
+
+  <table>
+    <thead><tr><th style="width:24%">Concept</th><th>Définition opératoire</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong class="accent">Cybersécurité</strong></td>
+        <td>Moyens <strong>techniques, organisationnels et humains</strong> protégeant la <strong>confidentialité, l'intégrité et la disponibilité</strong> (triade <strong>CIA</strong>) des SI. <em>(ANSSI ; ISO/IEC 27000)</em></td>
+      </tr>
+      <tr>
+        <td><strong class="danger">IA en cybersécurité</strong></td>
+        <td>Application du <strong>machine learning</strong> : apprentissage <strong>supervisé</strong> (reconnaître le connu) et <strong>non supervisé</strong> (détecter l'anomalie inconnue).</td>
+      </tr>
+      <tr>
+        <td><strong class="success">SI résilient</strong></td>
+        <td>Capacité à <strong>anticiper, résister, se rétablir et s'adapter</strong>. On ne cherche plus seulement à <em>empêcher</em>, mais à <em>encaisser et continuer</em>. <em>(NIST CSF 2.0)</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <blockquote class="muted" style="margin-top:30px;">
+    <strong>Sécurité ≠ Résilience.</strong> La sécurité vise à bloquer l'attaque ; la résilience suppose qu'une partie passera — et organise la <strong>survie du service</strong>.
+  </blockquote>
+
+  <p class="source"><strong>Sources :</strong> ANSSI / ISO 27000 (triade CIA) · NIST Cybersecurity Framework 2.0, 2024 (Govern · Identify · Protect · Detect · Respond · Recover).</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 05 — I. L'IA BOUCLIER -->
+<!-- ============================================================== -->
+<section class="slide" data-num="05">
+  <span class="slide-num">05 / 13</span>
+  <div class="eyebrow">Partie I · La cyberdéfense augmentée</div>
+  <h2>L'IA, <span class="accent">bouclier</span> : la valeur d'abord</h2>
+
+  <div class="two-col">
+    <div>
+      <ul>
+        <li><strong class="success">− 1,9 M$</strong> par violation avec IA + automatisation (3,62 vs 5,52 M$) — <em>IBM 2025</em></li>
+        <li>Détection <strong>80+ jours</strong> plus rapide · maîtrise moyenne <strong>241 j</strong>, au plus bas depuis 9 ans</li>
+        <li>Marché IA-cyber : <strong class="accent2">≈ 26 → ≈ 86 Md$</strong> — <em>Gartner / MarketsandMarkets</em></li>
+      </ul>
+
+      <h3 style="margin-top:24px;">Où l'IA agit dans un SOC</h3>
+      <ul>
+        <li><strong>SIEM + UEBA</strong> — détecter l'anomalie comportementale</li>
+        <li><strong>SOAR</strong> — automatiser la réponse (playbooks)</li>
+        <li><strong>EDR / XDR</strong> — corréler postes, réseau, cloud</li>
+        <li>Réduire la <strong>fatigue d'alerte</strong> des analystes</li>
+      </ul>
+    </div>
+    <div class="chart-wrap">
+      <img src="assets/charts/chart-02-cout-violation-ibm.svg" alt="Coût d'une violation avec/sans IA — IBM 2025"/>
+    </div>
+  </div>
+
+  <p class="source"><strong>Sources :</strong> IBM Cost of a Data Breach 2025 · Gartner / MarketsandMarkets — marché IA cybersécurité.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 06 — BASCULE -->
+<!-- ============================================================== -->
+<section class="slide" data-num="06">
+  <span class="slide-num">06 / 13</span>
+  <div class="eyebrow">Transition · L'IA change de camp</div>
+  <h2>Un outil n'a pas de <span class="accent2">camp</span></h2>
+
+  <blockquote class="muted" style="text-align:center;font-size:20px;margin:14px auto;max-width:820px;">
+    <span class="accent">DÉFENSE</span> &nbsp;⟷&nbsp; <span class="accent2">même machine learning</span> &nbsp;⟷&nbsp; <span class="danger">ATTAQUE</span><br/>
+    <span style="font-size:14px;color:var(--fg-2);">La puissance qui augmente le défenseur augmente aussi l'attaquant.</span>
+  </blockquote>
+
+  <div class="two-col text-left" style="align-items:start;">
+    <div>
+      <table style="margin-top:6px;">
+        <thead><tr><th style="width:50%">Côté défense</th><th>Côté attaque</th></tr></thead>
+        <tbody>
+          <tr><td>Détecter l'anomalie</td><td>Contourner la détection (<strong>exemples adverses</strong>)</td></tr>
+          <tr><td>Écrire des règles de détection</td><td>Écrire des <strong>phishing parfaits</strong> à l'échelle</td></tr>
+          <tr><td>Automatiser la réponse</td><td>Automatiser <strong>reconnaissance &amp; exploitation</strong></td></tr>
+        </tbody>
+      </table>
+      <blockquote style="margin-top:16px;font-size:17px;">
+        Conséquence : la <strong>barrière à l'entrée</strong> de la cybercriminalité s'effondre.
+      </blockquote>
+    </div>
+    <div class="image-card">
+      <img src="assets/img/datacenter.jpg" alt="Salle serveurs / data center (CERN, CC BY-SA 3.0)" style="height:260px;"/>
+      <div class="caption">
+        <strong style="color:var(--fg-0)">Le SI, au milieu</strong><br/>
+        La même infrastructure, la même IA — deux usages opposés. Le différenciateur n'est plus l'outil, mais la <strong>résilience</strong>.<br/>
+        <em style="color:var(--fg-2);">Photo : CERN · CC BY-SA 3.0 (Wikimedia Commons)</em>
+      </div>
+    </div>
+  </div>
+
+  <p class="source"><strong>Transition :</strong> du bouclier à l'épée — voyons comment l'IA réarme l'attaquant, et devient elle-même une cible.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 07 — II. L'IA ARME + IA VULNÉRABLE -->
+<!-- ============================================================== -->
+<section class="slide" data-num="07">
+  <span class="slide-num">07 / 13</span>
+  <div class="brandchip"><span class="chip"><img src="assets/img/enisa-logo.png" alt="ENISA"/></span></div>
+  <div class="eyebrow">Partie II · Le revers, en deux volets</div>
+  <h2>L'IA qui <span class="danger">attaque</span> — et l'IA qu'on <span class="danger">attaque</span></h2>
+
+  <div class="grid cols-2" style="margin-top:14px;">
+    <div>
+      <h3 class="danger">A · L'IA qui attaque</h3>
+      <ul>
+        <li><strong>Phishing / spear-phishing</strong> généré à l'échelle — <em>ENISA : 80 %+ des e-mails</em></li>
+        <li><strong>LLM malveillants</strong> : WormGPT, FraudGPT, EscapeGPT (jailbreakés)</li>
+        <li><strong>Deepfakes</strong> vocaux &amp; vidéo → fraude au président (<strong>Arup : 25,6 M$</strong>)</li>
+        <li>Reconnaissance &amp; génération de code (acteurs étatiques)</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="accent2">B · L'IA qui se fait attaquer</h3>
+      <ul>
+        <li><strong>Empoisonnement</strong> des données d'entraînement</li>
+        <li><strong>Exemples adverses</strong> — tromper le modèle</li>
+        <li><strong>Injection de prompt</strong> — <em>OWASP LLM01, risque n°1</em></li>
+        <li><strong>Shadow AI</strong> : <span class="danger">+ 670 000 $</span> / violation (IBM)</li>
+      </ul>
+      <blockquote style="border-left-color:var(--danger);background:rgba(239,68,68,0.06);font-size:17px;margin-top:12px;">
+        Sécuriser <strong>avec</strong> l'IA ne suffit pas : il faut aussi sécuriser <strong>l'IA elle-même</strong>.
+      </blockquote>
+    </div>
+  </div>
+
+  <p class="source"><strong>Sources :</strong> ENISA Threat Landscape 2025 · CNN / Fortune (Arup) · OWASP Top 10 for LLM Applications 2025 · MITRE ATLAS · IBM 2025.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 08 — PANORAMA CHIFFRÉ -->
+<!-- ============================================================== -->
+<section class="slide" data-num="08">
+  <span class="slide-num">08 / 13</span>
+  <div class="brandchip"><span class="chip"><img src="assets/img/anssi-logo.jpg" alt="ANSSI"/></span></div>
+  <div class="eyebrow">Le cœur du sujet · Panorama de la menace 2025</div>
+  <h2>Les chiffres… et, séparément, les <span class="accent2">usages</span></h2>
+
+  <div class="two-col">
+    <div>
+      <h3 class="accent">📊 Les volumes</h3>
+      <ul>
+        <li><strong>1 366</strong> incidents traités par l'ANSSI (France, 2025)</li>
+        <li><strong>128</strong> rançongiciels majeurs · <strong>196</strong> exfiltrations</li>
+        <li><strong>4 875</strong> incidents analysés par l'ENISA (12 mois)</li>
+      </ul>
+
+      <h3 class="danger" style="margin-top:22px;">🎯 Les usages structurants</h3>
+      <ul>
+        <li><strong>80 %+</strong> du phishing dopé à l'IA</li>
+        <li><strong>48 %</strong> des victimes de rançongiciel = <strong>PME / TPE / ETI</strong></li>
+        <li>Brouillage <strong>États ⟷ cybercriminels</strong></li>
+      </ul>
+    </div>
+    <div class="chart-wrap">
+      <img src="assets/charts/chart-03-menace-secteurs.svg" alt="Répartition sectorielle des incidents — ANSSI 2025"/>
+    </div>
+  </div>
+
+  <p class="source"><strong>Sources :</strong> ANSSI — Panorama de la cybermenace 2025 · ENISA — Threat Landscape 2025.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 09 — III. CADRE NIS2 / DORA -->
+<!-- ============================================================== -->
+<section class="slide" data-num="09">
+  <span class="slide-num">09 / 13</span>
+  <div class="brandchip"><span class="chip"><img src="assets/img/eu-flag.svg" alt="Union européenne"/></span></div>
+  <div class="eyebrow">Partie III · La résilience devient une obligation</div>
+  <h2>Bâtir la résilience — le <span class="accent">cadre réglementaire</span></h2>
+
+  <div class="grid cols-2" style="margin-top:14px;">
+    <div>
+      <h3 class="accent">NIS2 — sécuriser tout l'écosystème</h3>
+      <ul>
+        <li>Entités <strong>essentielles</strong> (≥ 250 sal./50 M€) &amp; <strong>importantes</strong> (≥ 50 sal./10 M€)</li>
+        <li>Mesures <strong>techniques ET organisationnelles</strong></li>
+        <li>Notification ANSSI : <strong>24 h → 72 h → 30 j</strong></li>
+        <li>Sanctions <strong>10 M€ / 2 % CA</strong> · <strong>responsabilité des dirigeants</strong></li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="success">DORA — la résilience de la finance</h3>
+      <ul>
+        <li>Règl. (UE) <strong>2022/2554</strong> · application <strong>17/01/2025</strong></li>
+        <li><strong>&gt; 22 000</strong> entités financières concernées</li>
+        <li><strong>Tests de résilience</strong> obligatoires · supervision des prestataires TIC</li>
+        <li>Notification d'incident majeur en <strong>4 h</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <blockquote style="margin-top:20px;">
+    Basculement de doctrine : on n'exige plus seulement d'<strong>empêcher</strong>, mais de pouvoir <strong class="accent2">encaisser et se rétablir</strong>.
+  </blockquote>
+
+  <p class="source"><strong>Sources :</strong> Directive NIS2 (cyber.gouv.fr · Orange Cyberdefense) · Règlement DORA (ACPR / Banque de France · ESMA).</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 10 — AI ACT & RGPD -->
+<!-- ============================================================== -->
+<section class="slide" data-num="10">
+  <span class="slide-num">10 / 13</span>
+  <div class="brandchip"><span class="chip"><img src="assets/img/eu-flag.svg" alt="Union européenne"/></span><span class="chip"><img src="assets/img/cnil-logo.svg" alt="CNIL"/></span></div>
+  <div class="eyebrow">Sécuriser l'IA elle-même</div>
+  <h2>L'<span class="accent">AI Act</span> répond aux attaques de la Partie II</h2>
+
+  <div class="chart-full">
+    <img src="assets/charts/chart-04-reglementation-timeline.svg" alt="Empilement réglementaire cybersécurité et IA"/>
+  </div>
+
+  <div class="grid cols-3" style="margin-top:14px;">
+    <div class="stat" style="text-align:left;padding:14px 18px;">
+      <h3 style="font-size:16px;color:var(--accent);margin-bottom:6px;">🤖 AI Act · art. 15</h3>
+      <p style="font-size:14px;margin:0;">Haut risque (infra critique) → <strong>robustesse + cybersécurité</strong> : résistance à l'empoisonnement &amp; aux exemples adverses. 35 M€ / 7 %.</p>
+    </div>
+    <div class="stat" style="text-align:left;padding:14px 18px;">
+      <h3 style="font-size:16px;color:var(--success);margin-bottom:6px;">🔐 RGPD · art. 32-33</h3>
+      <p style="font-size:14px;margin:0;">Mesures de sécurité appropriées · notif. 72 h. La faille <strong>ANTS (11,7 M)</strong> = manquement type.</p>
+    </div>
+    <div class="stat" style="text-align:left;padding:14px 18px;">
+      <h3 style="font-size:16px;color:var(--accent2);margin-bottom:6px;">📘 ANSSI-PA-102</h3>
+      <p style="font-size:14px;margin:0;">Guide avril 2024 : <strong>35 recommandations</strong> pour sécuriser une IA générative.</p>
+    </div>
+  </div>
+
+  <p class="source"><strong>Sources :</strong> Commission européenne (AI Act, art. 6/15, Annexe III) · RGPD art. 32-33 · La Dépêche (ANTS) · ANSSI-PA-102 (29/04/2024).</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 11 — LEVIERS -->
+<!-- ============================================================== -->
+<section class="slide" data-num="11">
+  <span class="slide-num">11 / 13</span>
+  <div class="eyebrow">Les leviers de la résilience · trois familles</div>
+  <h2>Technique · Organisationnel · Juridique</h2>
+
+  <div class="two-col text-left">
+    <div>
+      <h3 class="accent" style="margin-bottom:6px;">⚙️ Techniques</h3>
+      <ul style="font-size:15px;">
+        <li><strong>Zero Trust</strong> (NIST SP 800-207) · défense en profondeur · SOC/IA (SIEM-SOAR-XDR)</li>
+        <li><strong>MLSecOps</strong> — moindre privilège, filtrage, tests adverses, validation humaine (OWASP)</li>
+        <li><strong>PRA / PCA</strong> — sauvegardes <strong>immuables</strong> → survivre au rançongiciel</li>
+      </ul>
+
+      <h3 class="accent2" style="margin:14px 0 6px;">🏛️ Organisationnels <span style="font-size:12px;color:var(--fg-2);font-weight:400;">(le plan trop souvent oublié)</span></h3>
+      <ul style="font-size:15px;">
+        <li>Gouvernance : <strong>RSSI + DPO + comité éthique IA</strong></li>
+        <li><strong>EBIOS RM</strong> · <strong>AIPD</strong> · classification des données</li>
+        <li><strong>Politique d'usage de l'IA</strong> (contre le shadow AI) · RACI</li>
+        <li><strong>Formation &amp; culture de crise</strong> : exercices, red team</li>
+      </ul>
+
+      <h3 class="success" style="margin:14px 0 6px;">⚖️ Juridiques</h3>
+      <ul style="font-size:15px;">
+        <li>Conformité <strong>NIS2 · DORA · AI Act · RGPD</strong> · clauses fournisseurs (<strong>art. 28</strong>)</li>
+      </ul>
+
+      <blockquote style="border-left-color:var(--danger);background:rgba(239,68,68,0.06);font-size:14px;margin-top:12px;">
+        <strong class="danger">90 %</strong> des entreprises sans cadre de gouvernance de l'IA. <span style="font-style:italic;color:var(--fg-2);">— Thomson Reuters / UNESCO</span>
+      </blockquote>
+    </div>
+    <div class="chart-wrap">
+      <img src="assets/charts/chart-05-resilience-triangle.svg" alt="La résilience : convergence des trois plans"/>
+    </div>
+  </div>
+
+  <p class="source"><strong>Sources :</strong> NIST SP 800-207 · OWASP Top 10 LLM 2025 · ANSSI EBIOS RM · Le Monde/Cegos (formation) · Thomson Reuters / UNESCO.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 12 — CONCLUSION -->
+<!-- ============================================================== -->
+<section class="slide" data-num="12">
+  <span class="slide-num">12 / 13</span>
+  <div class="eyebrow">Conclusion · Ouverture</div>
+  <h2>L'épée à double tranchant, en équilibre</h2>
+
+  <div class="grid cols-3" style="margin-top:14px;">
+    <div class="stat" style="text-align:left;">
+      <div class="badge">1</div>
+      <p style="margin-top:8px;">L'IA est un <strong class="accent">multiplicateur de force</strong> pour la défense — réel et mesurable (−1,9 M$ / violation).</p>
+    </div>
+    <div class="stat" style="text-align:left;">
+      <div class="badge" style="background:rgba(239,68,68,0.15);color:var(--danger);">2</div>
+      <p style="margin-top:8px;">La même IA <strong class="danger">arme l'attaquant</strong> et devient une cible — 80 % du phishing, deepfakes, empoisonnement.</p>
+    </div>
+    <div class="stat" style="text-align:left;">
+      <div class="badge" style="background:rgba(245,158,11,0.15);color:var(--accent-2);">3</div>
+      <p style="margin-top:8px;">La <strong class="accent2">résilience</strong> naît de la convergence technique + organisationnelle + juridique — « <em>assume the breach</em> ».</p>
+    </div>
+  </div>
+
+  <blockquote style="margin-top:28px;font-size:22px;">
+    La question n'est plus <strong>si</strong> on sera attaqué, mais <strong class="accent2">quand</strong> — et si le SI <strong>tiendra</strong>.
+  </blockquote>
+
+  <p style="margin-top:18px;font-size:18px;color:var(--fg-0);font-style:italic;">
+    <strong style="color:var(--accent);">Question ouverte :</strong> si défenseurs et attaquants s'équipent de la <strong>même</strong> IA, l'humain reste-t-il l'<strong>arbitre</strong> de la cybersécurité… ou en devient-il la <strong>variable d'ajustement</strong> ?
+  </p>
+
+  <p class="source" style="text-align:center;color:var(--fg-1);font-size:14px;">Je vous remercie.</p>
+</section>
+
+<!-- ============================================================== -->
+<!-- SLIDE 13 — SOURCES -->
+<!-- ============================================================== -->
+<section class="slide" data-num="13">
+  <span class="slide-num">13 / 13</span>
+  <div class="eyebrow">Bibliographie · Sources vérifiées</div>
+  <h2>Sources</h2>
+
+  <div class="grid cols-3" style="margin-top:14px;">
+    <div>
+      <h3 style="color:var(--accent);">🏛️ Institutionnel</h3>
+      <ul style="font-size:14px;">
+        <li><strong>ANSSI</strong> — Panorama cybermenace 2025 · guide IA générative (PA-102) · EBIOS RM</li>
+        <li><strong>ENISA</strong> — Threat Landscape 2025</li>
+        <li><strong>Commission européenne</strong> — AI Act · NIS2 · DORA</li>
+        <li><strong>NIST</strong> — CSF 2.0 · SP 800-207 (Zero Trust)</li>
+        <li><strong>RGPD</strong> — art. 28, 32, 33</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:var(--accent2);">📊 Études &amp; marché</h3>
+      <ul style="font-size:14px;">
+        <li><strong>IBM</strong> — Cost of a Data Breach 2025</li>
+        <li><strong>Gartner / MarketsandMarkets</strong> — marché IA-cyber</li>
+        <li><strong>Thomson Reuters Foundation × UNESCO</strong> — gouvernance IA (AICDI)</li>
+        <li><strong>Cegos</strong> — baromètre compétences 2026</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="color:var(--success);">📰 Faits · 📚 Référentiels</h3>
+      <ul style="font-size:14px;">
+        <li><strong>CNN / Fortune</strong> — deepfake Arup (25,6 M$)</li>
+        <li><strong>La Dépêche</strong> — fuite ANTS 11,7 M (B. Robert)</li>
+        <li><strong>OWASP</strong> — Top 10 for LLM Applications 2025</li>
+        <li><strong>MITRE ATLAS</strong> · <strong>NIST AI RMF</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="source" style="text-align:center;">Bibliographie complète détaillée dans <code class="mono">répétition/cybersecurite-ia-si-resilient/sources.md</code> (25 entrées vérifiées).</p>
+</section>
+
+</div>
+
+<div class="nav">
+  <button onclick="goPrev()">←</button>
+  <button onclick="toggleOverview()" id="ovBtn">Vue d'ensemble</button>
+  <button onclick="window.print()">Imprimer / PDF</button>
+  <button onclick="goNext()">→</button>
+</div>
+
+<script>
+  const deck = document.getElementById('deck');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const progress = document.getElementById('progress');
+  let current = 0;
+
+  // Mise à l'échelle de la scène 16:9 (1280×720) pour remplir la fenêtre sans déformer.
+  function fitStage() {
+    const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    deck.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fitStage);
+  fitStage();
+
+  function show(i) {
+    current = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('active', k === current));
+    progress.style.width = ((current + 1) / slides.length * 100) + '%';
+    location.hash = '#' + (current + 1);
+  }
+
+  function goNext() { show(current + 1); }
+  function goPrev() { show(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); goNext(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goPrev(); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(slides.length - 1); }
+    else if (/^[1-9]$/.test(e.key)) { show(parseInt(e.key) - 1); }
+  });
+
+  function toggleOverview() { document.body.classList.toggle('overview'); }
+
+  const h = parseInt(location.hash.replace('#', ''), 10);
+  show(isNaN(h) ? 0 : h - 1);
+</script>
+
+</body>
+</html>

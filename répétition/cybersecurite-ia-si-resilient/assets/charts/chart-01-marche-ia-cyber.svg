@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 540" font-family="Inter, system-ui, sans-serif">
+  <!-- transparent canvas -->
+  <text x="640" y="42" font-size="24" font-weight="700" fill="#0f172a" text-anchor="middle">Le marché de l'IA en cybersécurité décolle</text>
+  <text x="640" y="68" font-size="13" fill="#64748b" text-anchor="middle">Estimations Gartner / MarketsandMarkets — en milliards de dollars</text>
+
+  <!-- baseline -->
+  <line x1="180" y1="430" x2="1120" y2="430" stroke="#cbd5e1" stroke-width="2"/>
+
+  <!-- Bar 2025 : ~26 Md$ -->
+  <g>
+    <rect x="340" y="300" width="200" height="130" rx="8" fill="#3b82f6"/>
+    <text x="440" y="285" font-size="34" font-weight="800" fill="#1d4ed8" text-anchor="middle">≈ 26 Md$</text>
+    <text x="440" y="458" font-size="16" font-weight="700" fill="#334155" text-anchor="middle">2025</text>
+  </g>
+
+  <!-- Bar horizon : ~86 Md$ -->
+  <g>
+    <rect x="740" y="90" width="200" height="340" rx="8" fill="#f59e0b"/>
+    <text x="840" y="75" font-size="34" font-weight="800" fill="#b45309" text-anchor="middle">≈ 86 Md$</text>
+    <text x="840" y="458" font-size="16" font-weight="700" fill="#334155" text-anchor="middle">horizon</text>
+  </g>
+
+  <!-- x3.3 arrow -->
+  <g>
+    <path d="M560 250 C 640 210, 700 210, 730 240" stroke="#ef4444" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+    <text x="645" y="195" font-size="22" font-weight="800" fill="#ef4444" text-anchor="middle">× 3,3</text>
+  </g>
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- context note -->
+  <text x="640" y="500" font-size="14" fill="#64748b" text-anchor="middle">Marché cybersécurité global &gt; 250 Md$ en 2025 · dépenses IA mondiales ≈ 2 500 Md$ en 2026 (Gartner)</text>
+</svg>

@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 540" font-family="Inter, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="axisPast4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="axisFut4" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <marker id="arr4" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <text x="640" y="42" font-size="24" font-weight="700" fill="#0f172a" text-anchor="middle">La résilience devient une obligation légale</text>
+  <text x="640" y="68" font-size="13" fill="#64748b" text-anchor="middle">Empilement réglementaire européen — cybersécurité &amp; IA</text>
+
+  <!-- year gridlines -->
+  <g stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 6" opacity="0.8">
+    <line x1="230" y1="120" x2="230" y2="470"/>
+    <line x1="520" y1="120" x2="520" y2="470"/>
+    <line x1="810" y1="120" x2="810" y2="470"/>
+  </g>
+  <g font-size="14" font-weight="700" fill="#64748b" text-anchor="middle" letter-spacing="2">
+    <text x="150" y="150">2018</text>
+    <text x="375" y="150">2025</text>
+    <text x="665" y="150">2026</text>
+    <text x="1000" y="150">2027+</text>
+  </g>
+
+  <!-- axis -->
+  <line x1="100" y1="250" x2="720" y2="250" stroke="url(#axisPast4)" stroke-width="6" stroke-linecap="round"/>
+  <line x1="720" y1="250" x2="1190" y2="250" stroke="url(#axisFut4)" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 10" marker-end="url(#arr4)"/>
+
+  <!-- AUJOURD'HUI -->
+  <g>
+    <line x1="720" y1="110" x2="720" y2="470" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3 5" opacity="0.6"/>
+    <circle cx="720" cy="250" r="9" fill="#dc2626" stroke="#ffffff" stroke-width="2"/>
+    <rect x="662" y="100" width="116" height="34" rx="6" fill="#dc2626"/>
+    <text x="720" y="122" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="1">AUJOURD'HUI · 2026</text>
+  </g>
+
+  <!-- M1 RGPD 2018 -->
+  <g>
+    <circle cx="120" cy="250" r="8" fill="#3b82f6" stroke="#ffffff" stroke-width="2"/>
+    <line x1="120" y1="258" x2="120" y2="300" stroke="#3b82f6" stroke-width="1.5"/>
+    <rect x="55" y="300" width="140" height="70" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="125" y="322" font-size="13" font-weight="700" fill="#1d4ed8" text-anchor="middle">RGPD · 2018</text>
+    <text x="125" y="341" font-size="11" fill="#334155" text-anchor="middle">sécurité (art. 32)</text>
+    <text x="125" y="356" font-size="11" fill="#334155" text-anchor="middle">notif. 72 h (art. 33)</text>
+  </g>
+
+  <!-- M2 DORA 17/01/2025 -->
+  <g>
+    <circle cx="360" cy="250" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+    <line x1="360" y1="242" x2="360" y2="200" stroke="#ef4444" stroke-width="1.5"/>
+    <rect x="290" y="165" width="140" height="52" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="360" y="187" font-size="13" font-weight="700" fill="#b91c1c" text-anchor="middle">DORA · 17/01/2025</text>
+    <text x="360" y="205" font-size="11" fill="#334155" text-anchor="middle">résilience — finance</text>
+  </g>
+
+  <!-- M3 NIS2 transposition FR 2025 -->
+  <g>
+    <circle cx="470" cy="250" r="9" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+    <line x1="470" y1="258" x2="470" y2="300" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect x="400" y="300" width="150" height="70" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="475" y="322" font-size="13" font-weight="700" fill="#b45309" text-anchor="middle">NIS2 · 2025</text>
+    <text x="475" y="341" font-size="11" fill="#334155" text-anchor="middle">transposition France</text>
+    <text x="475" y="356" font-size="11" fill="#334155" text-anchor="middle">10 M€ / 2 % CA</text>
+  </g>
+
+  <!-- M4 AI Act 02/08/2026 (majeur) -->
+  <g>
+    <circle cx="790" cy="250" r="11" fill="#8b5cf6" stroke="#ffffff" stroke-width="2"/>
+    <line x1="790" y1="258" x2="790" y2="300" stroke="#8b5cf6" stroke-width="1.5"/>
+    <rect x="710" y="300" width="160" height="86" rx="8" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="790" y="323" font-size="13" font-weight="700" fill="#6d28d9" text-anchor="middle">AI Act · 02/08/2026</text>
+    <text x="790" y="342" font-size="11" fill="#334155" text-anchor="middle">application complète</text>
+    <text x="790" y="358" font-size="11" fill="#334155" text-anchor="middle">art. 15 : robustesse</text>
+    <text x="790" y="374" font-size="11" fill="#334155" text-anchor="middle">+ cybersécurité · 35 M€/7 %</text>
+  </g>
+
+  <!-- M5 AI Act haut risque 2027 -->
+  <g>
+    <circle cx="1030" cy="250" r="8" fill="#64748b" stroke="#ffffff" stroke-width="2"/>
+    <line x1="1030" y1="258" x2="1030" y2="300" stroke="#64748b" stroke-width="1.5"/>
+    <rect x="960" y="300" width="150" height="70" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+    <text x="1035" y="322" font-size="13" font-weight="700" fill="#475569" text-anchor="middle">2027+</text>
+    <text x="1035" y="341" font-size="11" fill="#334155" text-anchor="middle">AI Act haut risque</text>
+    <text x="1035" y="356" font-size="11" fill="#334155" text-anchor="middle">(Annexe III)</text>
+  </g>
+
+  <text x="640" y="510" font-size="13" fill="#64748b" text-anchor="middle" font-style="italic">Du « protéger la donnée » (2018) au « garantir la résilience du service » (2025-2027)</text>
+</svg>

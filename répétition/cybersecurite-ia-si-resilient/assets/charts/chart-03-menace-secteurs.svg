@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 540" font-family="Inter, system-ui, sans-serif">
+  <text x="640" y="42" font-size="24" font-weight="700" fill="#0f172a" text-anchor="middle">Qui est visé en France ? — répartition des incidents 2025</text>
+  <text x="640" y="68" font-size="13" fill="#64748b" text-anchor="middle">ANSSI — Panorama de la cybermenace 2025 · part des incidents traités</text>
+
+  <!-- horizontal bars -->
+  <!-- scale: 34% -> 700px width at x0=430 -->
+  <g font-size="16" fill="#334155">
+    <!-- Éducation & recherche 34% -->
+    <text x="410" y="140" text-anchor="end" font-weight="600">Éducation &amp; recherche</text>
+    <rect x="430" y="120" width="620" height="34" rx="6" fill="#ef4444"/>
+    <text x="1065" y="143" font-size="18" font-weight="800" fill="#b91c1c">34 %</text>
+
+    <!-- Collectivités & ministères 24% -->
+    <text x="410" y="205" text-anchor="end" font-weight="600">Collectivités &amp; ministères</text>
+    <rect x="430" y="185" width="438" height="34" rx="6" fill="#f59e0b"/>
+    <text x="883" y="208" font-size="18" font-weight="800" fill="#b45309">24 %</text>
+
+    <!-- Santé 10% -->
+    <text x="410" y="270" text-anchor="end" font-weight="600">Santé</text>
+    <rect x="430" y="250" width="183" height="34" rx="6" fill="#3b82f6"/>
+    <text x="628" y="273" font-size="18" font-weight="800" fill="#1d4ed8">10 %</text>
+
+    <!-- Télécoms 9% -->
+    <text x="410" y="335" text-anchor="end" font-weight="600">Télécommunications</text>
+    <rect x="430" y="315" width="165" height="34" rx="6" fill="#8b5cf6"/>
+    <text x="610" y="338" font-size="18" font-weight="800" fill="#6d28d9">9 %</text>
+  </g>
+
+  <!-- key stat callouts -->
+  <g>
+    <rect x="150" y="400" width="340" height="96" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+    <text x="320" y="435" font-size="30" font-weight="800" fill="#b91c1c" text-anchor="middle">1 366</text>
+    <text x="320" y="462" font-size="14" fill="#334155" text-anchor="middle">incidents traités par l'ANSSI</text>
+    <text x="320" y="482" font-size="14" fill="#334155" text-anchor="middle">dont 128 rançongiciels majeurs</text>
+  </g>
+  <g>
+    <rect x="520" y="400" width="340" height="96" rx="10" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="690" y="435" font-size="30" font-weight="800" fill="#b45309" text-anchor="middle">48 %</text>
+    <text x="690" y="462" font-size="14" fill="#334155" text-anchor="middle">des victimes de rançongiciel</text>
+    <text x="690" y="482" font-size="14" fill="#334155" text-anchor="middle">sont des PME / TPE / ETI</text>
+  </g>
+  <g>
+    <rect x="890" y="400" width="340" height="96" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="1060" y="435" font-size="30" font-weight="800" fill="#1d4ed8" text-anchor="middle">80 %+</text>
+    <text x="1060" y="462" font-size="14" fill="#334155" text-anchor="middle">du phishing dopé à l'IA</text>
+    <text x="1060" y="482" font-size="14" fill="#334155" text-anchor="middle">(ENISA 2025)</text>
+  </g>
+</svg>
