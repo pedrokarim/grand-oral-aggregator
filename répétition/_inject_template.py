@@ -387,6 +387,22 @@ for idx in range(9, 0, -1):    # indices 9..1
 # placer les 12 slides sujet juste après le titre, avant le projet pro
 move_block_to(12, 1)
 
+# ======================================================================
+# Notes du présentateur, format PUCES (ouverture + points à aborder + transition).
+# Réécrit les notes des 13 slides sujet (slides[0..12] après réordonnancement).
+# ======================================================================
+NOTES_PUCES = []
+import re as _re
+_raw = open(os.path.join(REP, SLUG, "notes-orales-puces.md"), encoding="utf-8").read()
+for _part in _re.split(r"(?m)^## Slide ", _raw)[1:]:
+    _lines = _part.splitlines()[1:]
+    _lines = [l for l in _lines if l.strip() != "---"]
+    NOTES_PUCES.append(chr(10).join(_lines).strip().replace("**", ""))
+NOTES_PUCES = NOTES_PUCES[:13]
+subject_slides = list(prs.slides)[:13]
+for sl, txt in zip(subject_slides, NOTES_PUCES):
+    sl.notes_slide.notes_text_frame.text = txt
+
 out = os.path.join(REP, SLUG, SLUG + "-CESI.pptx")
 prs.save(out)
 print("OK ->", out, "| n slides:", len(list(prs.slides._sldIdLst)))
