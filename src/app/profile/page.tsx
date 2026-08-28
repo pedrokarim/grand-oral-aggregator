@@ -26,18 +26,15 @@ interface UserPreferences {
 export default function ProfilePage() {
   const { data: session } = useSession();
   const [prefs, setPrefs] = useState<UserPreferences | null>(null);
-  const [prefsLoading, setPrefsLoading] = useState(false);
 
   useEffect(() => {
     if (!session) return;
-    setPrefsLoading(true);
     fetch("/api/user/preferences")
       .then((r) => r.json())
       .then((data) => {
         setPrefs(data.preferences);
-        setPrefsLoading(false);
       })
-      .catch(() => setPrefsLoading(false));
+      .catch(() => setPrefs(null));
   }, [session]);
 
   const updatePref = useCallback(async (key: string, value: unknown) => {
@@ -72,23 +69,17 @@ export default function ProfilePage() {
                 Connectez-vous pour accéder à votre profil
               </p>
               <button
-                onClick={() => {
-                  if (window.top !== window.self) {
-                    window.top!.location.href = "/api/auth/signin/discord";
-                  } else {
-                    signIn.social({ provider: "discord" });
-                  }
-                }}
+                onClick={() => void signIn()}
                 className="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-medium
-                  text-[#FDFDF8] bg-[#5865F2] hover:bg-[#4752C4] rounded-md transition-colors cursor-default"
+                  text-[#FDFDF8] bg-[#EB9D2A] hover:bg-[#D98D20] rounded-md transition-colors cursor-default"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                Se connecter avec Discord
+                Se connecter avec Ascencia ID
               </button>
             </div>
           </CardContent>
         </Card>
-      ) : prefsLoading || !prefs ? (
+      ) : !prefs ? (
         <Card>
           <CardContent className="py-8">
             <div className="flex justify-center">
@@ -112,7 +103,7 @@ export default function ProfilePage() {
                   onChange={(e) => updatePref("displayName", e.target.value || null)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Laissez vide pour utiliser votre nom Discord
+                  Laissez vide pour utiliser votre nom Ascencia ID
                 </p>
               </div>
               <div className="space-y-2">

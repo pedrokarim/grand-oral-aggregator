@@ -8,26 +8,43 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  displayName   String?
-  status        String    @default("online")
-  role          String    @default("user")
-  globalMentionOptOut  Boolean @default(false)
-  chatMentionOptOut    Boolean @default(false)
-  commentMentionOptOut Boolean @default(false)
-  searchLayout  String    @default("masonry-editorial")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                   String   @id @default(cuid())
+  ascenciaAccountId    String?  @unique
+  name                 String
+  email                String   @unique
+  emailVerified        Boolean  @default(false)
+  image                String?
+  displayName          String?
+  status               String   @default("online")
+  role                 String   @default("user")
+  globalMentionOptOut  Boolean  @default(false)
+  chatMentionOptOut    Boolean  @default(false)
+  commentMentionOptOut Boolean  @default(false)
+  searchLayout         String   @default("masonry-editorial")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
-  sessions      Session[]
-  accounts      Account[]
-  chatMessages  ChatMessage[]
-  comments      Comment[]
-  subjects      Subject[]
+  sessions         Session[]
+  accounts         Account[]
+  chatMessages     ChatMessage[]
+  comments         Comment[]
+  subjects         Subject[]
+  ascenciaSessions AscenciaSession[]
+}
+
+model AscenciaSession {
+  id           String   @id
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime
+  claims       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Session {
@@ -112,10 +129,10 @@ model EditHistory {
 }
 
 model Theme {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  slug     String    @unique
-  icon     String    @default("Settings")
+  id       Int           @id @default(autoincrement())
+  name     String        @unique
+  slug     String        @unique
+  icon     String        @default("Settings")
   subjects Subject[]
   articles NewsArticle[]
   comments Comment[]
@@ -124,14 +141,14 @@ model Theme {
 }
 
 model Subject {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   type     String
   domaine  String
   sujet    String
   themeId  Int
-  theme    Theme  @relation(fields: [themeId], references: [id])
+  theme    Theme   @relation(fields: [themeId], references: [id])
   userId   String?
-  user     User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user     User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   isPublic Boolean @default(true)
 
   createdAt DateTime @default(now())
@@ -154,8 +171,8 @@ model NewsArticle {
   theme       Theme    @relation(fields: [themeId], references: [id])
   fetchedAt   DateTime @default(now())
 
-  histories   NewsHistory[]
-  summaries   AiSummary[]
+  histories NewsHistory[]
+  summaries AiSummary[]
 
   @@unique([url, themeId])
 }

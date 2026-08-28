@@ -542,13 +542,7 @@ export function ThemeComments({ themeName }: ThemeCommentsProps) {
       <div className="mt-4">
         {!session ? (
           <button
-            onClick={() => {
-              if (window.top !== window.self) {
-                window.top!.location.href = "/api/auth/signin/discord";
-              } else {
-                signIn.social({ provider: "discord" });
-              }
-            }}
+            onClick={() => void signIn()}
             className="flex w-full items-center justify-center gap-2 rounded-md border border-[#C8CABF] bg-[#F1F2EC] px-3 py-2.5 text-[14px] font-medium text-[#5A5C53] transition-colors hover:bg-[#ECEDE5] dark:border-[#3A3D46] dark:bg-[#25272D] dark:text-[#B8BBC8] dark:hover:bg-[#2A2D35]"
           >
             <LogIn className="h-4 w-4" />

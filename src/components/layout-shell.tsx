@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
 import { DesktopLayout } from "./desktop-layout";
 import { SiteLayout } from "./site-layout";
@@ -11,11 +11,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 function LayoutInner({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const isEmbed = searchParams.get("_embed") === "1";
   const [mode, , hydrated] = useSiteMode();
   const isMobile = useIsMobile();
 
-  if (isEmbed) {
+  if (isEmbed || pathname === "/auth/callback") {
     return (
       <div className="bg-[#FDFDF8] dark:bg-[#1E1F23] min-h-screen">
         <EmbedRouteSync />

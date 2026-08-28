@@ -3,6 +3,7 @@ import { IBM_Plex_Sans, Syne, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LayoutShell } from "@/components/layout-shell";
+import { AuthSessionProvider } from "@/lib/auth-client";
 
 const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-ibm-plex",
@@ -52,9 +53,11 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className={`${ibmPlexSans.variable} ${syne.variable} ${dmSans.variable} antialiased`}>
-        <TooltipProvider>
-          <LayoutShell>{children}</LayoutShell>
-        </TooltipProvider>
+        <AuthSessionProvider>
+          <TooltipProvider>
+            <LayoutShell>{children}</LayoutShell>
+          </TooltipProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );
