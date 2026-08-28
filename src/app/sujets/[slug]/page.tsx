@@ -26,6 +26,10 @@ export default function SubjectDetailPage() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const subjectTitle = subject?.sujet;
+  const subjectTheme = subject?.theme;
+  const summaryProvider = settings.ai.provider;
+  const summaryModel = settings.ai.model;
 
   // Lookup: try JSON synchronously, then fall back to DB via API for custom subjects.
   useEffect(() => {
@@ -46,15 +50,13 @@ export default function SubjectDetailPage() {
   }, [slug]);
 
   useEffect(() => {
-    if (!subject) return;
-    const { provider, model } = settings.ai;
-    if (!provider || !model) return;
+    if (!subjectTitle || !subjectTheme || !summaryProvider || !summaryModel) return;
     const ctrl = new AbortController();
     const params = new URLSearchParams({
-      subject: subject.sujet,
-      theme: subject.theme,
-      provider,
-      model,
+      subject: subjectTitle,
+      theme: subjectTheme,
+      provider: summaryProvider,
+      model: summaryModel,
       length: settings.summaryLength,
     });
     fetch(`/api/ai/summarize?${params.toString()}`, { signal: ctrl.signal })
@@ -67,7 +69,7 @@ export default function SubjectDetailPage() {
       })
       .catch(() => {});
     return () => ctrl.abort();
-  }, [subject?.sujet, subject?.theme, settings.ai.provider, settings.ai.model, settings.summaryLength]);
+  }, [subjectTitle, subjectTheme, summaryProvider, summaryModel, settings.summaryLength]);
 
   async function generateSummary() {
     if (!subject) return;

@@ -34,21 +34,28 @@ export function CountdownWidget({ state }: WidgetComponentProps) {
   const [draft, setDraft] = useState(DEFAULT_TARGET);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        setTarget(raw);
-        setDraft(raw);
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          setTarget(raw);
+          setDraft(raw);
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    setParts(diff(target));
-    const t = setInterval(() => setParts(diff(target)), 1000);
-    return () => clearInterval(t);
+    const update = () => setParts(diff(target));
+    const initialTimer = window.setTimeout(update, 0);
+    const interval = window.setInterval(update, 1000);
+    return () => {
+      window.clearTimeout(initialTimer);
+      window.clearInterval(interval);
+    };
   }, [target]);
 
   const save = useCallback(() => {

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Plus, X, StickyNote } from "lucide-react";
-import type { WidgetComponentProps } from "@/lib/widgets-types";
 
 const STORAGE_KEY = "widget-postits";
 
@@ -74,30 +73,33 @@ function newPostit(color: PostitColor = "yellow"): Postit {
   return { id: crypto.randomUUID(), text: "", color };
 }
 
-export function PostitsWidget(_props: WidgetComponentProps) {
+export function PostitsWidget() {
   const [notes, setNotes] = useState<Postit[]>([]);
   const loadedRef = useRef(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Postit[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setNotes(parsed);
-          loadedRef.current = true;
-          return;
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as Postit[];
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setNotes(parsed);
+            loadedRef.current = true;
+            return;
+          }
         }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
-    }
-    setNotes([
-      newPostit("yellow"),
-      newPostit("pink"),
-      newPostit("green"),
-    ]);
-    loadedRef.current = true;
+      setNotes([
+        newPostit("yellow"),
+        newPostit("pink"),
+        newPostit("green"),
+      ]);
+      loadedRef.current = true;
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {

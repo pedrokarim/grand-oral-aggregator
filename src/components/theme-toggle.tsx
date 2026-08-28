@@ -8,8 +8,10 @@ export function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setDark(isDark);
+    const frame = requestAnimationFrame(() => {
+      setDark(document.documentElement.classList.contains("dark"));
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   function toggle() {

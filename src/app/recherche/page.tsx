@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   subjects as builtInSubjects,
   themeStats,
@@ -46,58 +46,66 @@ export default function RecherchePage() {
   const [customSubjects, setCustomSubjects] = useState<CustomSubject[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Shuffled built-in subjects computed once per mount for "trending"
-  const trendingBuiltInsRef = useRef<Subject[]>([]);
-  if (trendingBuiltInsRef.current.length === 0) {
-    trendingBuiltInsRef.current = shuffle(builtInSubjects).slice(0, TRENDING_BUILTIN_COUNT);
-  }
+  const [trendingBuiltIns, setTrendingBuiltIns] = useState<Subject[]>(() =>
+    builtInSubjects.slice(0, TRENDING_BUILTIN_COUNT),
+  );
+  const [trendingThemes, setTrendingThemes] = useState<typeof themeStats>(() =>
+    themeStats.slice(0, TRENDING_THEMES_COUNT),
+  );
 
-  // Trending themes: shuffle to avoid always showing same order
-  const trendingThemesRef = useRef<typeof themeStats>([]);
-  if (trendingThemesRef.current.length === 0) {
-    trendingThemesRef.current = shuffle(themeStats).slice(0, TRENDING_THEMES_COUNT);
-  }
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setTrendingBuiltIns(shuffle(builtInSubjects).slice(0, TRENDING_BUILTIN_COUNT));
+      setTrendingThemes(shuffle(themeStats).slice(0, TRENDING_THEMES_COUNT));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const q = debounced.trim();
     const ctrl = new AbortController();
-    setLoading(true);
+    const timer = window.setTimeout(() => {
+      setLoading(true);
 
-    // News: when q is empty, API returns top 30 recent — take first TRENDING_NEWS_COUNT.
-    const newsUrl = q ? `/api/news?q=${encodeURIComponent(q)}` : `/api/news`;
-    const newsReq = fetch(newsUrl, { signal: ctrl.signal })
-      .then((r) => r.json())
-      .then((data) => {
-        const articles: SearchNewsItem[] = data.articles ?? [];
-        setNews(q ? articles : articles.slice(0, TRENDING_NEWS_COUNT));
-      })
-      .catch(() => {});
+      // News: when q is empty, API returns top 30 recent — take first TRENDING_NEWS_COUNT.
+      const newsUrl = q ? `/api/news?q=${encodeURIComponent(q)}` : `/api/news`;
+      const newsReq = fetch(newsUrl, { signal: ctrl.signal })
+        .then((r) => r.json())
+        .then((data) => {
+          const articles: SearchNewsItem[] = data.articles ?? [];
+          setNews(q ? articles : articles.slice(0, TRENDING_NEWS_COUNT));
+        })
+        .catch(() => {});
 
-    // Custom subjects: q -> search endpoint; else trending (top 12 recent visible).
-    const subjUrl = q ? `/api/subjects?q=${encodeURIComponent(q)}` : `/api/subjects`;
-    const subjReq = fetch(subjUrl, { signal: ctrl.signal })
-      .then((r) => r.json())
-      .then((data) => setCustomSubjects(data.subjects ?? []))
-      .catch(() => {});
+      // Custom subjects: q -> search endpoint; else trending (top 12 recent visible).
+      const subjUrl = q ? `/api/subjects?q=${encodeURIComponent(q)}` : `/api/subjects`;
+      const subjReq = fetch(subjUrl, { signal: ctrl.signal })
+        .then((r) => r.json())
+        .then((data) => setCustomSubjects(data.subjects ?? []))
+        .catch(() => {});
 
-    Promise.all([newsReq, subjReq]).finally(() => setLoading(false));
+      Promise.all([newsReq, subjReq]).finally(() => setLoading(false));
+    }, 0);
 
-    return () => ctrl.abort();
+    return () => {
+      window.clearTimeout(timer);
+      ctrl.abort();
+    };
   }, [debounced]);
 
   const filteredThemes = useMemo(() => {
     const q = debounced.trim();
-    if (!q) return trendingThemesRef.current;
+    if (!q) return trendingThemes;
     return themeStats.filter((t) => matches(t.theme, q));
-  }, [debounced]);
+  }, [debounced, trendingThemes]);
 
   const filteredBuiltIns = useMemo(() => {
     const q = debounced.trim();
-    if (!q) return trendingBuiltInsRef.current;
+    if (!q) return trendingBuiltIns;
     return builtInSubjects
       .filter((s) => matches(s.sujet, q) || matches(s.theme, q))
       .slice(0, 50);
-  }, [debounced]);
+  }, [debounced, trendingBuiltIns]);
 
   const hasQuery = debounced.trim().length > 0;
 

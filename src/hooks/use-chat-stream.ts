@@ -27,7 +27,10 @@ interface ChatStreamCallbacks {
 
 export function useChatStream(callbacks: ChatStreamCallbacks) {
   const ref = useRef(callbacks);
-  ref.current = callbacks;
+
+  useEffect(() => {
+    ref.current = callbacks;
+  }, [callbacks]);
 
   useEffect(() => {
     const es = new EventSource("/api/chat/stream");

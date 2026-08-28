@@ -14,7 +14,11 @@ mkdirSync(OUTPUT_DIR, { recursive: true });
 
 const workbook = XLSX.readFile(INPUT_FILE);
 const sheet = workbook.Sheets["Liste"];
-const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
+const rawData = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1 });
+
+function cellText(value: unknown): string {
+  return value == null ? "" : String(value).trim();
+}
 
 // Parse and structure data
 const subjects: {
@@ -29,10 +33,10 @@ for (let i = 1; i < rawData.length; i++) {
   if (!row[0] || !row[6]) continue;
 
   subjects.push({
-    type: row[0]?.toString().trim() ?? "",
-    domaine: row[2]?.toString().trim() ?? "",
-    theme: row[4]?.toString().trim() ?? "",
-    sujet: row[6]?.toString().trim() ?? "",
+    type: cellText(row[0]),
+    domaine: cellText(row[2]),
+    theme: cellText(row[4]),
+    sujet: cellText(row[6]),
   });
 }
 

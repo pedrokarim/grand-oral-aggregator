@@ -27,18 +27,21 @@ export function TimerWidget({ state }: WidgetComponentProps) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const n = parseInt(raw, 10);
-        if (!Number.isNaN(n) && n > 0) {
-          setDuration(n);
-          setRemaining(n);
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const storedDuration = parseInt(raw, 10);
+          if (!Number.isNaN(storedDuration) && storedDuration > 0) {
+            setDuration(storedDuration);
+            setRemaining(storedDuration);
+          }
         }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {

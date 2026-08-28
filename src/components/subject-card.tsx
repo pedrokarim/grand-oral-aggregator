@@ -63,18 +63,19 @@ export function SubjectCard({
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const summaryProvider = settings.ai.provider;
+  const summaryModel = settings.ai.model;
 
   // Load cached summary for this subject under current AI config.
   useEffect(() => {
     if (!isSuperAdmin) return;
-    const { provider, model } = settings.ai;
-    if (!provider || !model) return;
+    if (!summaryProvider || !summaryModel) return;
     const ctrl = new AbortController();
     const params = new URLSearchParams({
       subject: sujet,
       theme,
-      provider,
-      model,
+      provider: summaryProvider,
+      model: summaryModel,
       length: settings.summaryLength,
     });
     fetch(`/api/ai/summarize?${params.toString()}`, { signal: ctrl.signal })
@@ -84,7 +85,7 @@ export function SubjectCard({
       })
       .catch(() => {});
     return () => ctrl.abort();
-  }, [sujet, theme, settings.ai.provider, settings.ai.model, settings.summaryLength, isSuperAdmin]);
+  }, [sujet, theme, summaryProvider, summaryModel, settings.summaryLength, isSuperAdmin]);
 
   const hasAIConfig = settings.ai.apiKey || settings.ai.provider === "ollama";
 
