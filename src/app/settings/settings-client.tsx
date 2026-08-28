@@ -70,7 +70,7 @@ export default function SettingsPage() {
       const models = (data.models ?? []).map((m: { name: string }) => m.name);
       setOllamaModels(models);
       if (models.length > 0 && !models.includes(settings.ai.model)) {
-        updateSettings({ ai: { ...settings.ai, model: models[0] } });
+        updateSettings({ ai: { model: models[0] } });
       }
     } catch {
       setOllamaError("Impossible de contacter Ollama");
@@ -78,7 +78,7 @@ export default function SettingsPage() {
     } finally {
       setOllamaLoading(false);
     }
-  }, [settings.ai.baseUrl, settings.ai.model]);
+  }, [settings.ai.baseUrl, settings.ai.model, updateSettings]);
 
   useEffect(() => {
     if (settings.ai.provider === "ollama") {

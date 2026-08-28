@@ -19,40 +19,52 @@ const ANON: RoleInfo = {
   loading: false,
 };
 
+const LOADING: RoleInfo = { ...ANON, loading: true };
+
+interface RoleResponse {
+  role: Role;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+}
+
 export function useUserRole(): RoleInfo {
   const { data: session, isPending } = useSession();
-  const [info, setInfo] = useState<RoleInfo>({ ...ANON, loading: true });
+  const userId = session?.user?.id;
+  const [result, setResult] = useState<{
+    userId: string;
+    info: RoleInfo;
+  } | null>(null);
 
   useEffect(() => {
-    if (isPending) return;
-    if (!session?.user) {
-      setInfo(ANON);
-      return;
-    }
+    if (!userId) return;
     let cancelled = false;
-    setInfo((prev) => ({ ...prev, loading: true }));
     fetch("/api/user/role", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
+      .then((data: RoleResponse | null) => {
         if (cancelled) return;
         if (!data) {
-          setInfo(ANON);
+          setResult({ userId, info: ANON });
           return;
         }
-        setInfo({
-          role: data.role,
-          isAdmin: !!data.isAdmin,
-          isSuperAdmin: !!data.isSuperAdmin,
-          loading: false,
+        setResult({
+          userId,
+          info: {
+            role: data.role,
+            isAdmin: data.isAdmin,
+            isSuperAdmin: data.isSuperAdmin,
+            loading: false,
+          },
         });
       })
       .catch(() => {
-        if (!cancelled) setInfo(ANON);
+        if (!cancelled) setResult({ userId, info: ANON });
       });
     return () => {
       cancelled = true;
     };
-  }, [session?.user?.id, isPending]);
+  }, [userId]);
 
-  return info;
+  if (isPending) return LOADING;
+  if (!userId) return ANON;
+  return result?.userId === userId ? result.info : LOADING;
 }

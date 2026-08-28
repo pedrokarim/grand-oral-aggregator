@@ -20,6 +20,8 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const summaryProvider = settings.ai.provider;
+  const summaryModel = settings.ai.model;
 
   async function generateWithStream(force: boolean) {
     setFiche("");
@@ -42,14 +44,13 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
   // On mount: check for cached fiche
   useEffect(() => {
     if (!isSuperAdmin) return;
-    const { provider, model } = settings.ai;
-    if (!provider || !model) return;
+    if (!summaryProvider || !summaryModel) return;
     const ctrl = new AbortController();
     const params = new URLSearchParams({
       kind: "theme",
       theme,
-      provider,
-      model,
+      provider: summaryProvider,
+      model: summaryModel,
     });
     fetch(`/api/ai/summarize?${params.toString()}`, { signal: ctrl.signal })
       .then((r) => r.json())
@@ -61,7 +62,7 @@ export function ThemeFiche({ theme, subjects }: ThemeFicheProps) {
       })
       .catch(() => {});
     return () => ctrl.abort();
-  }, [theme, settings.ai.provider, settings.ai.model, isSuperAdmin]);
+  }, [theme, summaryProvider, summaryModel, isSuperAdmin]);
 
   async function generate(force = false) {
     if (loading) return;

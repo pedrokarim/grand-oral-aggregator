@@ -46,7 +46,7 @@ export function MySubjectsList({ color, initialSubjects }: MySubjectsListProps) 
   if (subjects.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-[#D2D3CC] dark:border-[#3a3b3f] p-8 text-center text-[#9EA096]">
-        Vous n'avez ajouté aucun sujet dans ce thème pour l'instant.
+        Vous n&apos;avez ajouté aucun sujet dans ce thème pour l&apos;instant.
       </div>
     );
   }

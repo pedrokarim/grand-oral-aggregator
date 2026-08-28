@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 interface MentionUser {
   id: string;
@@ -24,10 +24,9 @@ export function MentionAutocomplete({
   visible,
   onSelect,
   onClose,
-  anchorRef,
 }: MentionAutocompleteProps) {
   const [users, setUsers] = useState<MentionUser[]>([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selection, setSelection] = useState({ query: "", index: 0 });
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,24 +37,28 @@ export function MentionAutocomplete({
       .catch(() => setUsers([]));
   }, [fetchUrl, visible]);
 
-  const filtered = users.filter((u) => {
-    const name = (u.displayName || u.name).toLowerCase();
-    return name.includes(query.toLowerCase());
-  });
-
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
+  const filtered = useMemo(
+    () =>
+      users.filter((user) => {
+        const name = (user.displayName || user.name).toLowerCase();
+        return name.includes(query.toLowerCase());
+      }),
+    [query, users],
+  );
+  const selectedIndex = selection.query === query ? selection.index : 0;
 
   useEffect(() => {
     if (!visible) return;
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1));
+        setSelection({
+          query,
+          index: Math.min(selectedIndex + 1, filtered.length - 1),
+        });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.max(i - 1, 0));
+        setSelection({ query, index: Math.max(selectedIndex - 1, 0) });
       } else if (e.key === "Enter" || e.key === "Tab") {
         e.preventDefault();
         if (filtered[selectedIndex]) onSelect(filtered[selectedIndex]);
@@ -66,7 +69,7 @@ export function MentionAutocomplete({
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [visible, filtered, selectedIndex, onSelect, onClose]);
+  }, [visible, filtered, query, selectedIndex, onSelect, onClose]);
 
   if (!visible || filtered.length === 0) return null;
 

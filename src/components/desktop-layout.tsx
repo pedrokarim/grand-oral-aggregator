@@ -339,7 +339,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
       clearTimeout(renderTimer);
       window.removeEventListener("resize", handleResize);
     };
-  }, [computePositions]);
+  }, [allApps, computePositions]);
 
   // Auto-open/focus a window for the current route on first load.
   // openWindow dedupes by path, so if a restored window matches, it is brought
@@ -351,7 +351,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     if (hasAutoOpened.current) return;
     hasAutoOpened.current = true;
     openWindow(pathname, getWindowTitle(pathname));
-  }, []);
+  }, [openWindow, pathname]);
 
   // Refs for stable postMessage handler (avoid re-attaching on every state change)
   const openWindowRef = useRef(openWindow);
@@ -553,29 +553,32 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
     if (lastLayoutRef.current === desktopLayout) return;
     lastLayoutRef.current = desktopLayout;
     if (desktopLayout !== "grid") return;
-    const rect = desktopRef.current?.getBoundingClientRect();
-    const w = rect?.width ?? window.innerWidth;
-    const h = rect?.height ?? window.innerHeight;
-    setIconPositions((prev) => {
-      const out: IconPositions = {};
-      const occupied = new Set<string>();
-      let changed = false;
-      // Sort top-to-bottom, left-to-right so visually higher icons get cell
-      // priority on conflicts — feels more natural than label order.
-      const sorted = Object.entries(prev).sort(([, a], [, b]) => {
-        if (a.y !== b.y) return a.y - b.y;
-        return a.x - b.x;
+    const frame = requestAnimationFrame(() => {
+      const rect = desktopRef.current?.getBoundingClientRect();
+      const w = rect?.width ?? window.innerWidth;
+      const h = rect?.height ?? window.innerHeight;
+      setIconPositions((prev) => {
+        const out: IconPositions = {};
+        const occupied = new Set<string>();
+        let changed = false;
+        // Sort top-to-bottom, left-to-right so visually higher icons get cell
+        // priority on conflicts — feels more natural than label order.
+        const sorted = Object.entries(prev).sort(([, a], [, b]) => {
+          if (a.y !== b.y) return a.y - b.y;
+          return a.x - b.x;
+        });
+        for (const [label, pos] of sorted) {
+          const snapped = snapToGridSafe(pos, occupied, w, h);
+          occupied.add(snapped.key);
+          if (snapped.x !== pos.x || snapped.y !== pos.y) changed = true;
+          out[label] = { x: snapped.x, y: snapped.y };
+        }
+        if (!changed) return prev;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+        return out;
       });
-      for (const [label, pos] of sorted) {
-        const snapped = snapToGridSafe(pos, occupied, w, h);
-        occupied.add(snapped.key);
-        if (snapped.x !== pos.x || snapped.y !== pos.y) changed = true;
-        out[label] = { x: snapped.x, y: snapped.y };
-      }
-      if (!changed) return prev;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
-      return out;
     });
+    return () => cancelAnimationFrame(frame);
   }, [desktopLayout]);
 
   const resetIcons = () => {

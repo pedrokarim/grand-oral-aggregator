@@ -27,6 +27,9 @@ export default function ArticleDetailPage() {
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [refetching, setRefetching] = useState(false);
   const [refetchError, setRefetchError] = useState<string | null>(null);
+  const articleSlug = article?.slug;
+  const summaryProvider = settings.ai.provider;
+  const summaryModel = settings.ai.model;
 
   useEffect(() => {
     if (!slug) return;
@@ -49,14 +52,12 @@ export default function ArticleDetailPage() {
 
   // Restore any cached summary so it survives page reloads
   useEffect(() => {
-    if (!article) return;
-    const { provider, model } = settings.ai;
-    if (!provider || !model) return;
+    if (!articleSlug || !summaryProvider || !summaryModel) return;
     const ctrl = new AbortController();
     const params = new URLSearchParams({
-      slug: article.slug,
-      provider,
-      model,
+      slug: articleSlug,
+      provider: summaryProvider,
+      model: summaryModel,
       length: settings.summaryLength,
     });
     fetch(`/api/ai/summarize?${params.toString()}`, { signal: ctrl.signal })
@@ -69,7 +70,7 @@ export default function ArticleDetailPage() {
       })
       .catch(() => {});
     return () => ctrl.abort();
-  }, [article?.slug, settings.ai.provider, settings.ai.model, settings.summaryLength]);
+  }, [articleSlug, summaryProvider, summaryModel, settings.summaryLength]);
 
   async function generateSummary() {
     if (!article) return;

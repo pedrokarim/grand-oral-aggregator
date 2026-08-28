@@ -22,7 +22,7 @@ type FlatItem = {
  * left at 60%, compact list on the right at 40%.
  */
 export function SplitHeroLayout({ data }: SearchLayoutProps) {
-  const { query, onQueryChange, themes, builtInSubjects, customSubjects, news, loading, hasQuery } = data;
+  const { query, onQueryChange, themes, builtInSubjects, customSubjects, news, hasQuery } = data;
 
   const items: FlatItem[] = [];
   for (const a of news) items.push({ key: `n-${a.slug}`, href: `/actualites/${a.slug}`, title: a.title, sub: a.source, theme: a.theme, image: a.image, kind: "Actualité" });

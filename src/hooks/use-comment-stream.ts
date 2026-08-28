@@ -32,7 +32,10 @@ export function useCommentStream(
   callbacks: CommentStreamCallbacks,
 ) {
   const ref = useRef(callbacks);
-  ref.current = callbacks;
+
+  useEffect(() => {
+    ref.current = callbacks;
+  }, [callbacks]);
 
   useEffect(() => {
     if (!themeId) return;

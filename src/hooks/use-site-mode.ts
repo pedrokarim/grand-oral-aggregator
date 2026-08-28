@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 export type SiteMode = "desktop" | "site";
 
@@ -27,27 +27,26 @@ export function setSiteMode(mode: SiteMode) {
   window.dispatchEvent(new CustomEvent(EVENT, { detail: mode }));
 }
 
+function subscribe(onStoreChange: () => void): () => void {
+  const onModeChange = () => onStoreChange();
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY) onStoreChange();
+  };
+  window.addEventListener(EVENT, onModeChange);
+  window.addEventListener("storage", onStorage);
+  return () => {
+    window.removeEventListener(EVENT, onModeChange);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
 export function useSiteMode(): [SiteMode, (mode: SiteMode) => void, boolean] {
-  const [mode, setMode] = useState<SiteMode>("desktop");
+  const mode = useSyncExternalStore<SiteMode>(subscribe, readStored, () => "desktop");
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setMode(readStored());
-    setHydrated(true);
-
-    const onChange = (e: Event) => {
-      const detail = (e as CustomEvent<SiteMode>).detail;
-      if (detail === "site" || detail === "desktop") setMode(detail);
-    };
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setMode(readStored());
-    };
-    window.addEventListener(EVENT, onChange);
-    window.addEventListener("storage", onStorage);
-    return () => {
-      window.removeEventListener(EVENT, onChange);
-      window.removeEventListener("storage", onStorage);
-    };
+    const frame = requestAnimationFrame(() => setHydrated(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   const update = useCallback((next: SiteMode) => {

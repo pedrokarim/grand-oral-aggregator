@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Search, Filter } from "lucide-react";
 import { EmbedLink } from "@/components/embed-link";
 import { slugifySubject } from "@/lib/data";
@@ -26,7 +26,10 @@ export function SidebarListLayout({ data }: SearchLayoutProps) {
   const [themeFilter, setThemeFilter] = useState<Set<string>>(new Set());
   const [kindFilter, setKindFilter] = useState<Set<Kind>>(new Set(ALL_KINDS.map((k) => k.id)));
 
-  const themeAllowed = (t: string) => themeFilter.size === 0 || themeFilter.has(t);
+  const themeAllowed = useCallback(
+    (theme: string) => themeFilter.size === 0 || themeFilter.has(theme),
+    [themeFilter],
+  );
 
   const rows = useMemo(() => {
     type Row = {
@@ -54,7 +57,7 @@ export function SidebarListLayout({ data }: SearchLayoutProps) {
       for (const a of news) if (themeAllowed(a.theme)) out.push({ key: `n-${a.slug}`, href: `/actualites/${a.slug}`, kind: "news", title: a.title, theme: a.theme, sub: a.source, thumb: a.image ?? a.favicon });
     }
     return out;
-  }, [themes, customSubjects, builtInSubjects, news, kindFilter, themeFilter]);
+  }, [themes, customSubjects, builtInSubjects, news, kindFilter, themeAllowed]);
 
   const toggleTheme = (t: string) =>
     setThemeFilter((prev) => {

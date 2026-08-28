@@ -23,7 +23,7 @@ type FlatItem = {
  */
 export function CommandPaletteLayout({ data }: SearchLayoutProps) {
   const { query, onQueryChange, themes, builtInSubjects, customSubjects, news, loading, hasQuery } = data;
-  const [cursor, setCursor] = useState(0);
+  const [selection, setSelection] = useState({ key: "", index: 0 });
   const listRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo<FlatItem[]>(() => {
@@ -35,19 +35,21 @@ export function CommandPaletteLayout({ data }: SearchLayoutProps) {
     return out;
   }, [news, customSubjects, builtInSubjects, themes]);
 
-  useEffect(() => {
-    setCursor(0);
-  }, [query, items.length]);
+  const selectionKey = `${query}\u0000${items.length}`;
+  const cursor = selection.key === selectionKey ? selection.index : 0;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (items.length === 0) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setCursor((c) => Math.min(c + 1, items.length - 1));
+        setSelection({
+          key: selectionKey,
+          index: Math.min(cursor + 1, items.length - 1),
+        });
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setCursor((c) => Math.max(c - 1, 0));
+        setSelection({ key: selectionKey, index: Math.max(cursor - 1, 0) });
       } else if (e.key === "Enter") {
         e.preventDefault();
         const sel = items[cursor];
@@ -56,7 +58,7 @@ export function CommandPaletteLayout({ data }: SearchLayoutProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [items, cursor]);
+  }, [items, cursor, selectionKey]);
 
   const grouped = {
     Actualités: items.filter((i) => i.group === "Actualités"),
@@ -115,7 +117,9 @@ export function CommandPaletteLayout({ data }: SearchLayoutProps) {
                       <EmbedLink
                         key={r.key}
                         href={r.href}
-                        onMouseEnter={() => setCursor(globalIdx)}
+                        onMouseEnter={() =>
+                          setSelection({ key: selectionKey, index: globalIdx })
+                        }
                         className={`flex items-center gap-3 px-4 py-2 transition-colors ${
                           active
                             ? "bg-[#EB9D2A]/10"

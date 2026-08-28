@@ -2,24 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import { StickyNote, Check } from "lucide-react";
-import type { WidgetComponentProps } from "@/lib/widgets-types";
 
 const STORAGE_KEY = "widget-notes-content";
 
-export function NotesWidget(_props: WidgetComponentProps) {
+export function NotesWidget() {
   const [value, setValue] = useState("");
   const [saved, setSaved] = useState(false);
   const loadedRef = useRef(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setValue(raw);
-    } catch {
-      /* ignore */
-    }
-    loadedRef.current = true;
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) setValue(raw);
+      } catch {
+        /* ignore */
+      }
+      loadedRef.current = true;
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {

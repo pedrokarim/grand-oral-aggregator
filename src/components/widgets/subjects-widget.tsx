@@ -14,7 +14,8 @@ export function SubjectsWidget({ onOpenRoute }: WidgetComponentProps) {
   const [pick, setPick] = useState<Subject | null>(null);
 
   useEffect(() => {
-    setPick(pickRandom());
+    const timer = window.setTimeout(() => setPick(pickRandom()), 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const reroll = useCallback(() => {
@@ -33,7 +34,7 @@ export function SubjectsWidget({ onOpenRoute }: WidgetComponentProps) {
       <div className="flex items-center gap-1.5">
         <Sparkles className="w-3.5 h-3.5 text-[#EB9D2A]" />
         <span className="text-[11px] uppercase tracking-wider text-[#9EA096] font-semibold">
-          Sujet pour s'entraîner
+          Sujet pour s&apos;entraîner
         </span>
       </div>
 
