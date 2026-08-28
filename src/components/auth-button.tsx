@@ -13,7 +13,7 @@ const statusColors: Record<string, string> = {
 };
 
 export function AuthButton() {
-  const { data: session, isPending } = useSession();
+  const { data: session, isPending, isAuthReady, error } = useSession();
   const role = useUserRole();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -43,7 +43,10 @@ export function AuthButton() {
   if (!session) {
     return (
       <button
-        onClick={() => signIn.social({ provider: "discord" })}
+        type="button"
+        onClick={() => void signIn()}
+        disabled={!isAuthReady}
+        title={error ?? "Se connecter avec Ascencia ID"}
         className="inline-flex items-center gap-1 px-2 py-0.5 text-[12px] font-medium text-[#9EA096] hover:text-[#FDFDF8] transition-colors cursor-default"
       >
         <LogIn className="w-3 h-3" />
@@ -123,7 +126,7 @@ export function AuthButton() {
             <button
               onClick={() => {
                 setOpen(false);
-                signOut();
+                void signOut();
               }}
               className="w-full flex items-center gap-2 px-3 py-1.5 text-[13px] text-[#4D4F46] dark:text-[#9EA096] hover:bg-[#E5E7E0] dark:hover:bg-[#2a2b2f] transition-colors cursor-default"
             >

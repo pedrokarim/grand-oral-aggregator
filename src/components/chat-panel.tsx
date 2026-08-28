@@ -350,7 +350,7 @@ export function ChatPanel({ open, onClose }: ChatPanelProps) {
           <div className="border-t border-[#E5E7E0] dark:border-[#2a2b2f] px-3 py-2">
             {!session ? (
               <button
-                onClick={() => signIn.social({ provider: "discord" })}
+                onClick={() => void signIn()}
                 className="w-full flex items-center justify-center gap-2 py-2 text-[13px] font-medium
                   text-[#9EA096] hover:text-[#23251D] dark:hover:text-[#EAECF6]
                   border border-[#D2D3CC] dark:border-[#3a3b3f] rounded-md

@@ -7,7 +7,7 @@ Le repo embarque un `Dockerfile` (Next.js standalone, Bun) et un `docker-compose
 Sur le serveur, dans le dossier du projet, créer un fichier `.env` à côté du `docker-compose.yml`. Générer des secrets aléatoires :
 
 ```sh
-echo "BETTER_AUTH_SECRET=$(openssl rand -hex 32)"
+echo "ASCENCIA_SESSION_SECRET=$(openssl rand -hex 32)"
 echo "CRON_SECRET=$(openssl rand -hex 32)"
 echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)"
 ```
@@ -23,20 +23,15 @@ POSTGRES_DB=grandoral
 # réservés comme #, @, :, /, ?, &, %.
 DATABASE_URL=postgresql://grandoral:<mot de passe URL-encodé>@postgres:5432/grandoral?schema=public
 
-# App URLs (mettre l'URL publique réelle, pas localhost)
+# URL publique (mettre l'URL réelle, pas localhost)
 NEXT_PUBLIC_APP_URL=https://grandoral.example.com
-BETTER_AUTH_URL=https://grandoral.example.com
 
-# Better Auth
-BETTER_AUTH_SECRET=<32+ bytes hex>
-
-# Discord OAuth — ajouter https://grandoral.example.com/api/auth/callback/discord
-# dans les redirect URLs du portail Discord Developer
-DISCORD_CLIENT_ID=...
-DISCORD_CLIENT_SECRET=...
-
-# Discord IDs autorisés à devenir superadmin (séparés par virgules)
-SUPER_ADMIN_DISCORD_IDS=319842407829078016
+# Ascencia ID — client web avec code + PKCE
+ASCENCIA_ISSUER=https://id.ascencia.re
+ASCENCIA_CLIENT_ID=asc_cid_...
+ASCENCIA_CLIENT_SECRET=asc_cs_...
+ASCENCIA_SESSION_SECRET=<32+ bytes hex>
+ASCENCIA_REDIRECT_URI=https://grandoral.example.com/auth/callback
 
 # Cron — voir section 4
 CRON_SECRET=<32+ bytes hex>
@@ -49,7 +44,13 @@ CRON_SECRET=<32+ bytes hex>
 # HOST_PORT=4070
 ```
 
-Le `docker-compose.yml` lit ces variables et **refuse de démarrer** si les secrets obligatoires manquent (`POSTGRES_PASSWORD`, `DATABASE_URL`, `BETTER_AUTH_SECRET`, `CRON_SECRET`, etc.).
+Le `docker-compose.yml` lit ces variables et **refuse de démarrer** si les secrets obligatoires manquent (`POSTGRES_PASSWORD`, `DATABASE_URL`, `ASCENCIA_CLIENT_SECRET`, `ASCENCIA_SESSION_SECRET`, `CRON_SECRET`, etc.).
+
+Lors de la première connexion Ascencia ID, un profil historique portant la
+même adresse vérifiée est rattaché sur place. Son identifiant local ne change
+pas : messages, commentaires, sujets et préférences sont conservés. La
+migration invalide en revanche les anciennes sessions Better Auth et efface
+leurs jetons Discord, puisqu'ils ne sont plus utilisés.
 
 ## 2. Build et démarrage
 
@@ -92,7 +93,7 @@ Caddy gère le certificat Let's Encrypt automatiquement.
 Un fichier `nginx.conf` modèle (gitignoré) est fourni à la racine du repo. Le TLS est terminé par Cloudflare ; l'origine nginx reste en HTTP sur le port 80 et proxy vers `127.0.0.1:${HOST_PORT}` avec :
 - Headers de sécurité (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`)
 - `X-Real-IP` lu depuis `CF-Connecting-IP`
-- `X-Forwarded-Proto: https` forcé (Cloudflare termine TLS) pour que Better Auth émette des cookies sécurisés
+- `X-Forwarded-Proto: https` forcé (Cloudflare termine TLS) pour que l'application émette des cookies sécurisés
 - Support SSE (`proxy_buffering off`, `proxy_read_timeout 24h`) pour le chat / les commentaires temps réel
 
 **Cloudflare** : enregistrement A pour `grand-oral` → IP du serveur, proxy orange activé. SSL/TLS mode "Flexible" (ou "Full" avec un Origin Certificate si tu préfères chiffrer aussi Cloudflare ↔ origine).

@@ -7,7 +7,7 @@ Plateforme de préparation au Grand Oral (Master informatique) : thèmes, sujets
 - **Next.js 16** (App Router) + **React 19** + **TypeScript**
 - **Bun** (runtime + bundler)
 - **Postgres 17** + **Prisma 7** (avec adapter `@prisma/adapter-pg`)
-- **Better Auth** + Discord OAuth
+- **Ascencia ID** (OAuth 2.0/OIDC, code + PKCE, sessions serveur)
 - **Tailwind 4** + **shadcn/ui** + **Radix UI** + **Framer Motion**
 - **Server-Sent Events** pour le chat / commentaires temps réel
 - **react-markdown** + Web Speech API (TTS) pour les résumés
@@ -21,7 +21,8 @@ Plateforme de préparation au Grand Oral (Master informatique) : thèmes, sujets
 - Cache persistant des résumés en base (`AiSummary`)
 - Chat global + commentaires par thème, avec mentions, édition, suppression et historique
 - Deux modes d'affichage : "OS desktop" avec fenêtres iframe ou layout site classique
-- Système de rôles : `user` / `admin` (en DB) / `superadmin` (dérivé d'`SUPER_ADMIN_DISCORD_IDS`, jamais stocké)
+- Session partagée entre le bureau et ses fenêtres iframe via `BroadcastChannel`
+- Système de rôles : `user` / `admin` applicatif / `superadmin` plateforme, fourni par Ascencia ID
 
 ## Démarrage local
 
@@ -48,12 +49,12 @@ Variables d'environnement attendues dans `.env` (cf. `docs/DEPLOYMENT.md` §1 po
 
 ```env
 DATABASE_URL=postgresql://grandoral:grandoral@localhost:5432/grandoral?schema=public
-BETTER_AUTH_SECRET=<32+ bytes hex>
-BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-DISCORD_CLIENT_ID=...
-DISCORD_CLIENT_SECRET=...
-SUPER_ADMIN_DISCORD_IDS=<ton id discord>
+ASCENCIA_ISSUER=https://id.ascencia.re
+ASCENCIA_CLIENT_ID=asc_cid_...
+ASCENCIA_CLIENT_SECRET=asc_cs_...
+ASCENCIA_SESSION_SECRET=<32+ bytes hex>
+ASCENCIA_REDIRECT_URI=http://localhost:3000/auth/callback
 CRON_SECRET=<32+ bytes hex>
 # NEWS_API_KEY=  # optionnel — bascule sur NewsAPI au lieu de Bing News RSS
 ```
@@ -66,9 +67,17 @@ CRON_SECRET=<32+ bytes hex>
 | `scripts/seed.ts` | Peuple la DB : thèmes, sujets, articles depuis `resources/news-cache/` |
 | `scripts/fetch-news.ts` | Scrape les actualités Bing News pour les 10 thèmes et upsert en DB |
 
+Vérifications avant livraison :
+
+```sh
+bun run test
+bunx tsc --noEmit
+bun run build
+```
+
 ## Routes API
 
-- `GET/POST /api/auth/[...all]` — Better Auth (Discord OAuth)
+- `GET /api/auth/config|session`, `POST /api/auth/exchange|signout` — Ascencia ID
 - `GET/POST/PATCH/DELETE /api/chat` + `GET /api/chat/stream` (SSE)
 - `GET/POST/PATCH/DELETE /api/comments` + `GET /api/comments/stream`
 - `GET /api/news`, `GET /api/news/[slug]`, `POST /api/news/[slug]/scrape` (auth)
